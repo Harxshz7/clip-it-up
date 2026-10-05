@@ -4,6 +4,17 @@
 
 ---
 
+## 📚 Documentation & Onboarding
+
+> **Start here**: [CONTRIBUTING.md](CONTRIBUTING.md) $\rightarrow$ [IMPLEMENTATION.md](IMPLEMENTATION.md) $\rightarrow$ [ARCHITECTURE.md](ARCHITECTURE.md)
+
+- **[CONTRIBUTING.md](CONTRIBUTING.md)**: Developer setup in under 10 commands, PR workflow, code standards, conflict avoidance, and Definition of Done.
+- **[IMPLEMENTATION.md](IMPLEMENTATION.md)**: Goals, v1 scope, 8-phase delivery roadmap, task checklists tagged by subsystem, and developer ownership split.
+- **[ARCHITECTURE.md](ARCHITECTURE.md)**: System topology diagram, pipeline execution & idempotency rules, data flows, and key architectural decisions.
+- **[docs/cost-sheet.md](docs/cost-sheet.md)**: Per-stage ₹ INR rate card and measurement methodology.
+
+---
+
 ## 🏛 Architecture Diagram
 
 ```text
@@ -141,6 +152,8 @@ clip-it-up/
   ├── docs/               # cost-sheet.md (₹ per source-hour rates & methodology)
   ├── eval/               # Evaluation benchmark placeholder (Phase 2)
   ├── Makefile            # Convenience CLI targets (up, down, migrate, test, lint)
-  ├── DECISIONS.md        # Architecture Decision Records
+  ├── CONTRIBUTING.md     # Developer guide, git workflow, and definition of done
+  ├── IMPLEMENTATION.md   # Goals, phase table, task checklist, and team split
+  ├── ARCHITECTURE.md     # Topology diagram, idempotency rules, and ADR decisions
   └── README.md
 ```
