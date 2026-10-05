@@ -1,0 +1,27 @@
+[project]
+name = "clip-shared"
+version = "0.1.0"
+description = "Shared models, database, storage, and utilities for clip-it-up"
+requires-python = ">=3.12"
+dependencies = [
+    "pydantic>=2.7.0",
+    "pydantic-settings>=2.2.0",
+    "sqlalchemy>=2.0.30",
+    "asyncpg>=0.29.0",
+    "psycopg2-binary>=2.9.9",
+    "alembic>=1.13.1",
+    "redis>=5.0.4",
+    "boto3>=1.34.0",
+    "botocore>=1.34.0",
+    "celery>=5.4.0",
+    "python-jose[cryptography]>=3.3.0",
+    "httpx>=0.27.0",
+    "structlog>=24.1.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/clip_shared"]

@@ -1,0 +1,10 @@
+{
+  "name": "clip-it-up-monorepo",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --filter @clip-it-up/web dev",
+    "build": "pnpm --filter @clip-it-up/shared build && pnpm --filter @clip-it-up/web build",
+    "lint": "pnpm --filter @clip-it-up/web lint",
+    "typecheck": "pnpm --filter @clip-it-up/shared typecheck && pnpm --filter @clip-it-up/web typecheck"
+  }
+}

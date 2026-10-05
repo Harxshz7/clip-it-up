@@ -1,0 +1,87 @@
+from functools import lru_cache
+from typing import List, Literal, Optional
+from pydantic import Field, field_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="ignore",
+    )
+
+    # Environment
+    ENVIRONMENT: Literal["development", "staging", "production"] = "development"
+    LOG_LEVEL: str = "info"
+
+    # Database
+    DATABASE_URL: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/clip_it_up"
+    DATABASE_SYNC_URL: str = "postgresql://postgres:postgres@localhost:5432/clip_it_up"
+    DB_POOL_SIZE: int = 10
+    DB_MAX_OVERFLOW: int = 20
+
+    # Redis
+    REDIS_URL: str = "redis://localhost:6379/0"
+
+    # Storage (S3 / MinIO / Cloudflare R2)
+    S3_ENDPOINT_URL: str = "http://localhost:9000"
+    S3_PUBLIC_ENDPOINT_URL: Optional[str] = "http://localhost:9000"
+    S3_ACCESS_KEY_ID: str = "minioadmin"
+    S3_SECRET_ACCESS_KEY: str = "minioadmin"
+    S3_BUCKET_NAME: str = "clip-it-up-videos"
+    S3_REGION: str = "us-east-1"
+    S3_USE_SSL: bool = False
+
+    # Auth (Clerk)
+    CLERK_SECRET_KEY: Optional[str] = None
+    CLERK_PUBLISHABLE_KEY: Optional[str] = None
+    CLERK_JWKS_URL: Optional[str] = "https://api.clerk.com/v1/jwks"
+    CLERK_ISSUER: Optional[str] = None
+
+    # Dev Auth Bypass
+    DEV_AUTH_BYPASS: bool = True
+    DEV_USER_ID: str = "00000000-0000-0000-0000-000000000001"
+    DEV_USER_EMAIL: str = "dev@clipitup.local"
+    DEV_CLERK_USER_ID: str = "user_dev_bypass"
+
+    # API Settings
+    API_HOST: str = "0.0.0.0"
+    API_PORT: int = 8000
+    CORS_ORIGINS: str = "http://localhost:3000,http://127.0.0.1:3000"
+
+    MAX_UPLOAD_SIZE_BYTES: int = 5 * 1024 * 1024 * 1024  # 5 GB
+    MULTIPART_THRESHOLD_BYTES: int = 100 * 1024 * 1024  # 100 MB
+    MULTIPART_PART_SIZE_BYTES: int = 10 * 1024 * 1024  # 10 MB per part
+    PRESIGNED_URL_EXPIRY_SECONDS: int = 3600
+
+    ALLOWED_CONTENT_TYPES: List[str] = Field(
+        default_factory=lambda: [
+            "video/mp4",
+            "video/quicktime",
+            "video/x-matroska",
+            "video/webm",
+        ]
+    )
+
+    # Pipeline Simulation Settings
+    PIPELINE_STAGE_DURATION_SECONDS: float = 2.0
+    INJECT_RANDOM_FAILURE: bool = False
+
+    # Sentry
+    SENTRY_DSN: Optional[str] = None
+
+    @property
+    def cors_origins_list(self) -> List[str]:
+        return [origin.strip() for origin in self.CORS_ORIGINS.split(",") if origin.strip()]
+
+    @field_validator("DEV_AUTH_BYPASS")
+    @classmethod
+    def validate_dev_bypass(cls, v: bool, info) -> bool:
+        # Note: in pydantic-settings, validation runs per field
+        return v
+
+
+@lru_cache()
+def get_settings() -> Settings:
+    return Settings()

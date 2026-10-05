@@ -1,0 +1,3 @@
+# Root docker compose referencing infra/docker-compose.yml
+include:
+  - infra/docker-compose.yml
