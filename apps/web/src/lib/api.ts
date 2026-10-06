@@ -249,4 +249,63 @@ export const api = {
   async getUsageSummary(token?: string | null): Promise<UsageSummary> {
     return request<UsageSummary>("/usage/summary", {}, token);
   },
+
+  // 8. Phase 1 Transcript endpoints
+  async getTranscript(
+    videoId: string,
+    params?: { from_ms?: number; to_ms?: number },
+    token?: string | null
+  ): Promise<TranscriptResponse> {
+    const searchParams = new URLSearchParams();
+    if (params?.from_ms !== undefined) searchParams.set("from_ms", params.from_ms.toString());
+    if (params?.to_ms !== undefined) searchParams.set("to_ms", params.to_ms.toString());
+    const queryStr = searchParams.toString() ? `?${searchParams.toString()}` : "";
+    return request<TranscriptResponse>(`/videos/${videoId}/transcript${queryStr}`, {}, token);
+  },
+
+  async getTranscriptWords(
+    videoId: string,
+    params?: { from_ms?: number; to_ms?: number },
+    token?: string | null
+  ): Promise<TranscriptWordsResponse> {
+    const searchParams = new URLSearchParams();
+    if (params?.from_ms !== undefined) searchParams.set("from_ms", params.from_ms.toString());
+    if (params?.to_ms !== undefined) searchParams.set("to_ms", params.to_ms.toString());
+    const queryStr = searchParams.toString() ? `?${searchParams.toString()}` : "";
+    return request<TranscriptWordsResponse>(`/videos/${videoId}/transcript/words${queryStr}`, {}, token);
+  },
+
+  async updateSpeaker(
+    videoId: string,
+    speakerId: string,
+    displayName: string,
+    token?: string | null
+  ): Promise<Speaker> {
+    return request<Speaker>(
+      `/videos/${videoId}/speakers/${speakerId}`,
+      {
+        method: "PATCH",
+        body: JSON.stringify({ display_name: displayName }),
+      },
+      token
+    );
+  },
+
+  async getProxyUrl(videoId: string, token?: string | null): Promise<ProxyUrlResponse> {
+    return request<ProxyUrlResponse>(`/videos/${videoId}/proxy-url`, {}, token);
+  },
+
+  getExportUrl(videoId: string, format: ExportFormat): string {
+    return `${API_BASE_URL}/videos/${videoId}/transcript/export?format=${format}`;
+  },
+
+  async exportTranscriptText(videoId: string, format: ExportFormat, token?: string | null): Promise<string> {
+    const url = `${API_BASE_URL}/videos/${videoId}/transcript/export?format=${format}`;
+    const headers: Record<string, string> = {};
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+    const res = await fetch(url, { headers });
+    if (!res.ok) throw new ApiError(`Failed to export transcript (${res.status})`, `HTTP_${res.status}`);
+    return res.text();
+  },
 };
+

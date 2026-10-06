@@ -111,11 +111,11 @@ services:
       timeout: 5s
       retries: 5
 
-  worker:
+  worker-cpu:
     build:
       context: ..
-      dockerfile: apps/worker/Dockerfile
-    container_name: clip_worker
+      dockerfile: apps/worker/Dockerfile.cpu
+    container_name: clip_worker_cpu
     restart: unless-stopped
     environment:
       ENVIRONMENT: development
@@ -129,8 +129,64 @@ services:
       S3_BUCKET_NAME: clip-it-up-videos
       S3_REGION: us-east-1
       S3_USE_SSL: "false"
+      TRANSCRIBE_BACKEND: mock
+      HF_TOKEN: ${HF_TOKEN:-}
+      WHISPER_MODEL: ${WHISPER_MODEL:-large-v3}
+      WHISPER_COMPUTE_TYPE: ${WHISPER_COMPUTE_TYPE:-float16}
+      DIARIZATION_ENABLED: ${DIARIZATION_ENABLED:-true}
+      MIN_SPEAKERS: ${MIN_SPEAKERS:-1}
+      MAX_SPEAKERS: ${MAX_SPEAKERS:-10}
+      DEEPGRAM_API_KEY: ${DEEPGRAM_API_KEY:-}
       PIPELINE_STAGE_DURATION_SECONDS: 2
       INJECT_RANDOM_FAILURE: "false"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      api:
+        condition: service_healthy
+
+  worker-gpu:
+    profiles: ["gpu"]
+    build:
+      context: ..
+      dockerfile: apps/worker/Dockerfile.gpu
+    container_name: clip_worker_gpu
+    restart: unless-stopped
+    environment:
+      ENVIRONMENT: development
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@postgres:5432/clip_it_up
+      DATABASE_SYNC_URL: postgresql://postgres:postgres@postgres:5432/clip_it_up
+      REDIS_URL: redis://redis:6379/0
+      S3_ENDPOINT_URL: http://minio:9000
+      S3_PUBLIC_ENDPOINT_URL: http://localhost:9000
+      S3_ACCESS_KEY_ID: minioadmin
+      S3_SECRET_ACCESS_KEY: minioadmin
+      S3_BUCKET_NAME: clip-it-up-videos
+      S3_REGION: us-east-1
+      S3_USE_SSL: "false"
+      TRANSCRIBE_BACKEND: whisperx
+      HF_TOKEN: ${HF_TOKEN:-}
+      WHISPER_MODEL: ${WHISPER_MODEL:-large-v3}
+      WHISPER_COMPUTE_TYPE: ${WHISPER_COMPUTE_TYPE:-float16}
+      DIARIZATION_ENABLED: ${DIARIZATION_ENABLED:-true}
+      MIN_SPEAKERS: ${MIN_SPEAKERS:-1}
+      MAX_SPEAKERS: ${MAX_SPEAKERS:-10}
+      DEEPGRAM_API_KEY: ${DEEPGRAM_API_KEY:-}
+      PIPELINE_STAGE_DURATION_SECONDS: 2
+      INJECT_RANDOM_FAILURE: "false"
+    volumes:
+      - whisperx_cache:/root/.cache
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
     depends_on:
       postgres:
         condition: service_healthy
@@ -161,3 +217,4 @@ volumes:
   postgres_data:
   redis_data:
   minio_data:
+  whisperx_cache:

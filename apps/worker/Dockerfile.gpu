@@ -1,0 +1,48 @@
+# Stage 1: GPU Base builder with CUDA and WhisperX
+FROM nvidia/cuda:12.1.1-runtime-ubuntu22.04 AS runtime
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3.11 \
+    python3.11-venv \
+    python3.11-dev \
+    python3-pip \
+    build-essential \
+    ffmpeg \
+    libsndfile1 \
+    git \
+    curl \
+    libpq5 \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip install --no-cache-dir uv
+
+RUN uv venv /opt/venv --python python3.11
+ENV VIRTUAL_ENV=/opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Install PyTorch with CUDA 12.1 and WhisperX
+RUN uv pip install --no-cache-dir \
+    torch==2.3.1 \
+    torchaudio==2.3.1 \
+    --index-url https://download.pytorch.org/whl/cu121
+
+RUN uv pip install --no-cache-dir \
+    whisperx==3.1.1 \
+    pyannote.audio==3.1.1
+
+COPY packages/shared-py /app/packages/shared-py
+COPY apps/worker /app/apps/worker
+
+RUN uv pip install -e /app/packages/shared-py
+RUN uv pip install -e /app/apps/worker
+
+ENV PYTHONPATH="/app/packages/shared-py/src:/app/apps/worker/src:/app"
+ENV HF_HOME="/root/.cache/huggingface"
+ENV TORCH_HOME="/root/.cache/torch"
+
+CMD ["celery", "-A", "worker.celery_app.celery_app", "worker", "-Q", "gpu", "--loglevel=info", "--concurrency=1"]
