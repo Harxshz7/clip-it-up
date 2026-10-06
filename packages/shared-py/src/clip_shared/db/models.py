@@ -6,9 +6,11 @@ from typing import Optional, List, Dict, Any
 from sqlalchemy import (
     String,
     BigInteger,
+    Integer,
     Float,
     Numeric,
     DateTime,
+    Boolean,
     ForeignKey,
     Index,
     UniqueConstraint,
@@ -66,6 +68,12 @@ class Video(Base):
     storage_key: Mapped[str] = mapped_column(String(1024), nullable=False)
     size_bytes: Mapped[int] = mapped_column(BigInteger, nullable=False)
     duration_seconds: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    width: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    height: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    fps: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    has_audio: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    proxy_key: Mapped[Optional[str]] = mapped_column(String(1024), nullable=True)
+    audio_key: Mapped[Optional[str]] = mapped_column(String(1024), nullable=True)
     content_type: Mapped[str] = mapped_column(String(128), nullable=False)
     status: Mapped[str] = mapped_column(String(32), default="uploading", nullable=False)  # uploading | uploaded | processing | ready | failed
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
@@ -74,6 +82,7 @@ class Video(Base):
     user: Mapped["User"] = relationship("User", back_populates="videos")
     project: Mapped[Optional["Project"]] = relationship("Project", back_populates="videos")
     jobs: Mapped[List["Job"]] = relationship("Job", back_populates="video", cascade="all, delete-orphan")
+    transcript: Mapped[Optional["Transcript"]] = relationship("Transcript", back_populates="video", uselist=False, cascade="all, delete-orphan")
     usage_records: Mapped[List["Usage"]] = relationship("Usage", back_populates="video")
 
     __table_args__ = (
@@ -92,6 +101,7 @@ class Job(Base):
     current_stage: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     progress: Mapped[int] = mapped_column(BigInteger, default=0, nullable=False)
     error: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    partial_results: Mapped[Dict[str, Any]] = mapped_column(JSONB, default=dict, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
     started_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
     finished_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
@@ -131,6 +141,88 @@ class JobStage(Base):
     )
 
 
+class Transcript(Base):
+    __tablename__ = "transcripts"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    video_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("videos.id", ondelete="CASCADE"), unique=True, nullable=False, index=True)
+    language: Mapped[Optional[str]] = mapped_column(String(16), nullable=True)
+    status: Mapped[str] = mapped_column(String(32), default="running", nullable=False)  # running | ready | failed
+    model: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    backend: Mapped[Optional[str]] = mapped_column(String(32), nullable=True)
+    word_count: Mapped[int] = mapped_column(BigInteger, default=0, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+
+    # Relationships
+    video: Mapped["Video"] = relationship("Video", back_populates="transcript")
+    words: Mapped[List["TranscriptWord"]] = relationship("TranscriptWord", back_populates="transcript", cascade="all, delete-orphan", order_by="TranscriptWord.idx")
+    segments: Mapped[List["TranscriptSegment"]] = relationship("TranscriptSegment", back_populates="transcript", cascade="all, delete-orphan", order_by="TranscriptSegment.idx")
+    speakers: Mapped[List["Speaker"]] = relationship("Speaker", back_populates="transcript", cascade="all, delete-orphan", order_by="Speaker.label")
+
+    __table_args__ = (
+        Index("ix_transcripts_video_id", "video_id"),
+        Index("ix_transcripts_status", "status"),
+    )
+
+
+class TranscriptWord(Base):
+    __tablename__ = "transcript_words"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    transcript_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("transcripts.id", ondelete="CASCADE"), nullable=False, index=True)
+    idx: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    word: Mapped[str] = mapped_column(String(255), nullable=False)
+    start_ms: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    end_ms: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    speaker: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    confidence: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+
+    # Relationships
+    transcript: Mapped["Transcript"] = relationship("Transcript", back_populates="words")
+
+    __table_args__ = (
+        Index("ix_transcript_words_t_idx", "transcript_id", "idx"),
+        Index("ix_transcript_words_t_time", "transcript_id", "start_ms", "end_ms"),
+    )
+
+
+class TranscriptSegment(Base):
+    __tablename__ = "transcript_segments"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    transcript_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("transcripts.id", ondelete="CASCADE"), nullable=False, index=True)
+    idx: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    start_ms: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    end_ms: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    speaker: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    text: Mapped[str] = mapped_column(Text, nullable=False)
+
+    # Relationships
+    transcript: Mapped["Transcript"] = relationship("Transcript", back_populates="segments")
+
+    __table_args__ = (
+        Index("ix_transcript_segments_t_idx", "transcript_id", "idx"),
+        Index("ix_transcript_segments_t_time", "transcript_id", "start_ms", "end_ms"),
+    )
+
+
+class Speaker(Base):
+    __tablename__ = "speakers"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    transcript_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("transcripts.id", ondelete="CASCADE"), nullable=False, index=True)
+    label: Mapped[str] = mapped_column(String(64), nullable=False)  # SPEAKER_00
+    display_name: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+
+    # Relationships
+    transcript: Mapped["Transcript"] = relationship("Transcript", back_populates="speakers")
+
+    __table_args__ = (
+        UniqueConstraint("transcript_id", "label", name="uq_speaker_transcript_label"),
+        Index("ix_speakers_transcript_label", "transcript_id", "label"),
+    )
+
+
 class Usage(Base):
     __tablename__ = "usage"
 
@@ -154,3 +246,4 @@ class Usage(Base):
         Index("ix_usage_user_created_at", "user_id", "created_at"),
         Index("ix_usage_metric", "metric"),
     )
+

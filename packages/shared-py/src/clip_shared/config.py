@@ -64,9 +64,21 @@ class Settings(BaseSettings):
         ]
     )
 
-    # Pipeline Simulation Settings
+    # Pipeline & Processing Limits
+    MAX_DURATION_MIN: int = 120
     PIPELINE_STAGE_DURATION_SECONDS: float = 2.0
     INJECT_RANDOM_FAILURE: bool = False
+
+    # Transcription Backend & Models
+    TRANSCRIBE_BACKEND: Literal["whisperx", "deepgram", "mock"] = "mock"
+    HF_TOKEN: Optional[str] = None
+    WHISPER_MODEL: str = "large-v3"
+    WHISPER_COMPUTE_TYPE: str = "float16"
+    WHISPER_BATCH_SIZE: int = 16
+    DIARIZATION_ENABLED: bool = True
+    MIN_SPEAKERS: Optional[int] = 1
+    MAX_SPEAKERS: Optional[int] = 10
+    DEEPGRAM_API_KEY: Optional[str] = None
 
     # Sentry
     SENTRY_DSN: Optional[str] = None

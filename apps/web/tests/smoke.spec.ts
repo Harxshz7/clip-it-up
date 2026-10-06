@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { Buffer } from 'node:buffer';
 
 test.describe('Video Upload and Processing Pipeline Smoke Test', () => {
   test('User uploads video directly to storage and monitors 100% progress via SSE', async ({ page }) => {
