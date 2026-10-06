@@ -19,4 +19,14 @@ celery_app.conf.update(
     task_track_started=True,
     task_acks_late=True,
     worker_prefetch_multiplier=1,
+    task_default_queue="cpu",
+    task_queues={
+        "cpu": {},
+        "gpu": {},
+    },
+    task_routes={
+        "worker.tasks.pipeline.run_stage": lambda name, args, kwargs, options, task=None: {
+            "queue": "gpu" if (args and len(args) > 1 and args[1] == "transcribe") else "cpu"
+        },
+    },
 )
