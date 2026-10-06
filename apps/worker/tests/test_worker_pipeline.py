@@ -8,6 +8,8 @@ from sqlalchemy.orm import sessionmaker
 os.environ["ENVIRONMENT"] = "development"
 os.environ["PIPELINE_STAGE_DURATION_SECONDS"] = "0.05"
 os.environ["INJECT_RANDOM_FAILURE"] = "false"
+os.environ["DATABASE_URL"] = "sqlite+aiosqlite:///:memory:"
+os.environ["DATABASE_SYNC_URL"] = "sqlite:///:memory:"
 
 from clip_shared.db.base import Base, utc_now
 from clip_shared.db.models import User, Video, Job, JobStage, Usage

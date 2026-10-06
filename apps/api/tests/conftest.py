@@ -11,6 +11,7 @@ from sqlalchemy.pool import StaticPool
 os.environ["ENVIRONMENT"] = "development"
 os.environ["DEV_AUTH_BYPASS"] = "true"
 os.environ["DATABASE_URL"] = "sqlite+aiosqlite:///:memory:"
+os.environ["DATABASE_SYNC_URL"] = "sqlite:///:memory:"
 
 from clip_shared.db.base import Base
 from clip_shared.db.session import get_db
