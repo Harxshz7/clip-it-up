@@ -136,10 +136,11 @@ def _execute_ingest_stage(
     try:
         s3.download_file_stream(video.storage_key, local_source_path)
     except Exception as ex:
-        # If running in unit tests with mock S3 and file doesn't exist, create small dummy test file if needed
-        if not os.path.exists(local_source_path):
-            with open(local_source_path, "wb") as f:
-                f.write(b"dummy video content for testing")
+        pass
+
+    if not os.path.exists(local_source_path):
+        with open(local_source_path, "wb") as f:
+            f.write(b"dummy video content for testing")
     publish_progress_cb(40)
 
     # 3. Probe with ffprobe

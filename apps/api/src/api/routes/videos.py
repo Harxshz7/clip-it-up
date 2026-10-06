@@ -7,7 +7,16 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from clip_shared.config import get_settings
 from clip_shared.db.session import get_db
-from clip_shared.db.models import Video, Job, JobStage, Project
+from clip_shared.db.models import (
+    Video,
+    Job,
+    JobStage,
+    Project,
+    Transcript,
+    TranscriptWord,
+    TranscriptSegment,
+    Speaker,
+)
 from clip_shared.db.base import utc_now
 from clip_shared.schemas.auth import AuthenticatedUser
 from clip_shared.schemas.videos import (
@@ -20,6 +29,16 @@ from clip_shared.schemas.videos import (
     VideoResponse,
 )
 from clip_shared.schemas.jobs import CompleteUploadResponse, JobResponse
+from clip_shared.schemas.transcripts import (
+    SpeakerResponse,
+    UpdateSpeakerRequest,
+    TranscriptWordResponse,
+    TranscriptSegmentResponse,
+    TranscriptMetadataResponse,
+    TranscriptDetailResponse,
+    TranscriptWordsRangeResponse,
+    ProxyUrlResponse,
+)
 from clip_shared.storage.s3 import get_s3_client, get_storage_key, sanitize_filename
 from api.dependencies import get_current_user
 
@@ -321,3 +340,267 @@ async def get_video(
             detail={"error": {"code": "VIDEO_NOT_FOUND", "message": "Video not found."}},
         )
     return video
+
+
+@router.get("/{video_id}/proxy-url", response_model=ProxyUrlResponse)
+async def get_video_proxy_url(
+    video_id: uuid.UUID,
+    user: AuthenticatedUser = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Get presigned GET URL for the 720p preview proxy video (supports range requests)."""
+    stmt = select(Video).where(Video.id == video_id, Video.user_id == user.id)
+    result = await db.execute(stmt)
+    video = result.scalar_one_or_none()
+    if not video:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"error": {"code": "VIDEO_NOT_FOUND", "message": "Video not found."}},
+        )
+
+    target_key = video.proxy_key or video.storage_key
+    s3 = get_s3_client()
+    proxy_url = s3.generate_presigned_get_url(target_key, expires_in=3600)
+
+    return ProxyUrlResponse(
+        video_id=video.id,
+        proxy_url=proxy_url,
+        expires_in_seconds=3600,
+        content_type="video/mp4",
+    )
+
+
+@router.get("/{video_id}/transcript", response_model=TranscriptDetailResponse)
+async def get_video_transcript(
+    video_id: uuid.UUID,
+    from_ms: Optional[int] = Query(None, description="Filter start time in milliseconds"),
+    to_ms: Optional[int] = Query(None, description="Filter end time in milliseconds"),
+    user: AuthenticatedUser = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Get transcript metadata, speaker list, and timed segments.
+    Optionally filter segments by time range [from_ms, to_ms].
+    """
+    stmt = (
+        select(Transcript)
+        .join(Video, Video.id == Transcript.video_id)
+        .where(Transcript.video_id == video_id, Video.user_id == user.id)
+    )
+    result = await db.execute(stmt)
+    transcript = result.scalar_one_or_none()
+
+    if not transcript:
+        # Check if video exists to return appropriate 404
+        v_stmt = select(Video).where(Video.id == video_id, Video.user_id == user.id)
+        v_res = await db.execute(v_stmt)
+        if not v_res.scalar_one_or_none():
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail={"error": {"code": "VIDEO_NOT_FOUND", "message": "Video not found."}},
+            )
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"error": {"code": "TRANSCRIPT_NOT_FOUND", "message": "Transcript is not ready yet."}},
+        )
+
+    # Fetch speakers
+    spk_stmt = select(Speaker).where(Speaker.transcript_id == transcript.id).order_by(Speaker.label)
+    spk_res = await db.execute(spk_stmt)
+    speakers = spk_res.scalars().all()
+
+    # Fetch segments with optional time filtering
+    seg_stmt = select(TranscriptSegment).where(TranscriptSegment.transcript_id == transcript.id)
+    if from_ms is not None:
+        seg_stmt = seg_stmt.where(TranscriptSegment.end_ms >= from_ms)
+    if to_ms is not None:
+        seg_stmt = seg_stmt.where(TranscriptSegment.start_ms <= to_ms)
+    seg_stmt = seg_stmt.order_by(TranscriptSegment.idx)
+
+    seg_res = await db.execute(seg_stmt)
+    segments = seg_res.scalars().all()
+
+    # Count total segments
+    count_stmt = select(TranscriptSegment).where(TranscriptSegment.transcript_id == transcript.id)
+    count_res = await db.execute(count_stmt)
+    total_segments = len(count_res.scalars().all())
+
+    return TranscriptDetailResponse(
+        transcript=TranscriptMetadataResponse.model_validate(transcript),
+        speakers=[SpeakerResponse.model_validate(s) for s in speakers],
+        segments=[TranscriptSegmentResponse.model_validate(s) for s in segments],
+        total_segments=total_segments,
+        has_more=False,
+    )
+
+
+@router.get("/{video_id}/transcript/words", response_model=TranscriptWordsRangeResponse)
+async def get_transcript_words_range(
+    video_id: uuid.UUID,
+    from_ms: Optional[int] = Query(None, description="Start time filter in ms"),
+    to_ms: Optional[int] = Query(None, description="End time filter in ms"),
+    user: AuthenticatedUser = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Fetch words within a specific time range for high precision player seeking & highlighting."""
+    stmt = (
+        select(Transcript)
+        .join(Video, Video.id == Transcript.video_id)
+        .where(Transcript.video_id == video_id, Video.user_id == user.id)
+    )
+    result = await db.execute(stmt)
+    transcript = result.scalar_one_or_none()
+
+    if not transcript:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"error": {"code": "TRANSCRIPT_NOT_FOUND", "message": "Transcript not found."}},
+        )
+
+    w_stmt = select(TranscriptWord).where(TranscriptWord.transcript_id == transcript.id)
+    if from_ms is not None:
+        w_stmt = w_stmt.where(TranscriptWord.end_ms >= from_ms)
+    if to_ms is not None:
+        w_stmt = w_stmt.where(TranscriptWord.start_ms <= to_ms)
+    w_stmt = w_stmt.order_by(TranscriptWord.idx)
+
+    w_res = await db.execute(w_stmt)
+    words = w_res.scalars().all()
+
+    return TranscriptWordsRangeResponse(
+        words=[TranscriptWordResponse.model_validate(w) for w in words],
+        from_ms=from_ms,
+        to_ms=to_ms,
+        total=len(words),
+    )
+
+
+@router.patch("/{video_id}/speakers/{speaker_id}", response_model=SpeakerResponse)
+async def update_speaker_display_name(
+    video_id: uuid.UUID,
+    speaker_id: uuid.UUID,
+    payload: UpdateSpeakerRequest,
+    user: AuthenticatedUser = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Update speaker display name (e.g. rename SPEAKER_00 to 'Alex')."""
+    stmt = (
+        select(Speaker)
+        .join(Transcript, Transcript.id == Speaker.transcript_id)
+        .join(Video, Video.id == Transcript.video_id)
+        .where(Speaker.id == speaker_id, Video.id == video_id, Video.user_id == user.id)
+    )
+    result = await db.execute(stmt)
+    speaker = result.scalar_one_or_none()
+
+    if not speaker:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"error": {"code": "SPEAKER_NOT_FOUND", "message": "Speaker not found."}},
+        )
+
+    speaker.display_name = payload.display_name.strip()
+    await db.commit()
+    await db.refresh(speaker)
+
+    return SpeakerResponse.model_validate(speaker)
+
+
+@router.get("/{video_id}/transcript/export")
+async def export_transcript(
+    video_id: uuid.UUID,
+    format: str = Query("txt", pattern="^(txt|srt|vtt|json)$"),
+    user: AuthenticatedUser = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Export transcript in requested format: txt, srt, vtt, or json."""
+    from fastapi.responses import Response
+    from worker.transcription.export import export_txt, export_srt, export_vtt, export_json
+    from worker.transcription.base import SegmentItem, WordItem, SpeakerItem, TranscriptionResult
+
+    stmt = (
+        select(Transcript)
+        .join(Video, Video.id == Transcript.video_id)
+        .where(Transcript.video_id == video_id, Video.user_id == user.id)
+    )
+    result = await db.execute(stmt)
+    transcript = result.scalar_one_or_none()
+
+    if not transcript:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"error": {"code": "TRANSCRIPT_NOT_FOUND", "message": "Transcript not found."}},
+        )
+
+    # Fetch speakers
+    spk_stmt = select(Speaker).where(Speaker.transcript_id == transcript.id).order_by(Speaker.label)
+    spk_res = await db.execute(spk_stmt)
+    speakers = spk_res.scalars().all()
+    speakers_map = {s.label: s.display_name or s.label for s in speakers}
+
+    # Fetch segments
+    seg_stmt = select(TranscriptSegment).where(TranscriptSegment.transcript_id == transcript.id).order_by(TranscriptSegment.idx)
+    seg_res = await db.execute(seg_stmt)
+    segments = seg_res.scalars().all()
+
+    # Convert to SegmentItems
+    segment_items = [
+        SegmentItem(
+            idx=s.idx,
+            start_ms=s.start_ms,
+            end_ms=s.end_ms,
+            speaker=s.speaker,
+            text=s.text,
+        )
+        for s in segments
+    ]
+
+    media_types = {
+        "txt": "text/plain; charset=utf-8",
+        "srt": "application/x-subrip; charset=utf-8",
+        "vtt": "text/vtt; charset=utf-8",
+        "json": "application/json; charset=utf-8",
+    }
+
+    if format == "txt":
+        content = export_txt(segment_items, speakers_map=speakers_map)
+    elif format == "srt":
+        content = export_srt(segment_items, speakers_map=speakers_map)
+    elif format == "vtt":
+        content = export_vtt(segment_items, speakers_map=speakers_map)
+    elif format == "json":
+        # Fetch words for json
+        w_stmt = select(TranscriptWord).where(TranscriptWord.transcript_id == transcript.id).order_by(TranscriptWord.idx)
+        w_res = await db.execute(w_stmt)
+        words = w_res.scalars().all()
+        word_items = [
+            WordItem(
+                idx=w.idx,
+                word=w.word,
+                start_ms=w.start_ms,
+                end_ms=w.end_ms,
+                speaker=w.speaker,
+                confidence=w.confidence,
+            )
+            for w in words
+        ]
+        trans_res = TranscriptionResult(
+            language=transcript.language or "en",
+            status=transcript.status,
+            model=transcript.model or "unknown",
+            backend=transcript.backend or "unknown",
+            word_count=transcript.word_count,
+            words=word_items,
+            segments=segment_items,
+            speakers=[SpeakerItem(label=s.label, display_name=s.display_name) for s in speakers],
+        )
+        content = export_json(trans_res, speakers_map=speakers_map)
+    else:
+        content = export_txt(segment_items, speakers_map=speakers_map)
+
+    filename = f"transcript_{str(video_id)[:8]}.{format}"
+    return Response(
+        content=content,
+        media_type=media_types.get(format, "text/plain"),
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )

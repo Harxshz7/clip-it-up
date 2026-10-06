@@ -65,11 +65,14 @@ def test_stage_chain_and_idempotent_rerun(sync_db):
 
     with patch("worker.tasks.pipeline.get_sync_db") as mock_db, \
          patch("worker.tasks.pipeline.publish_job_event_sync") as mock_pub, \
+         patch("worker.tasks.pipeline.get_s3_client") as mock_s3, \
          patch("worker.tasks.pipeline.run_stage.apply_async") as mock_apply, \
          patch("worker.tasks.pipeline.run_stage.delay") as mock_delay:
 
         mock_db.return_value.__enter__.return_value = sync_db
         mock_db.return_value.__exit__.return_value = None
+        mock_s3_inst = MagicMock()
+        mock_s3.return_value = mock_s3_inst
 
         # 1. Run first stage: ingest
         res = run_stage(str(job_id), "ingest")
