@@ -17,12 +17,20 @@ export function useJobSSE({ jobId, token, onEvent, onError, enabled = true }: Us
   const [error, setError] = useState<Error | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
   const lastEventIdRef = useRef<string | null>(null);
+  const onEventRef = useRef(onEvent);
+  const onErrorRef = useRef(onError);
+
+  useEffect(() => {
+    onEventRef.current = onEvent;
+    onErrorRef.current = onError;
+  });
 
   useEffect(() => {
     if (!enabled || !jobId) return;
 
     let isMounted = true;
     let retryTimeout: NodeJS.Timeout | null = null;
+
 
     async function connectSSE() {
       if (abortControllerRef.current) {
@@ -97,7 +105,7 @@ export function useJobSSE({ jobId, token, onEvent, onError, enabled = true }: Us
                 const parsed: JobEventPayload = JSON.parse(dataStr);
                 if (isMounted) {
                   setData(parsed);
-                  onEvent?.(parsed);
+                  onEventRef.current?.(parsed);
 
                   if (["succeeded", "failed", "cancelled"].includes(parsed.status)) {
                     setIsConnected(false);
@@ -116,7 +124,8 @@ export function useJobSSE({ jobId, token, onEvent, onError, enabled = true }: Us
           setIsConnected(false);
           const errorObj = err instanceof Error ? err : new Error(String(err));
           setError(errorObj);
-          onError?.(errorObj);
+          onErrorRef.current?.(errorObj);
+
 
           // Retry connection after 3 seconds
           retryTimeout = setTimeout(() => {

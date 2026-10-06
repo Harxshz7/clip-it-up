@@ -6,7 +6,13 @@ import {
   Job,
   UsageSummary,
   MultipartPartUrlResponse,
+  TranscriptResponse,
+  TranscriptWordsResponse,
+  Speaker,
+  ProxyUrlResponse,
+  ExportFormat,
 } from "@clip-it-up/shared";
+
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 

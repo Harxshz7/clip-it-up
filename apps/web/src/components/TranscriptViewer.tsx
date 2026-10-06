@@ -325,8 +325,9 @@ export function TranscriptViewer({
         <FileText className="w-10 h-10 text-zinc-600" />
         <h3 className="text-sm font-semibold text-zinc-300">No Transcript Available</h3>
         <p className="text-xs text-zinc-500 max-w-xs">
-          This video does not have a transcript yet or processing hasn't started.
+          This video does not have a transcript yet or processing hasn&apos;t started.
         </p>
+
       </div>
     );
   }

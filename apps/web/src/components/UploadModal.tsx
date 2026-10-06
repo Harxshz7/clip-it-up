@@ -107,8 +107,9 @@ export function UploadModal() {
 
       // 4. Redirect to job progress page
       handleClose();
-      router.push(`/videos/${completeRes.video_id}`);
+      router.push(`/videos/${completeRes.video?.id || uploadInfo.video_id}`);
     } catch (err: any) {
+
       console.error("Upload failed:", err);
       const msg = err instanceof ApiError ? err.message : err?.message || "Upload failed. Please try again.";
       setErrorMessage(msg);
