@@ -149,12 +149,82 @@ class S3Client:
                 return False
             raise
 
-    def get_object_metadata(self, storage_key: str) -> Dict[str, Any]:
-        """Get object metadata / size."""
-        return self.client.head_object(
+    def generate_presigned_get_url(
+        self,
+        storage_key: str,
+        expires_in: Optional[int] = None,
+        response_content_disposition: Optional[str] = None,
+    ) -> str:
+        """Generate a presigned GET URL for downloading or streaming media."""
+        if expires_in is None:
+            expires_in = self.settings.PRESIGNED_URL_EXPIRY_SECONDS
+
+        params: Dict[str, Any] = {
+            "Bucket": self.settings.S3_BUCKET_NAME,
+            "Key": storage_key,
+        }
+        if response_content_disposition:
+            params["ResponseContentDisposition"] = response_content_disposition
+
+        url = self.client.generate_presigned_url(
+            ClientMethod="get_object",
+            Params=params,
+            ExpiresIn=expires_in,
+        )
+
+        if self.settings.S3_PUBLIC_ENDPOINT_URL and self.settings.S3_ENDPOINT_URL:
+            if self.settings.S3_PUBLIC_ENDPOINT_URL != self.settings.S3_ENDPOINT_URL:
+                url = url.replace(self.settings.S3_ENDPOINT_URL, self.settings.S3_PUBLIC_ENDPOINT_URL)
+
+        return url
+
+    def download_file_stream(self, storage_key: str, target_path: str, chunk_size: int = 8 * 1024 * 1024) -> None:
+        """Stream download an object directly to a local file path in chunks."""
+        response = self.client.get_object(Bucket=self.settings.S3_BUCKET_NAME, Key=storage_key)
+        body = response["Body"]
+        with open(target_path, "wb") as f:
+            while True:
+                chunk = body.read(chunk_size)
+                if not chunk:
+                    break
+                f.write(chunk)
+
+    def upload_file(self, file_path: str, storage_key: str, content_type: Optional[str] = None) -> None:
+        """Upload a local file to S3 with content type."""
+        extra_args = {}
+        if content_type:
+            extra_args["ContentType"] = content_type
+        self.client.upload_file(
+            Filename=file_path,
             Bucket=self.settings.S3_BUCKET_NAME,
             Key=storage_key,
+            ExtraArgs=extra_args if extra_args else None,
         )
+
+    def upload_json(self, data: Any, storage_key: str) -> None:
+        """Serialize data to JSON and upload to S3."""
+        import json
+        payload_bytes = json.dumps(data, indent=2).encode("utf-8")
+        self.client.put_object(
+            Bucket=self.settings.S3_BUCKET_NAME,
+            Key=storage_key,
+            Body=payload_bytes,
+            ContentType="application/json",
+        )
+
+    def download_json(self, storage_key: str) -> Any:
+        """Download and parse a JSON object from S3."""
+        import json
+        response = self.client.get_object(Bucket=self.settings.S3_BUCKET_NAME, Key=storage_key)
+        body = response["Body"].read().decode("utf-8")
+        return json.loads(body)
+
+    def delete_object(self, storage_key: str) -> None:
+        """Delete an object from S3 if it exists."""
+        try:
+            self.client.delete_object(Bucket=self.settings.S3_BUCKET_NAME, Key=storage_key)
+        except Exception:
+            pass
 
 
 _s3_client_instance: Optional[S3Client] = None

@@ -7,7 +7,7 @@ from pydantic import BaseModel, ConfigDict, Field
 class UploadUrlRequest(BaseModel):
     filename: str = Field(..., min_length=1, max_length=512)
     content_type: str = Field(..., min_length=1, max_length=128)
-    size_bytes: int = Field(..., gt=0)
+    size_bytes: int = Field(..., ge=0)
     project_id: Optional[uuid.UUID] = None
 
 
@@ -58,6 +58,12 @@ class VideoResponse(BaseModel):
     storage_key: str
     size_bytes: int
     duration_seconds: Optional[float] = None
+    width: Optional[int] = None
+    height: Optional[int] = None
+    fps: Optional[float] = None
+    has_audio: bool = True
+    proxy_key: Optional[str] = None
+    audio_key: Optional[str] = None
     content_type: str
     status: str
     created_at: datetime

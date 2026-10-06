@@ -2,6 +2,10 @@ export type VideoStatus = 'uploading' | 'uploaded' | 'processing' | 'ready' | 'f
 
 export type JobStatus = 'queued' | 'running' | 'succeeded' | 'failed' | 'cancelled';
 
+export type TranscriptStatus = 'running' | 'ready' | 'failed';
+
+export type ExportFormat = 'txt' | 'srt' | 'vtt' | 'json';
+
 export type PipelineStageName =
   | 'ingest'
   | 'proxy'
@@ -41,6 +45,12 @@ export interface Video {
   storage_key: string;
   size_bytes: number;
   duration_seconds?: number | null;
+  width?: number | null;
+  height?: number | null;
+  fps?: number | null;
+  has_audio: boolean;
+  proxy_key?: string | null;
+  audio_key?: string | null;
   content_type: string;
   status: VideoStatus;
   created_at: string;
@@ -67,10 +77,79 @@ export interface Job {
   current_stage?: PipelineStageName | null;
   progress: number;
   error?: string | null;
+  partial_results?: Record<string, any>;
   created_at: string;
   started_at?: string | null;
   finished_at?: string | null;
   stages?: JobStage[];
+}
+
+export interface Speaker {
+  id: string;
+  transcript_id: string;
+  label: string; // e.g. SPEAKER_00
+  display_name?: string | null;
+}
+
+export interface TranscriptWord {
+  id: string;
+  transcript_id: string;
+  idx: number;
+  word: string;
+  start_ms: number;
+  end_ms: number;
+  speaker?: string | null;
+  confidence?: number | null;
+}
+
+export interface TranscriptSegment {
+  id: string;
+  transcript_id: string;
+  idx: number;
+  start_ms: number;
+  end_ms: number;
+  speaker?: string | null;
+  text: string;
+  words?: TranscriptWord[];
+}
+
+export interface Transcript {
+  id: string;
+  video_id: string;
+  language?: string | null;
+  status: TranscriptStatus;
+  model?: string | null;
+  backend?: string | null;
+  word_count: number;
+  created_at: string;
+  speakers?: Speaker[];
+  segments?: TranscriptSegment[];
+}
+
+export interface TranscriptResponse {
+  transcript: Transcript;
+  speakers: Speaker[];
+  segments: TranscriptSegment[];
+  total_segments: number;
+  has_more?: boolean;
+}
+
+export interface TranscriptWordsResponse {
+  words: TranscriptWord[];
+  from_ms?: number | null;
+  to_ms?: number | null;
+  total: number;
+}
+
+export interface UpdateSpeakerRequest {
+  display_name: string;
+}
+
+export interface ProxyUrlResponse {
+  video_id: string;
+  proxy_url: string;
+  expires_in_seconds: number;
+  content_type: string;
 }
 
 export interface Usage {
@@ -135,11 +214,25 @@ export interface CompleteUploadResponse {
 
 export interface JobEventPayload {
   job_id: string;
+  video_id?: string;
+  user_id?: string;
   status: JobStatus;
   current_stage?: PipelineStageName | null;
   progress: number;
   error?: string | null;
+  partial_results?: Record<string, any>;
   stages: JobStage[];
+  timestamp: string;
+}
+
+export interface TranscriptReadyEventPayload {
+  job_id: string;
+  video_id: string;
+  transcript_id: string;
+  partial_results: {
+    transcript: boolean;
+    [key: string]: any;
+  };
   timestamp: string;
 }
 
