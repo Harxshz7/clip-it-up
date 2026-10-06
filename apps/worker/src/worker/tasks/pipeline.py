@@ -6,7 +6,7 @@ import time
 import uuid
 from datetime import datetime, timezone
 from decimal import Decimal
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, Callable
 import structlog
 from celery import shared_task
 from sqlalchemy.dialects.postgresql import insert as pg_insert

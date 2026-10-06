@@ -62,8 +62,8 @@ def probe_video(file_path: str, max_duration_min: int = 120) -> VideoMetadata:
     try:
         proc = subprocess.run(cmd, capture_output=True, text=True, check=False)
     except FileNotFoundError:
-        # If ffprobe is not installed on host machine during tests/simulation, handle gracefully or mock
-        raise MediaValidationError("FFPROBE_MISSING", "ffprobe binary not found in worker environment.")
+        # If ffprobe binary is missing in non-docker environment, raise FileNotFoundError
+        raise FileNotFoundError("ffprobe binary not found in worker environment.")
 
     if proc.returncode != 0:
         err_stderr = proc.stderr.strip()
