@@ -21,33 +21,37 @@ router = APIRouter(prefix="/jobs", tags=["jobs"])
 settings = get_settings()
 
 
-async def get_job_snapshot_data(job_id: uuid.UUID, user_id: uuid.UUID) -> Optional[dict]:
+async def get_job_snapshot_data(
+    job_id: uuid.UUID,
+    user_id: uuid.UUID,
+    session: Optional[AsyncSession] = None,
+) -> Optional[dict]:
     """Fetch complete job and stages data snapshot."""
-    async with AsyncSessionLocal() as session:
+    async def _fetch(s: AsyncSession):
         stmt = (
             select(Job)
             .options(selectinload(Job.stages))
             .where(Job.id == job_id, Job.user_id == user_id)
         )
-        result = await session.execute(stmt)
+        result = await s.execute(stmt)
         job = result.scalar_one_or_none()
         if not job:
             return None
 
         stages_data = [
             {
-                "id": str(s.id),
-                "job_id": str(s.job_id),
-                "name": s.name,
-                "status": s.status,
-                "progress": s.progress,
-                "started_at": s.started_at.isoformat() if s.started_at else None,
-                "finished_at": s.finished_at.isoformat() if s.finished_at else None,
-                "duration_ms": s.duration_ms,
-                "cost_inr": float(s.cost_inr),
-                "meta": s.meta or {},
+                "id": str(stg.id),
+                "job_id": str(stg.job_id),
+                "name": stg.name,
+                "status": stg.status,
+                "progress": stg.progress,
+                "started_at": stg.started_at.isoformat() if stg.started_at else None,
+                "finished_at": stg.finished_at.isoformat() if stg.finished_at else None,
+                "duration_ms": stg.duration_ms,
+                "cost_inr": float(stg.cost_inr),
+                "meta": stg.meta or {},
             }
-            for s in sorted(job.stages, key=lambda x: str(x.id))
+            for stg in sorted(job.stages, key=lambda x: str(x.id))
         ]
 
         return {
@@ -58,12 +62,18 @@ async def get_job_snapshot_data(job_id: uuid.UUID, user_id: uuid.UUID) -> Option
             "current_stage": job.current_stage,
             "progress": job.progress,
             "error": job.error,
+            "partial_results": job.partial_results or {},
             "created_at": job.created_at.isoformat() if job.created_at else None,
             "started_at": job.started_at.isoformat() if job.started_at else None,
             "finished_at": job.finished_at.isoformat() if job.finished_at else None,
             "stages": stages_data,
             "timestamp": utc_now().isoformat(),
         }
+
+    if session is not None:
+        return await _fetch(session)
+    async with AsyncSessionLocal() as s:
+        return await _fetch(s)
 
 
 @router.get("/{job_id}", response_model=JobResponse)
@@ -94,6 +104,7 @@ async def stream_job_events(
     request: Request,
     user: AuthenticatedUser = Depends(get_current_user),
     last_event_id: Optional[str] = Header(None, alias="Last-Event-ID"),
+    db: AsyncSession = Depends(get_db),
 ):
     """
     Server-Sent Events (SSE) endpoint:
@@ -103,7 +114,7 @@ async def stream_job_events(
     4. Sends 15s heartbeats.
     5. Closes cleanly on terminal state (succeeded, failed, cancelled).
     """
-    initial_snapshot = await get_job_snapshot_data(job_id, user.id)
+    initial_snapshot = await get_job_snapshot_data(job_id, user.id, session=db)
     if not initial_snapshot:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

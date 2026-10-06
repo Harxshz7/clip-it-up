@@ -15,11 +15,16 @@ from sqlalchemy import (
     Index,
     UniqueConstraint,
     Text,
+    JSON,
+    Uuid,
 )
-from sqlalchemy.dialects.postgresql import UUID, JSONB
+from sqlalchemy.dialects.postgresql import JSONB as PG_JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from clip_shared.db.base import Base, utc_now
+
+JSON_TYPE = JSON().with_variant(PG_JSONB, "postgresql")
+UUID = Uuid
 
 
 class User(Base):
@@ -101,7 +106,7 @@ class Job(Base):
     current_stage: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     progress: Mapped[int] = mapped_column(BigInteger, default=0, nullable=False)
     error: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    partial_results: Mapped[Dict[str, Any]] = mapped_column(JSONB, default=dict, nullable=False)
+    partial_results: Mapped[Dict[str, Any]] = mapped_column(JSON_TYPE, default=dict, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
     started_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
     finished_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
@@ -130,7 +135,7 @@ class JobStage(Base):
     finished_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
     duration_ms: Mapped[Optional[int]] = mapped_column(BigInteger, nullable=True)
     cost_inr: Mapped[Decimal] = mapped_column(Numeric(12, 4), default=Decimal("0.0000"), nullable=False)
-    meta: Mapped[Dict[str, Any]] = mapped_column(JSONB, default=dict, nullable=False)
+    meta: Mapped[Dict[str, Any]] = mapped_column(JSON_TYPE, default=dict, nullable=False)
 
     # Relationships
     job: Mapped["Job"] = relationship("Job", back_populates="stages")
@@ -145,7 +150,7 @@ class Transcript(Base):
     __tablename__ = "transcripts"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    video_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("videos.id", ondelete="CASCADE"), unique=True, nullable=False, index=True)
+    video_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("videos.id", ondelete="CASCADE"), unique=True, nullable=False)
     language: Mapped[Optional[str]] = mapped_column(String(16), nullable=True)
     status: Mapped[str] = mapped_column(String(32), default="running", nullable=False)  # running | ready | failed
     model: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
@@ -169,7 +174,7 @@ class TranscriptWord(Base):
     __tablename__ = "transcript_words"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    transcript_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("transcripts.id", ondelete="CASCADE"), nullable=False, index=True)
+    transcript_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("transcripts.id", ondelete="CASCADE"), nullable=False)
     idx: Mapped[int] = mapped_column(BigInteger, nullable=False)
     word: Mapped[str] = mapped_column(String(255), nullable=False)
     start_ms: Mapped[int] = mapped_column(BigInteger, nullable=False)
@@ -190,7 +195,7 @@ class TranscriptSegment(Base):
     __tablename__ = "transcript_segments"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    transcript_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("transcripts.id", ondelete="CASCADE"), nullable=False, index=True)
+    transcript_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("transcripts.id", ondelete="CASCADE"), nullable=False)
     idx: Mapped[int] = mapped_column(BigInteger, nullable=False)
     start_ms: Mapped[int] = mapped_column(BigInteger, nullable=False)
     end_ms: Mapped[int] = mapped_column(BigInteger, nullable=False)
@@ -210,7 +215,7 @@ class Speaker(Base):
     __tablename__ = "speakers"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    transcript_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("transcripts.id", ondelete="CASCADE"), nullable=False, index=True)
+    transcript_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("transcripts.id", ondelete="CASCADE"), nullable=False)
     label: Mapped[str] = mapped_column(String(64), nullable=False)  # SPEAKER_00
     display_name: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
 

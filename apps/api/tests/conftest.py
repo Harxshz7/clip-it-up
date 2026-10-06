@@ -14,6 +14,7 @@ os.environ["DATABASE_URL"] = "sqlite+aiosqlite:///:memory:"
 os.environ["DATABASE_SYNC_URL"] = "sqlite:///:memory:"
 
 from clip_shared.db.base import Base
+import clip_shared.db.session as db_session_module
 from clip_shared.db.session import get_db
 from clip_shared.db.models import User, Project, Video, Job, JobStage
 from api.main import app
@@ -28,31 +29,29 @@ TestingSessionLocal = async_sessionmaker(
     class_=AsyncSession,
     expire_on_commit=False,
 )
+db_session_module.AsyncSessionLocal = TestingSessionLocal
+db_session_module.async_engine = test_engine
 
+import pytest_asyncio
+from unittest.mock import patch
 
-@pytest.fixture(scope="session")
-def event_loop():
-    loop = asyncio.get_event_loop_policy().new_event_loop()
-    yield loop
-    loop.close()
-
-
-@pytest.fixture(autouse=True)
+@pytest_asyncio.fixture(autouse=True)
 async def init_test_db():
     async with test_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-    yield
+    with patch("worker.celery_app.celery_app.send_task") as _:
+        yield
     async with test_engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def db_session() -> AsyncGenerator[AsyncSession, None]:
     async with TestingSessionLocal() as session:
         yield session
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def client(db_session: AsyncSession) -> AsyncGenerator[AsyncClient, None]:
     async def override_get_db():
         yield db_session
@@ -64,7 +63,7 @@ async def client(db_session: AsyncSession) -> AsyncGenerator[AsyncClient, None]:
     app.dependency_overrides.clear()
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def sample_user(db_session: AsyncSession) -> User:
     user = User(
         id=uuid.UUID("00000000-0000-0000-0000-000000000001"),
@@ -77,7 +76,7 @@ async def sample_user(db_session: AsyncSession) -> User:
     return user
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def other_user(db_session: AsyncSession) -> User:
     user = User(
         id=uuid.UUID("00000000-0000-0000-0000-000000000002"),
