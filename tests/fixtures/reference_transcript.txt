@@ -1,0 +1,1 @@
+Welcome to clip it up. In this test audio recording, we demonstrate automated speech recognition, word-level alignment, and speaker diarization. We are evaluating WhisperX and deepgram pipelines to ensure high precision timestamps and sentence segmentation for vertical video clips.

@@ -21,7 +21,7 @@
 | Phase | Weeks | Done-When | Status | Owner |
 | :--- | :--- | :--- | :--- | :--- |
 | **0. Foundation** | W1–2 | Presigned S3 upload, dummy 6-stage worker, live SSE progress, ₹ INR cost recording | **Complete** | `<DEV_A>` / `<DEV_B>` |
-| **1. Transcript** | W3–4 | Real WhisperX audio extraction, word-level timestamps, speaker diarization | Planned | `<DEV_A>` |
+| **1. Transcript** | W3–4 | Real WhisperX audio extraction, word-level timestamps, speaker diarization, interactive viewer | **Complete** | `<DEV_A>` / `<DEV_B>` |
 | **2. Clip Selection**| W5–8 | LLM virality scoring (Claude API), candidate hook extraction, ranking | Planned | `<DEV_A>` |
 | **2.5 Reality Check**| W9 | Creators test raw AI clip cuts; validate hook retention against baseline | Planned | `<DEV_A>` / `<DEV_B>` |
 | **3. Reframe** | W10–12| Face tracking + active speaker detection (9:16 auto-crop) via FFmpeg | Planned | `<DEV_A>` |
@@ -34,11 +34,20 @@
 
 ## 4. Phase Task Checklist
 
-### Phase 1: Transcript Pipeline (Weeks 3–4)
-- [ ] `[worker]` Replace dummy ingest with FFmpeg 16kHz mono audio extraction.
-- [ ] `[worker]` Integrate WhisperX container for word-level timestamps and diarization.
-- [ ] `[api]` Add `GET /videos/{id}/transcript` endpoint returning timed word blocks.
-- [ ] `[web]` Build transcript review viewer with interactive word seeking.
+### Phase 1: Transcript Pipeline (Weeks 3–4) — COMPLETE
+- [x] `[worker]` Replace dummy ingest with FFprobe validation, S3 download stream, and error codes (`NO_AUDIO`, `TOO_LONG`, `UNSUPPORTED_CODEC`, `CORRUPT_FILE`).
+- [x] `[worker]` Replace dummy proxy with parallel FFmpeg execution producing 16kHz mono WAV and 720p H.264 preview proxy with pipe progress.
+- [x] `[worker]` Implement WhisperX transcription backend with faster-whisper, wav2vec2 alignment, and pyannote diarization, plus Deepgram adapter and Mock engine.
+- [x] `[worker]` Implement dual Celery worker queues (`cpu` and `gpu`), Dockerfile.cpu, Dockerfile.gpu, and docker compose profile `gpu`.
+- [x] `[worker]` Build sentence segments from words, persist `raw.json` to S3, and commit transcript/words/segments/speakers to DB in one transaction.
+- [x] `[worker]` Emit `transcript_ready` SSE event and `partial_results: { transcript: true }` so frontend renders transcript immediately.
+- [x] `[api]` Add `GET /videos/{id}/transcript` (with `?from_ms&to_ms` range filtering).
+- [x] `[api]` Add `GET /videos/{id}/transcript/words` (word-level time-range queries).
+- [x] `[api]` Add `PATCH /videos/{id}/speakers/{speaker_id}` for inline speaker name editing.
+- [x] `[api]` Add `GET /videos/{id}/proxy-url` for presigned 720p proxy video stream.
+- [x] `[api]` Add `GET /videos/{id}/transcript/export?format=txt|srt|vtt|json`.
+- [x] `[web]` Build side-by-side video player and transcript viewer with word-level seek, colored speaker labels, inline renaming, auto-scroll with manual pause, search highlighting & navigation, and multi-format exports.
+- [x] `[eval]` Add `scripts/bench_transcribe.py`, `make bench`, and fixtures with reference transcript.
 
 ### Phase 2: AI Clip Discovery (Weeks 5–8)
 - [ ] `[worker]` Prompt Claude 3.5 Sonnet to detect 30–90s coherent narrative arcs and hooks.
@@ -61,6 +70,6 @@
 
 ## 5. Known Gaps (Plan vs Actual Repo)
 
-1. **Pipeline Execution**: Stages in [`apps/worker/src/worker/tasks/pipeline.py`](apps/worker/src/worker/tasks/pipeline.py) currently simulate delay; WhisperX, Claude API, and FFmpeg face tracking are marked **Planned**.
+1. **Pipeline Execution**: Phase 1 stages (`ingest`, `proxy`, `transcribe`) are fully implemented and real. Stages 4–6 (`candidates`, `score`, `render`) remain simulated dummies until Phase 2/3/4.
 2. **Clerk In Dev**: [`apps/api/src/api/dependencies.py`](apps/api/src/api/dependencies.py) supports `DEV_AUTH_BYPASS=true` for local runs without live Clerk keys.
-3. **Evaluation Suite**: [`eval/README.md`](eval/README.md) is a placeholder for Phase 2 virality datasets.
+3. **Evaluation Suite**: Phase 1 transcription benchmarking script is at [`scripts/bench_transcribe.py`](scripts/bench_transcribe.py); virality datasets are scheduled for Phase 2.

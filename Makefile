@@ -30,6 +30,11 @@ test-api:
 test-worker:
 	docker compose -f infra/docker-compose.yml exec worker pytest -v
 
+# Benchmark
+bench:
+	python scripts/bench_transcribe.py
+
+
 # Linting & Formatting
 lint:
 	@echo "Linting Python with ruff & mypy..."

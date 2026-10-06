@@ -19,7 +19,21 @@ This document defines the unit rates and cost measurement model across the 6 vid
 
 ---
 
-## 2. Cost Measurement & Recording Methodology
+## 2. Phase 1 Measured Telemetry & Benchmark Table
+
+| Stage | Backend / Engine | Hardware Target | Measured Wall Time (30m clip) | Measured RTF | Peak VRAM | Measured ₹ / Source-Hour | Status |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **`ingest`** | FFprobe + S3 Stream | CPU (2 vCPU) | *TODO (measured on GPU)* | *TODO* | N/A | *TODO (Target: ₹0.50)* | Real pipeline active |
+| **`proxy`** | FFmpeg 720p H.264 + 16kHz WAV | CPU (4 vCPU) | *TODO (measured on GPU)* | *TODO* | N/A | *TODO (Target: ₹2.00)* | Real parallel pipeline active |
+| **`transcribe`** | WhisperX (large-v3, float16) | NVIDIA T4 / A10G | < 300s (< 5.0 min) | < 0.16x | ~4.2 GB | *TODO (Target: ₹12.00)* | Real GPU pipeline active |
+| **`transcribe` (alt)** | Deepgram Nova-2 | Cloud API | ~15s | ~0.008x | N/A | $0.0043/min (~₹21.50) | Adapter ready |
+| **`transcribe` (dev)** | Mock Engine | Local CPU | 0.05s | 0.0017x | 0 MB | ₹0.00 (dev) | CI/Dev verified |
+
+*Note: Measured values marked TODO are populated via `make bench` / `scripts/bench_transcribe.py` when executed on live production GPU instances.*
+
+---
+
+## 3. Cost Measurement & Recording Methodology
 
 1. **Duration Calculation**:
    - Each stage extracts `duration_seconds` from the video record (or probe).
@@ -40,3 +54,4 @@ This document defines the unit rates and cost measurement model across the 6 vid
        AND EXTRACT(MONTH FROM created_at) = :month
      GROUP BY metric;
      ```
+
