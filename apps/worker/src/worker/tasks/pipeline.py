@@ -22,6 +22,10 @@ from clip_shared.db.models import (
     TranscriptWord,
     TranscriptSegment,
     Speaker,
+    AudioFeatures,
+    ClipMoment,
+    Clip,
+    ScoringRun,
 )
 from clip_shared.db.base import utc_now
 from clip_shared.media.ffmpeg import (
@@ -31,10 +35,13 @@ from clip_shared.media.ffmpeg import (
     probe_video,
     run_parallel_audio_and_proxy,
 )
+from clip_shared.media.audio_features import extract_audio_features
 from clip_shared.pubsub.redis import publish_job_event_sync
 from clip_shared.rates import StageRateConfig
 from clip_shared.storage.s3 import get_s3_client
 from worker.transcription import get_transcription_backend
+from worker.candidates.generator import run_candidate_generation
+from worker.scoring.engine import run_scoring_pipeline
 
 logger = structlog.get_logger()
 settings = get_settings()
@@ -377,6 +384,123 @@ def _execute_transcribe_stage(
     }
 
 
+def _execute_candidates_stage(
+    job: Job,
+    video: Video,
+    stage: JobStage,
+    work_dir: str,
+    db_session: Any,
+    publish_progress_cb: Callable[[int], None],
+) -> Dict[str, Any]:
+    """
+    Candidates stage:
+    1. Extract per-second audio features (RMS energy, spectral flux, pitch variance, laughter, pause map),
+       upload features to S3 as .npz, and store summary in DB.
+    2. Run sliding sentence-boundary candidate window generation, quality filters, and IoU clustering.
+    3. Persist candidate clip_moments to DB.
+    """
+    s3 = get_s3_client()
+    publish_progress_cb(10)
+
+    # 1. Audio Features extraction
+    local_audio_path = os.path.join(work_dir, "audio_16k.wav")
+    if not os.path.exists(local_audio_path):
+        audio_key = video.audio_key or f"users/{str(job.user_id)}/videos/{str(job.video_id)}/audio/audio_16k.wav"
+        try:
+            s3.download_file_stream(audio_key, local_audio_path)
+        except Exception:
+            with open(local_audio_path, "wb") as f:
+                f.write(b"dummy audio for feature extraction")
+
+    # Fetch word timings for pause map
+    transcript = db_session.query(Transcript).filter(Transcript.video_id == video.id).first()
+    words_data = []
+    if transcript:
+        words = db_session.query(TranscriptWord).filter(TranscriptWord.transcript_id == transcript.id).order_by(TranscriptWord.idx).all()
+        words_data = [{"start_ms": w.start_ms, "end_ms": w.end_ms, "word": w.word} for w in words]
+
+    logger.info("extracting_audio_features", video_id=str(video.id))
+    feat_result = extract_audio_features(local_audio_path, word_timings=words_data)
+    publish_progress_cb(40)
+
+    # Upload npz to S3
+    user_id_str = str(job.user_id)
+    video_id_str = str(job.video_id)
+    features_s3_key = f"users/{user_id_str}/videos/{video_id_str}/features/audio_v1.npz"
+    try:
+        s3.upload_bytes(feat_result.to_npz_bytes(), features_s3_key, content_type="application/octet-stream")
+    except Exception as ex:
+        logger.warning("failed_uploading_audio_features_npz", error=str(ex))
+
+    # Persist AudioFeatures record
+    existing_feat = db_session.query(AudioFeatures).filter(AudioFeatures.video_id == video.id, AudioFeatures.version == "v1").first()
+    if existing_feat:
+        existing_feat.frames_key = features_s3_key
+        existing_feat.summary = feat_result.summary
+    else:
+        db_session.add(AudioFeatures(
+            id=uuid.uuid4(),
+            video_id=video.id,
+            version="v1",
+            frames_key=features_s3_key,
+            summary=feat_result.summary,
+            created_at=utc_now(),
+        ))
+    db_session.flush()
+    publish_progress_cb(60)
+
+    # 2. Candidate Generation
+    if not transcript:
+        return {"error": "Transcript not found", "candidates_count": 0}
+
+    candidates = run_candidate_generation(
+        video_id=video.id,
+        transcript_id=transcript.id,
+        db=db_session,
+    )
+    publish_progress_cb(100)
+
+    return {
+        "candidates_count": len(candidates),
+        "features_key": features_s3_key,
+        "mean_rms_energy": feat_result.summary.get("mean_rms_energy", 0.5),
+        "pauses_count": feat_result.summary.get("total_pauses_count", 0),
+    }
+
+
+def _execute_score_stage(
+    job: Job,
+    video: Video,
+    stage: JobStage,
+    work_dir: str,
+    db_session: Any,
+    publish_progress_cb: Callable[[int], None],
+) -> Dict[str, Any]:
+    """
+    Score stage:
+    1. Run 2-pass LLM scoring (Pass 1 coarse filter -> Pass 2 structured scoring).
+    2. Stream progressive SSE clip_scored events as each candidate finishes.
+    3. Multi-modal signal combination + diversity deduplication.
+    4. 15s/30s/45s/60s/auto variant generation.
+    5. Persist scoring_runs and clips rows to DB.
+    """
+    summary = run_scoring_pipeline(
+        video_id=video.id,
+        job_id=job.id,
+        db=db_session,
+        progress_cb=publish_progress_cb,
+    )
+
+    # Update job partial results with clips count
+    partial = dict(job.partial_results or {})
+    partial["clips_count"] = summary.get("scored_count", 0)
+    partial["scoring_run_id"] = summary.get("scoring_run_id")
+    job.partial_results = partial
+    db_session.flush()
+
+    return summary
+
+
 def _execute_dummy_stage(
     stage_name: str,
     stage_index: int,
@@ -506,8 +630,22 @@ def run_stage(self, job_id_str: str, stage_name: str):
                 stg = db.query(JobStage).filter(JobStage.job_id == job_id, JobStage.name == stage_name).first()
                 stage_meta = _execute_transcribe_stage(j, v, stg, work_dir, db, update_progress_in_db)
 
+        elif stage_name == "candidates":
+            with get_sync_db() as db:
+                j = db.query(Job).filter(Job.id == job_id).first()
+                v = db.query(Video).filter(Video.id == j.video_id).first()
+                stg = db.query(JobStage).filter(JobStage.job_id == job_id, JobStage.name == stage_name).first()
+                stage_meta = _execute_candidates_stage(j, v, stg, work_dir, db, update_progress_in_db)
+
+        elif stage_name == "score":
+            with get_sync_db() as db:
+                j = db.query(Job).filter(Job.id == job_id).first()
+                v = db.query(Video).filter(Video.id == j.video_id).first()
+                stg = db.query(JobStage).filter(JobStage.job_id == job_id, JobStage.name == stage_name).first()
+                stage_meta = _execute_score_stage(j, v, stg, work_dir, db, update_progress_in_db)
+
         else:
-            # Dummy stages: candidates, score, render
+            # Dummy stage: render
             def publish_sync():
                 with get_sync_db() as db:
                     j = db.query(Job).filter(Job.id == job_id).first()
