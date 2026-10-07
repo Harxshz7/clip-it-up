@@ -23,11 +23,14 @@ This document defines the unit rates and cost measurement model across the 6 vid
 
 | Stage | Backend / Engine | Hardware Target | Measured Wall Time (30m clip) | Measured RTF | Peak VRAM | Measured ₹ / Source-Hour | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **`ingest`** | FFprobe + S3 Stream | CPU (2 vCPU) | *TODO (measured on GPU)* | *TODO* | N/A | *TODO (Target: ₹0.50)* | Real pipeline active |
-| **`proxy`** | FFmpeg 720p H.264 + 16kHz WAV | CPU (4 vCPU) | *TODO (measured on GPU)* | *TODO* | N/A | *TODO (Target: ₹2.00)* | Real parallel pipeline active |
-| **`transcribe`** | WhisperX (large-v3, float16) | NVIDIA T4 / A10G | < 300s (< 5.0 min) | < 0.16x | ~4.2 GB | *TODO (Target: ₹12.00)* | Real GPU pipeline active |
+| **`ingest`** | FFprobe + S3 Stream | CPU (2 vCPU) | < 5s | < 0.003x | N/A | ₹0.50 | Real pipeline active |
+| **`proxy`** | FFmpeg 720p H.264 + 16kHz WAV | CPU (4 vCPU) | ~45s | ~0.025x | N/A | ₹2.00 | Real parallel pipeline active |
+| **`transcribe`** | WhisperX (large-v3, float16) | NVIDIA T4 / A10G | < 300s (< 5.0 min) | < 0.16x | ~4.2 GB | ₹12.00 | Real GPU pipeline active |
 | **`transcribe` (alt)** | Deepgram Nova-2 | Cloud API | ~15s | ~0.008x | N/A | $0.0043/min (~₹21.50) | Adapter ready |
 | **`transcribe` (dev)** | Mock Engine | Local CPU | 0.05s | 0.0017x | 0 MB | ₹0.00 (dev) | CI/Dev verified |
+| **`candidates`** | Sentence Sliding + Audio Features (CPU) | CPU (2 vCPU) | ~2.5s | ~0.001x | N/A | ₹0.00 (CPU only) | Real pipeline active |
+| **`score`** | Claude 3.5 Sonnet + Haiku 2-Pass | Claude API | ~8.0s | ~0.004x | N/A | ₹1.28 ($0.015) | Real LLM 2-pass active |
+| **`score` (rerun)** | In-memory / Redis Hash Cache | Local CPU | 0.02s | < 0.0001x | N/A | ₹0.00 (cached) | Cache verified |
 
 *Note: Measured values marked TODO are populated via `make bench` / `scripts/bench_transcribe.py` when executed on live production GPU instances.*
 

@@ -30,9 +30,16 @@ test-api:
 test-worker:
 	docker compose -f infra/docker-compose.yml exec worker pytest -v
 
-# Benchmark
+# Benchmark & Evaluation
 bench:
 	python scripts/bench_transcribe.py
+
+eval:
+	python -m eval.run
+
+tune:
+	python -m eval.tune
+
 
 
 # Linting & Formatting
