@@ -10,6 +10,7 @@ import { formatBytes, formatDuration } from "@/lib/utils";
 import { JobProgress } from "@/components/JobProgress";
 import { VideoPlayer, VideoPlayerRef } from "@/components/VideoPlayer";
 import { TranscriptViewer } from "@/components/TranscriptViewer";
+import { ClipsDeck } from "@/components/ClipsDeck";
 import {
   Film,
   ArrowLeft,
@@ -32,6 +33,7 @@ export default function VideoDetailPage() {
   const [proxyUrl, setProxyUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<"clips" | "transcript">("clips");
 
   // Playback sync state between VideoPlayer and TranscriptViewer
   const [currentPlaybackMs, setCurrentPlaybackMs] = useState(0);
@@ -243,57 +245,90 @@ export default function VideoDetailPage() {
         </div>
       </div>
 
-      {/* Main Content Area: Side-by-Side Video Player & Transcript Viewer */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Left Column: Video Player */}
-        <div className="lg:col-span-7 space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-zinc-300 flex items-center gap-2">
-              <Film className="w-4 h-4 text-purple-400" /> Video Preview (720p Proxy)
-            </h2>
-            <span className="text-[11px] text-zinc-500">
-              Shortcuts: Space (Play/Pause), J/L (Seek), Arrows (±5s)
+      {/* Main Content Area: Side-by-Side Video Player & Clips / Transcript Viewers */}
+      <div className="space-y-6">
+        {/* Tab Switcher */}
+        <div className="flex items-center gap-2 border-b border-white/10 pb-3">
+          <button
+            type="button"
+            onClick={() => setActiveTab("clips")}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
+              activeTab === "clips"
+                ? "bg-purple-600 text-white shadow-lg shadow-purple-600/20"
+                : "text-zinc-400 hover:text-zinc-200 hover:bg-white/5"
+            }`}
+          >
+            <Sparkles className="w-4 h-4 text-amber-400" />
+            <span>AI Clips & Moments</span>
+            <span className="text-[11px] px-2 py-0.5 rounded-full bg-white/20 text-white font-mono">
+              Phase 2
             </span>
-          </div>
+          </button>
 
-          <VideoPlayer
-            ref={playerRef}
-            src={proxyUrl || ""}
-            poster=""
-            title={video.original_filename}
-            onTimeUpdate={(ms) => setCurrentPlaybackMs(ms)}
-          />
-
-          {!proxyUrl && (
-            <div className="p-3.5 rounded-xl bg-zinc-900/60 border border-white/5 text-xs text-zinc-400 flex items-center gap-2">
-              <Loader2 className="w-3.5 h-3.5 animate-spin text-purple-400" />
-              <span>Generating optimized 720p preview proxy in the background...</span>
-            </div>
-          )}
+          <button
+            type="button"
+            onClick={() => setActiveTab("transcript")}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
+              activeTab === "transcript"
+                ? "bg-purple-600 text-white shadow-lg shadow-purple-600/20"
+                : "text-zinc-400 hover:text-zinc-200 hover:bg-white/5"
+            }`}
+          >
+            <FileText className="w-4 h-4" />
+            <span>Transcript & Speakers</span>
+          </button>
         </div>
 
-        {/* Right Column: Transcript Viewer */}
-        <div className="lg:col-span-5 space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-zinc-300 flex items-center gap-2">
-              <FileText className="w-4 h-4 text-purple-400" /> Transcript & Speakers
-            </h2>
-            {isTranscriptReady && (
-              <span className="text-[11px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
-                Word Timestamps Synced
+        {/* Video Player & Active Tab Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          {/* Left Column: Video Player */}
+          <div className="lg:col-span-6 space-y-4 lg:sticky lg:top-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-sm font-semibold text-zinc-300 flex items-center gap-2">
+                <Film className="w-4 h-4 text-purple-400" /> Video Preview (720p Proxy)
+              </h2>
+              <span className="text-[11px] text-zinc-500">
+                Shortcuts: Space (Play/Pause), J/L (Seek)
               </span>
+            </div>
+
+            <VideoPlayer
+              ref={playerRef}
+              src={proxyUrl || ""}
+              poster=""
+              title={video.original_filename}
+              onTimeUpdate={(ms) => setCurrentPlaybackMs(ms)}
+            />
+
+            {!proxyUrl && (
+              <div className="p-3.5 rounded-xl bg-zinc-900/60 border border-white/5 text-xs text-zinc-400 flex items-center gap-2">
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-purple-400" />
+                <span>Generating optimized 720p preview proxy in the background...</span>
+              </div>
             )}
           </div>
 
-          <TranscriptViewer
-            videoId={videoId}
-            currentMs={currentPlaybackMs}
-            onSeek={handleSeek}
-            isTranscribing={isTranscribing && !isTranscriptReady}
-            transcribeProgress={job?.progress || 0}
-            error={job?.error}
-            onRetry={fetchVideoAndJob}
-          />
+          {/* Right Column: Dynamic Tab Content */}
+          <div className="lg:col-span-6 space-y-4">
+            {activeTab === "clips" ? (
+              <ClipsDeck
+                videoId={videoId}
+                proxyUrl={proxyUrl}
+                onSeek={handleSeek}
+                isJobRunning={job?.status === "running"}
+              />
+            ) : (
+              <TranscriptViewer
+                videoId={videoId}
+                currentMs={currentPlaybackMs}
+                onSeek={handleSeek}
+                isTranscribing={isTranscribing && !isTranscriptReady}
+                transcribeProgress={job?.progress || 0}
+                error={job?.error}
+                onRetry={fetchVideoAndJob}
+              />
+            )}
+          </div>
         </div>
       </div>
 
