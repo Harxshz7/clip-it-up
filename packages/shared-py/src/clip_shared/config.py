@@ -80,6 +80,17 @@ class Settings(BaseSettings):
     MAX_SPEAKERS: Optional[int] = 10
     DEEPGRAM_API_KEY: Optional[str] = None
 
+    # LLM & Scoring (Anthropic Claude API)
+    ANTHROPIC_API_KEY: Optional[str] = None
+    LLM_PASS1_MODEL: str = "claude-3-haiku-20240307"
+    LLM_PASS2_MODEL: str = "claude-3-5-sonnet-20241022"
+    LLM_SCORER_BACKEND: Literal["anthropic", "mock"] = "mock"
+    PROMPT_VERSION: str = "v1"
+    SCORER_VERSION: str = "v1"
+    MAX_CANDIDATES_PER_HOUR: int = 60
+    LLM_CONCURRENCY: int = 5
+    USD_TO_INR_RATE: float = 85.0
+
     # Sentry
     SENTRY_DSN: Optional[str] = None
 
@@ -97,3 +108,45 @@ class Settings(BaseSettings):
 @lru_cache()
 def get_settings() -> Settings:
     return Settings()
+
+
+def load_scoring_weights(custom_weights_path: Optional[str] = None) -> dict:
+    """Load scoring weights and thresholds from YAML configuration file."""
+    import os
+    import yaml
+
+    if custom_weights_path and os.path.exists(custom_weights_path):
+        with open(custom_weights_path, "r", encoding="utf-8") as f:
+            return yaml.safe_load(f)
+
+    default_path = os.path.join(os.path.dirname(__file__), "config", "scoring_weights.yaml")
+    if os.path.exists(default_path):
+        with open(default_path, "r", encoding="utf-8") as f:
+            return yaml.safe_load(f)
+
+    # Fallback dictionary if file not found
+    return {
+        "version": "v1",
+        "weights": {
+            "hook": 0.30,
+            "emotion": 0.15,
+            "coherence": 0.20,
+            "payoff": 0.20,
+            "novelty": 0.10,
+            "audio_energy": 0.10,
+            "laughter": 0.05,
+            "pause_penalty": 0.15,
+            "flag_penalty": 0.30,
+        },
+        "hook_start_window_s": 3.0,
+        "hook_energy_boost": 0.15,
+        "thresholds": {
+            "min_usable_score": 0.65,
+            "selection_iou_threshold": 0.30,
+            "diversity_window_minutes": 5.0,
+            "max_clips_per_window": 2,
+            "diversity_score_override": 0.85,
+            "max_selected_clips": 10,
+            "candidate_iou_cluster_threshold": 0.50,
+        },
+    }

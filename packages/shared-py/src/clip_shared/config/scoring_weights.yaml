@@ -1,0 +1,23 @@
+version: "v1"
+weights:
+  hook: 0.30
+  emotion: 0.15
+  coherence: 0.20
+  payoff: 0.20
+  novelty: 0.10
+  audio_energy: 0.10
+  laughter: 0.05
+  pause_penalty: 0.15
+  flag_penalty: 0.30
+
+hook_start_window_s: 3.0
+hook_energy_boost: 0.15
+
+thresholds:
+  min_usable_score: 0.65
+  selection_iou_threshold: 0.30
+  diversity_window_minutes: 5.0
+  max_clips_per_window: 2
+  diversity_score_override: 0.85
+  max_selected_clips: 10
+  candidate_iou_cluster_threshold: 0.50
