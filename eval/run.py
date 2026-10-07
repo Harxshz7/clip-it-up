@@ -5,6 +5,7 @@ import sys
 import time
 from datetime import datetime, timezone
 from typing import Dict, Any, List, Optional
+import numpy as np
 import yaml
 
 # Ensure project packages are on python path
@@ -228,8 +229,9 @@ def run_evaluation(
             "top_clip_score": selected[0]["final_score"] if selected else 0.0,
         })
 
-        status_emoji = "✓" if p_at_5 >= 0.60 else "✗"
-        print(f"[{status_emoji}] {v_slug:32} | Type: {meta.get('type'):11} | P@5: {p_at_5*100:4.1f}% ({usable_count}/{total_k} usable) | Top: '{selected[0]['title'][:30] if selected else ''}'")
+        status_tag = "PASS" if p_at_5 >= 0.60 else "FAIL"
+        top_title = selected[0]['title'][:30] if selected else 'N/A'
+        print(f"[{status_tag:4}] {v_slug:32} | Type: {meta.get('type'):11} | P@5: {p_at_5*100:4.1f}% ({usable_count}/{total_k} usable) | Top: '{top_title}'")
 
     elapsed_wall_time = time.time() - start_eval_time
     total_source_hours = max(0.1, total_source_duration_s / 3600.0)
@@ -359,8 +361,8 @@ def run_evaluation(
 
     print(f"\n================================================================================")
     print(f"  EVALUATION SUMMARY: PRECISION@5 = {avg_precision_at_5*100:.1f}% | AUC = {auc:.3f}")
-    print(f"  TARGET (>=60%): {'PASSED ✅' if avg_precision_at_5 >= 0.60 else 'FAILED ❌'}")
-    print(f"  Cost / Source-Hour: ₹{cost_per_hour_inr:.2f} (${cost_per_hour_usd:.3f}) | Time: {wall_time_per_source_hour:.1f}s")
+    print(f"  TARGET (>=60%): {'PASSED (SUCCESS)' if avg_precision_at_5 >= 0.60 else 'FAILED'}")
+    print(f"  Cost / Source-Hour: Rs.{cost_per_hour_inr:.2f} (${cost_per_hour_usd:.3f}) | Time: {wall_time_per_source_hour:.1f}s")
     print(f"  Report written to: {md_path}")
     print(f"================================================================================\n")
 
