@@ -22,13 +22,8 @@
 | :--- | :--- | :--- | :--- | :--- |
 | **0. Foundation** | W1–2 | Presigned S3 upload, dummy 6-stage worker, live SSE progress, ₹ INR cost recording | **Complete** | `<DEV_A>` / `<DEV_B>` |
 | **1. Transcript** | W3–4 | Real WhisperX audio extraction, word-level timestamps, speaker diarization, interactive viewer | **Complete** | `<DEV_A>` / `<DEV_B>` |
-| **2. Clip Selection**| W5–8 | LLM virality scoring (Claude API), candidate hook extraction, ranking | Planned | `<DEV_A>` |
+| **2. Clip Selection**| W5–8 | LLM virality scoring (Claude API), candidate hook extraction, ranking, streaming SSE, eval harness | **Complete** | `<DEV_A>` / `<DEV_B>` |
 | **2.5 Reality Check**| W9 | Creators test raw AI clip cuts; validate hook retention against baseline | Planned | `<DEV_A>` / `<DEV_B>` |
-| **3. Reframe** | W10–12| Face tracking + active speaker detection (9:16 auto-crop) via FFmpeg | Planned | `<DEV_A>` |
-| **4. Captions & Export** | W13–14| ASS dynamic animated subtitles burned into exported 1080x1920 MP4 | Planned | `<DEV_A>` |
-| **5. Clip Editor** | W15–16| Web UI trimming, caption styling, speaker switch overrides, instant preview | Planned | `<DEV_B>` |
-| **6. Soft Launch** | W17–18| End-to-end user onboarding, Clerk billing gates, 50 creator beta | Planned | `<DEV_A>` / `<DEV_B>` |
-| **7. Post-Launch** | W19+ | Batch uploads, custom font presets, multi-aspect export (1:1, 4:5) | Planned | `<DEV_A>` / `<DEV_B>` |
 
 ---
 
@@ -49,11 +44,19 @@
 - [x] `[web]` Build side-by-side video player and transcript viewer with word-level seek, colored speaker labels, inline renaming, auto-scroll with manual pause, search highlighting & navigation, and multi-format exports.
 - [x] `[eval]` Add `scripts/bench_transcribe.py`, `make bench`, and fixtures with reference transcript.
 
-### Phase 2: AI Clip Discovery (Weeks 5–8)
-- [ ] `[worker]` Prompt Claude 3.5 Sonnet to detect 30–90s coherent narrative arcs and hooks.
-- [ ] `[worker]` Score virality (hook strength, pacing, payoff) and store candidate clips in DB.
-- [ ] `[api]` Add `GET /videos/{id}/clips` endpoint with ranking metadata.
-- [ ] `[web]` Build clip candidate card deck with confidence scores and hook previews.
+### Phase 2: AI Clip Discovery & Evaluation (Weeks 5–8) — COMPLETE
+- [x] `[worker]` Sliding sentence-boundary window generator (15–90s), hook and conclusion scoring heuristics.
+- [x] `[worker]` Quality filters: topic coherence, filler ratio, silence threshold (>30%), and single-speaker dominance.
+- [x] `[worker]` Acoustic feature extraction (RMS energy, spectral flux, pitch variance, laughter detector, pause map) stored to S3 as `.npz` and DB.
+- [x] `[worker]` Two-pass LLM scoring (Claude 3.5 Sonnet + Haiku) with SHA-256 response caching and full video summary context.
+- [x] `[worker]` Multi-modal signal combiner (hook, emotion, coherence, payoff, novelty, audio energy, laughter, penalties).
+- [x] `[worker]` Overlap deduplication (IoU > 0.3) and temporal diversity filter (max 2 clips per 5-min window).
+- [x] `[worker]` Sentence-boundary aligned multi-length variants (15s, 30s, 45s, 60s, auto).
+- [x] `[worker]` Real-time SSE streaming (`clip_scored` events emitted per batch).
+- [x] `[api]` Add `GET /videos/{id}/clips`, `GET /clips/{id}`, `POST /clips/{id}/feedback`, `POST /videos/{id}/rescore`, `GET /videos/{id}/scoring-runs`.
+- [x] `[web]` Interactive ClipsDeck and ClipCard with score breakdown tooltips, variant selector, proxy video preview seek, and thumbs feedback.
+- [x] `[web]` Blind human rater interface at `/eval/rate` for 3 independent raters with CSV export.
+- [x] `[eval]` Eval harness with 10 benchmark videos, ground truth ratings, `make eval` (Precision@5, AUC, correlations, cost diffs), `make tune` (coordinate search), and `docs/eval.md`.
 
 ### Phase 3 & 4: Reframe, Captions & Render (Weeks 10–14)
 - [ ] `[worker]` Implement MediaPipe/YOLO face tracking for 1–2 speaker 9:16 auto-framing.

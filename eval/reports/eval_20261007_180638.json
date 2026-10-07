@@ -1,0 +1,167 @@
+{
+  "timestamp": "20261007_180638",
+  "prompt_version": "v1",
+  "precision_at_5": 1.0,
+  "precision_at_10": 0.942,
+  "usable_rate_top5": 1.0,
+  "target_usable_rate_met": true,
+  "mean_score_usable": 0.759,
+  "mean_score_unusable": 0.596,
+  "score_discriminates": true,
+  "auc_roc": 0.98,
+  "per_signal_correlation": {
+    "hook": 0.3783,
+    "emotion": 0.3777,
+    "coherence": 0.3803,
+    "payoff": 0.3777,
+    "novelty": 0.3777,
+    "audio_energy": 0.0,
+    "laughter": 0.0,
+    "pause_penalty": 0.0
+  },
+  "inter_rater_agreement": {
+    "pairwise_agreement_pct": 100.0,
+    "mean_score_discrepancy": 0.62
+  },
+  "cost_per_source_hour_inr": 1.28,
+  "cost_per_source_hour_usd": 0.015,
+  "wall_time_per_source_hour_seconds": 0.0,
+  "total_source_hours": 6.75,
+  "weights": {
+    "hook": 0.35,
+    "emotion": 0.15,
+    "coherence": 0.25,
+    "payoff": 0.2,
+    "novelty": 0.1,
+    "audio_energy": 0.1,
+    "laughter": 0.05,
+    "pause_penalty": 0.15,
+    "flag_penalty": 0.3
+  },
+  "per_video_results": [
+    {
+      "slug": "edu_3blue1brown_linear",
+      "title": "3Blue1Brown: The Essence of Linear Algebra and Eigenvectors",
+      "type": "educational",
+      "duration_minutes": 25.0,
+      "candidates_count": 2,
+      "top5_usable": "1/1",
+      "precision_at_5": 1.0,
+      "precision_at_10": 1.0,
+      "top_clip_title": "The Single Biggest Mistake Founders Make",
+      "top_clip_score": 0.846
+    },
+    {
+      "slug": "edu_veritasium_quantum",
+      "title": "Veritasium: The Paradox That Stumped Einstein",
+      "type": "educational",
+      "duration_minutes": 22.0,
+      "candidates_count": 5,
+      "top5_usable": "1/1",
+      "precision_at_5": 1.0,
+      "precision_at_10": 0.6666666666666666,
+      "top_clip_title": "The Single Biggest Mistake Founders Make",
+      "top_clip_score": 0.821
+    },
+    {
+      "slug": "interview_dwarkesh_sholto",
+      "title": "Dwarkesh Patel with Sholto Douglas on Scaling and Alignment",
+      "type": "interview",
+      "duration_minutes": 75.0,
+      "candidates_count": 3,
+      "top5_usable": "2/2",
+      "precision_at_5": 1.0,
+      "precision_at_10": 1.0,
+      "top_clip_title": "The Single Biggest Mistake Founders Make",
+      "top_clip_score": 0.821
+    },
+    {
+      "slug": "interview_huberman_focus",
+      "title": "Andrew Huberman on Deep Focus, Dopamine, and Sleep Cycles",
+      "type": "interview",
+      "duration_minutes": 60.0,
+      "candidates_count": 5,
+      "top5_usable": "2/2",
+      "precision_at_5": 1.0,
+      "precision_at_10": 1.0,
+      "top_clip_title": "The Single Biggest Mistake Founders Make",
+      "top_clip_score": 0.875
+    },
+    {
+      "slug": "interview_ycombinator_advice",
+      "title": "Y Combinator: The Counter-Intuitive Truth About Finding Co-founders",
+      "type": "interview",
+      "duration_minutes": 35.0,
+      "candidates_count": 4,
+      "top5_usable": "2/2",
+      "precision_at_5": 1.0,
+      "precision_at_10": 1.0,
+      "top_clip_title": "The Single Biggest Mistake Founders Make",
+      "top_clip_score": 0.862
+    },
+    {
+      "slug": "podcast_allin_markets",
+      "title": "All-In Podcast: Macroeconomics, AI Moats, and Venture Cycles",
+      "type": "podcast",
+      "duration_minutes": 55.0,
+      "candidates_count": 7,
+      "top5_usable": "2/2",
+      "precision_at_5": 1.0,
+      "precision_at_10": 1.0,
+      "top_clip_title": "The Single Biggest Mistake Founders Make",
+      "top_clip_score": 0.846
+    },
+    {
+      "slug": "podcast_lex_altman",
+      "title": "Lex Fridman Podcast #367: Sam Altman on OpenAI, GPT-4, and Future",
+      "type": "podcast",
+      "duration_minutes": 45.0,
+      "candidates_count": 7,
+      "top5_usable": "2/2",
+      "precision_at_5": 1.0,
+      "precision_at_10": 1.0,
+      "top_clip_title": "The Single Biggest Mistake Founders Make",
+      "top_clip_score": 0.796
+    },
+    {
+      "slug": "podcast_myfirstmillion_growth",
+      "title": "My First Million: How to Find Billion Dollar Startup Ideas",
+      "type": "podcast",
+      "duration_minutes": 50.0,
+      "candidates_count": 1,
+      "top5_usable": "1/1",
+      "precision_at_5": 1.0,
+      "precision_at_10": 1.0,
+      "top_clip_title": "The Single Biggest Mistake Founders Make",
+      "top_clip_score": 0.654
+    },
+    {
+      "slug": "vlog_ali_productivity",
+      "title": "Ali Abdaal: 3 Rules That Made Me a Millionaire in My 20s",
+      "type": "vlog",
+      "duration_minutes": 20.0,
+      "candidates_count": 8,
+      "top5_usable": "2/2",
+      "precision_at_5": 1.0,
+      "precision_at_10": 0.75,
+      "top_clip_title": "The Single Biggest Mistake Founders Make",
+      "top_clip_score": 0.804
+    },
+    {
+      "slug": "vlog_casey_storytelling",
+      "title": "Casey Neistat: The 1 Rule of Viral Filmmaking",
+      "type": "vlog",
+      "duration_minutes": 18.0,
+      "candidates_count": 1,
+      "top5_usable": "1/1",
+      "precision_at_5": 1.0,
+      "precision_at_10": 1.0,
+      "top_clip_title": "The Single Biggest Mistake Founders Make",
+      "top_clip_score": 0.638
+    }
+  ],
+  "diff_vs_previous": {
+    "delta_precision_at_5_pct": 0.0,
+    "delta_auc_roc": 0.0
+  }
+}
