@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { ClipMoment, Clip, VideoClipsResponse, FeedbackReasonTag, ClipScoredEventPayload } from '@clip-it-up/shared';
 import { ClipCard } from './ClipCard';
 
@@ -25,7 +25,7 @@ export const ClipsDeck: React.FC<ClipsDeckProps> = ({
   const [isRescoring, setIsRescoring] = useState(false);
   const [streamingNotice, setStreamingNotice] = useState<string | null>(null);
 
-  const fetchClips = async () => {
+  const fetchClips = useCallback(async () => {
     try {
       const res = await fetch(`/api/videos/${videoId}/clips?sort=${sortBy}`, {
         headers: { 'Content-Type': 'application/json' },
@@ -39,11 +39,11 @@ export const ClipsDeck: React.FC<ClipsDeckProps> = ({
     } finally {
       setLoading(false);
     }
-  };
+  }, [videoId, sortBy]);
 
   useEffect(() => {
     fetchClips();
-  }, [videoId, sortBy]);
+  }, [fetchClips]);
 
   // Listen for real-time clip_scored SSE events emitted by the backend
   useEffect(() => {
@@ -59,7 +59,7 @@ export const ClipsDeck: React.FC<ClipsDeckProps> = ({
     return () => {
       window.removeEventListener('clip_scored' as any, handleClipScoredEvent as any);
     };
-  }, [videoId]);
+  }, [videoId, fetchClips]);
 
   const handleFeedback = async (clipId: string, value: 'up' | 'down', reasonTag?: FeedbackReasonTag) => {
     try {

@@ -1,25 +1,22 @@
 import numpy as np
-import pytest
-from worker.candidates.window_generator import (
-    generate_candidate_windows,
-    score_window_start_heuristics,
-    score_window_end_heuristics,
-    CandidateWindow,
+
+from clip_shared.media.audio_features import (
+    AudioFeaturesResult,
+    HeuristicLaughterDetector,
+    extract_audio_features,
+    normalize_series,
 )
 from worker.candidates.filters import (
     calculate_window_iou,
-    compute_text_similarity,
-    is_topic_coherent,
+    cluster_and_deduplicate_candidates,
     is_excessive_fillers,
     is_excessive_silence,
-    filter_candidate_windows,
-    cluster_and_deduplicate_candidates,
 )
-from clip_shared.media.audio_features import (
-    extract_audio_features,
-    normalize_series,
-    AudioFeaturesResult,
-    HeuristicLaughterDetector,
+from worker.candidates.window_generator import (
+    CandidateWindow,
+    generate_candidate_windows,
+    score_window_end_heuristics,
+    score_window_start_heuristics,
 )
 
 

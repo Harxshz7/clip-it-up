@@ -2,12 +2,12 @@ import io
 import math
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import Dict, Any, List, Optional, Tuple
+from typing import Any
+
 import numpy as np
 
 try:
     import librosa
-    import soundfile as sf
     LIBROSA_AVAILABLE = True
 except ImportError:
     LIBROSA_AVAILABLE = False
@@ -36,7 +36,6 @@ class HeuristicLaughterDetector(LaughterDetector):
         probs = np.zeros(duration_s, dtype=np.float32)
 
         try:
-            hop_length = sr  # 1 second windows
             for i in range(duration_s):
                 start = i * sr
                 end = min(len(y), (i + 1) * sr)
@@ -65,8 +64,8 @@ class AudioFeaturesResult:
     spectral_flux: np.ndarray          # 1D array, length = duration_s
     pitch_variance: np.ndarray         # 1D array, length = duration_s
     laughter_prob: np.ndarray          # 1D array, length = duration_s
-    pause_map: List[Dict[str, Any]] = field(default_factory=list) # [{start_ms, end_ms, duration_ms}]
-    summary: Dict[str, Any] = field(default_factory=dict)
+    pause_map: list[dict[str, Any]] = field(default_factory=list) # [{start_ms, end_ms, duration_ms}]
+    summary: dict[str, Any] = field(default_factory=dict)
 
     def to_npz_bytes(self) -> bytes:
         """Serialize raw feature frames to compressed npz bytes."""
@@ -81,7 +80,7 @@ class AudioFeaturesResult:
         return bio.getvalue()
 
     @classmethod
-    def from_npz_bytes(cls, data: bytes, duration_seconds: float, pause_map: Optional[List[Dict[str, Any]]] = None, summary: Optional[Dict[str, Any]] = None) -> "AudioFeaturesResult":
+    def from_npz_bytes(cls, data: bytes, duration_seconds: float, pause_map: list[dict[str, Any]] | None = None, summary: dict[str, Any] | None = None) -> "AudioFeaturesResult":
         bio = io.BytesIO(data)
         npz = np.load(bio)
         return cls(
@@ -94,7 +93,7 @@ class AudioFeaturesResult:
             summary=summary or {},
         )
 
-    def get_window_features(self, start_ms: int, end_ms: int, hook_s: float = 3.0) -> Dict[str, float]:
+    def get_window_features(self, start_ms: int, end_ms: int, hook_s: float = 3.0) -> dict[str, float]:
         """
         Extract normalized summary metrics for a specific time window [start_ms, end_ms].
         Returns:
@@ -146,9 +145,9 @@ def normalize_series(series: np.ndarray) -> np.ndarray:
 
 def extract_audio_features(
     audio_path: str,
-    word_timings: Optional[List[Dict[str, Any]]] = None,
+    word_timings: list[dict[str, Any]] | None = None,
     target_sr: int = 16000,
-    laughter_detector: Optional[LaughterDetector] = None,
+    laughter_detector: LaughterDetector | None = None,
 ) -> AudioFeaturesResult:
     """
     Extract per-second acoustic features (RMS energy, spectral flux, pitch variance, laughter)
@@ -179,9 +178,8 @@ def extract_audio_features(
         sr = target_sr
 
     duration_s = max(1, math.ceil(len(y) / sr))
-    
+
     # 1. Per-second RMS energy
-    hop = sr
     rms_per_sec = []
     spectral_flux_per_sec = []
     pitch_var_per_sec = []
@@ -196,7 +194,7 @@ def extract_audio_features(
             pitch_val = pitch_var_per_sec[-1] if pitch_var_per_sec else 0.0
         else:
             rms_val = float(np.sqrt(np.mean(chunk**2)))
-            
+
             # Spectral flux
             stft = np.abs(librosa.stft(chunk, n_fft=min(512, len(chunk)), hop_length=256))
             if stft.shape[1] > 1:
@@ -225,7 +223,7 @@ def extract_audio_features(
         laughter_arr = laughter_arr[:duration_s]
 
     # 3. Pause Map from word timings
-    pause_map: List[Dict[str, Any]] = []
+    pause_map: list[dict[str, Any]] = []
     if word_timings and len(word_timings) > 1:
         for i in range(len(word_timings) - 1):
             curr_end = word_timings[i].get("end_ms", 0)

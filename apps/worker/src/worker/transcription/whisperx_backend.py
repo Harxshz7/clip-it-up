@@ -1,13 +1,16 @@
 import gc
 import os
-from typing import Callable, Dict, List, Optional, Any, Tuple
+from collections.abc import Callable
+from typing import Any
+
 import structlog
+
 from clip_shared.config import get_settings
 from worker.transcription.base import (
     BaseTranscriptionBackend,
-    WordItem,
     SpeakerItem,
     TranscriptionResult,
+    WordItem,
 )
 from worker.transcription.segment_builder import build_segments_from_words
 
@@ -15,7 +18,7 @@ logger = structlog.get_logger()
 
 # Global worker singletons to load models once per worker process
 _WHISPER_MODEL = None
-_ALIGN_MODELS: Dict[str, Tuple[Any, Any]] = {}
+_ALIGN_MODELS: dict[str, tuple[Any, Any]] = {}
 _DIARIZATION_PIPELINE = None
 
 
@@ -30,7 +33,7 @@ def _cleanup_gpu_memory():
         pass
 
 
-def _get_device_and_compute_type() -> Tuple[str, str]:
+def _get_device_and_compute_type() -> tuple[str, str]:
     """Detect available compute device (cuda vs cpu) and appropriate compute type."""
     settings = get_settings()
     try:
@@ -110,7 +113,7 @@ class WhisperXBackend(BaseTranscriptionBackend):
     def transcribe(
         self,
         audio_path: str,
-        progress_cb: Optional[Callable[[str, float], None]] = None,
+        progress_cb: Callable[[str, float], None] | None = None,
     ) -> TranscriptionResult:
         if not os.path.exists(audio_path):
             raise FileNotFoundError(f"Audio file not found: {audio_path}")
@@ -118,7 +121,7 @@ class WhisperXBackend(BaseTranscriptionBackend):
         try:
             import whisperx
         except ImportError as e:
-            raise RuntimeError(f"whisperx is not installed in the worker environment: {e}")
+            raise RuntimeError(f"whisperx is not installed in the worker environment: {e}") from e
 
         device, compute_type = _get_device_and_compute_type()
 
@@ -177,7 +180,7 @@ class WhisperXBackend(BaseTranscriptionBackend):
             if progress_cb:
                 progress_cb("structuring_segments", 95.0)
 
-            words: List[WordItem] = []
+            words: list[WordItem] = []
             speaker_set = set()
             word_counter = 0
 

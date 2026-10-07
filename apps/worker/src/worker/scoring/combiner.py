@@ -1,16 +1,15 @@
-from typing import Dict, Any, Tuple
 from clip_shared.prompts.clip_score_v1 import Pass2CandidateScore
 
 
 def combine_signals(
     llm_score: Pass2CandidateScore,
-    audio_features: Dict[str, float],
-    weights: Dict[str, float],
+    audio_features: dict[str, float],
+    weights: dict[str, float],
     hook_energy_boost: float = 0.15,
-) -> Tuple[float, Dict[str, float]]:
+) -> tuple[float, dict[str, float]]:
     """
     Combine multi-modal LLM quality signals and acoustic features into a single final score [0.0, 1.0].
-    
+
     Formula:
       effective_hook = (1 - boost) * llm_hook + boost * hook_energy
       base_score = w_hook * effective_hook +

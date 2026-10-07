@@ -1,14 +1,13 @@
 import uuid
-import pytest
-from worker.scoring.llm_client import LLMClient, compute_cache_key, _LLM_RESPONSE_CACHE
-from worker.scoring.combiner import combine_signals
-from worker.scoring.selection import select_top_moments, calculate_moment_iou
-from worker.scoring.variants import generate_moment_variants
+
 from clip_shared.prompts.clip_score_v1 import (
-    Pass1BatchResponse,
-    Pass2CandidateScore,
     ClipScoreFlags,
+    Pass2CandidateScore,
 )
+from worker.scoring.combiner import combine_signals
+from worker.scoring.llm_client import LLMClient
+from worker.scoring.selection import select_top_moments
+from worker.scoring.variants import generate_moment_variants
 
 
 def test_llm_client_mock_and_caching():

@@ -1,23 +1,22 @@
-from typing import Optional
 from clip_shared.config import get_settings
 from worker.transcription.base import (
     BaseTranscriptionBackend,
-    WordItem,
     SegmentItem,
     SpeakerItem,
     TranscriptionResult,
+    WordItem,
 )
-from worker.transcription.segment_builder import build_segments_from_words
 from worker.transcription.export import (
-    export_txt,
-    export_srt,
-    export_vtt,
     export_json,
+    export_srt,
+    export_txt,
+    export_vtt,
 )
 from worker.transcription.mock import MockTranscriptionBackend
+from worker.transcription.segment_builder import build_segments_from_words
 
 
-def get_transcription_backend(backend_type: Optional[str] = None) -> BaseTranscriptionBackend:
+def get_transcription_backend(backend_type: str | None = None) -> BaseTranscriptionBackend:
     """Factory to get the configured transcription backend."""
     settings = get_settings()
     backend_name = (backend_type or settings.TRANSCRIBE_BACKEND).lower()

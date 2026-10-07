@@ -1,21 +1,21 @@
 import uuid
 from datetime import datetime
 from decimal import Decimal
-from typing import Optional, List, Dict, Any
+from typing import Any, Optional
 
 from sqlalchemy import (
-    String,
+    JSON,
     BigInteger,
-    Integer,
-    Float,
-    Numeric,
-    DateTime,
     Boolean,
+    DateTime,
+    Float,
     ForeignKey,
     Index,
-    UniqueConstraint,
+    Integer,
+    Numeric,
+    String,
     Text,
-    JSON,
+    UniqueConstraint,
     Uuid,
 )
 from sqlalchemy.dialects.postgresql import JSONB as PG_JSONB
@@ -36,10 +36,10 @@ class User(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
 
     # Relationships
-    projects: Mapped[List["Project"]] = relationship("Project", back_populates="user", cascade="all, delete-orphan")
-    videos: Mapped[List["Video"]] = relationship("Video", back_populates="user", cascade="all, delete-orphan")
-    jobs: Mapped[List["Job"]] = relationship("Job", back_populates="user", cascade="all, delete-orphan")
-    usage_records: Mapped[List["Usage"]] = relationship("Usage", back_populates="user", cascade="all, delete-orphan")
+    projects: Mapped[list["Project"]] = relationship("Project", back_populates="user", cascade="all, delete-orphan")
+    videos: Mapped[list["Video"]] = relationship("Video", back_populates="user", cascade="all, delete-orphan")
+    jobs: Mapped[list["Job"]] = relationship("Job", back_populates="user", cascade="all, delete-orphan")
+    usage_records: Mapped[list["Usage"]] = relationship("Usage", back_populates="user", cascade="all, delete-orphan")
 
     __table_args__ = (
         Index("ix_users_created_at", "created_at"),
@@ -56,7 +56,7 @@ class Project(Base):
 
     # Relationships
     user: Mapped["User"] = relationship("User", back_populates="projects")
-    videos: Mapped[List["Video"]] = relationship("Video", back_populates="project")
+    videos: Mapped[list["Video"]] = relationship("Video", back_populates="project")
 
     __table_args__ = (
         Index("ix_projects_user_created_at", "user_id", "created_at"),
@@ -67,18 +67,18 @@ class Video(Base):
     __tablename__ = "videos"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    project_id: Mapped[Optional[uuid.UUID]] = mapped_column(UUID(as_uuid=True), ForeignKey("projects.id", ondelete="SET NULL"), nullable=True, index=True)
+    project_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("projects.id", ondelete="SET NULL"), nullable=True, index=True)
     user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
     original_filename: Mapped[str] = mapped_column(String(512), nullable=False)
     storage_key: Mapped[str] = mapped_column(String(1024), nullable=False)
     size_bytes: Mapped[int] = mapped_column(BigInteger, nullable=False)
-    duration_seconds: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
-    width: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
-    height: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
-    fps: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    duration_seconds: Mapped[float | None] = mapped_column(Float, nullable=True)
+    width: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    height: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    fps: Mapped[float | None] = mapped_column(Float, nullable=True)
     has_audio: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
-    proxy_key: Mapped[Optional[str]] = mapped_column(String(1024), nullable=True)
-    audio_key: Mapped[Optional[str]] = mapped_column(String(1024), nullable=True)
+    proxy_key: Mapped[str | None] = mapped_column(String(1024), nullable=True)
+    audio_key: Mapped[str | None] = mapped_column(String(1024), nullable=True)
     content_type: Mapped[str] = mapped_column(String(128), nullable=False)
     status: Mapped[str] = mapped_column(String(32), default="uploading", nullable=False)  # uploading | uploaded | processing | ready | failed
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
@@ -86,13 +86,13 @@ class Video(Base):
     # Relationships
     user: Mapped["User"] = relationship("User", back_populates="videos")
     project: Mapped[Optional["Project"]] = relationship("Project", back_populates="videos")
-    jobs: Mapped[List["Job"]] = relationship("Job", back_populates="video", cascade="all, delete-orphan")
+    jobs: Mapped[list["Job"]] = relationship("Job", back_populates="video", cascade="all, delete-orphan")
     transcript: Mapped[Optional["Transcript"]] = relationship("Transcript", back_populates="video", uselist=False, cascade="all, delete-orphan")
-    usage_records: Mapped[List["Usage"]] = relationship("Usage", back_populates="video")
-    clip_moments: Mapped[List["ClipMoment"]] = relationship("ClipMoment", back_populates="video", cascade="all, delete-orphan")
-    clips: Mapped[List["Clip"]] = relationship("Clip", back_populates="video", cascade="all, delete-orphan")
-    scoring_runs: Mapped[List["ScoringRun"]] = relationship("ScoringRun", back_populates="video", cascade="all, delete-orphan")
-    audio_features_records: Mapped[List["AudioFeatures"]] = relationship("AudioFeatures", back_populates="video", cascade="all, delete-orphan")
+    usage_records: Mapped[list["Usage"]] = relationship("Usage", back_populates="video")
+    clip_moments: Mapped[list["ClipMoment"]] = relationship("ClipMoment", back_populates="video", cascade="all, delete-orphan")
+    clips: Mapped[list["Clip"]] = relationship("Clip", back_populates="video", cascade="all, delete-orphan")
+    scoring_runs: Mapped[list["ScoringRun"]] = relationship("ScoringRun", back_populates="video", cascade="all, delete-orphan")
+    audio_features_records: Mapped[list["AudioFeatures"]] = relationship("AudioFeatures", back_populates="video", cascade="all, delete-orphan")
 
     __table_args__ = (
         Index("ix_videos_user_created_at", "user_id", "created_at"),
@@ -107,19 +107,19 @@ class Job(Base):
     video_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("videos.id", ondelete="CASCADE"), nullable=False, index=True)
     user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
     status: Mapped[str] = mapped_column(String(32), default="queued", nullable=False)  # queued | running | succeeded | failed | cancelled
-    current_stage: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    current_stage: Mapped[str | None] = mapped_column(String(64), nullable=True)
     progress: Mapped[int] = mapped_column(BigInteger, default=0, nullable=False)
-    error: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    partial_results: Mapped[Dict[str, Any]] = mapped_column(JSON_TYPE, default=dict, nullable=False)
+    error: Mapped[str | None] = mapped_column(Text, nullable=True)
+    partial_results: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, default=dict, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
-    started_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
-    finished_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     # Relationships
     user: Mapped["User"] = relationship("User", back_populates="jobs")
     video: Mapped["Video"] = relationship("Video", back_populates="jobs")
-    stages: Mapped[List["JobStage"]] = relationship("JobStage", back_populates="job", cascade="all, delete-orphan", order_by="JobStage.started_at")
-    usage_records: Mapped[List["Usage"]] = relationship("Usage", back_populates="job")
+    stages: Mapped[list["JobStage"]] = relationship("JobStage", back_populates="job", cascade="all, delete-orphan", order_by="JobStage.started_at")
+    usage_records: Mapped[list["Usage"]] = relationship("Usage", back_populates="job")
 
     __table_args__ = (
         Index("ix_jobs_user_created_at", "user_id", "created_at"),
@@ -135,11 +135,11 @@ class JobStage(Base):
     name: Mapped[str] = mapped_column(String(64), nullable=False)  # ingest, proxy, transcribe, candidates, score, render
     status: Mapped[str] = mapped_column(String(32), default="pending", nullable=False)  # pending | running | succeeded | failed | cancelled
     progress: Mapped[int] = mapped_column(BigInteger, default=0, nullable=False)
-    started_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
-    finished_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
-    duration_ms: Mapped[Optional[int]] = mapped_column(BigInteger, nullable=True)
+    started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    duration_ms: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
     cost_inr: Mapped[Decimal] = mapped_column(Numeric(12, 4), default=Decimal("0.0000"), nullable=False)
-    meta: Mapped[Dict[str, Any]] = mapped_column(JSON_TYPE, default=dict, nullable=False)
+    meta: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, default=dict, nullable=False)
 
     # Relationships
     job: Mapped["Job"] = relationship("Job", back_populates="stages")
@@ -155,19 +155,19 @@ class Transcript(Base):
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     video_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("videos.id", ondelete="CASCADE"), unique=True, nullable=False)
-    language: Mapped[Optional[str]] = mapped_column(String(16), nullable=True)
+    language: Mapped[str | None] = mapped_column(String(16), nullable=True)
     status: Mapped[str] = mapped_column(String(32), default="running", nullable=False)  # running | ready | failed
-    model: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
-    backend: Mapped[Optional[str]] = mapped_column(String(32), nullable=True)
+    model: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    backend: Mapped[str | None] = mapped_column(String(32), nullable=True)
     word_count: Mapped[int] = mapped_column(BigInteger, default=0, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
 
     # Relationships
     video: Mapped["Video"] = relationship("Video", back_populates="transcript")
-    words: Mapped[List["TranscriptWord"]] = relationship("TranscriptWord", back_populates="transcript", cascade="all, delete-orphan", order_by="TranscriptWord.idx")
-    segments: Mapped[List["TranscriptSegment"]] = relationship("TranscriptSegment", back_populates="transcript", cascade="all, delete-orphan", order_by="TranscriptSegment.idx")
-    speakers: Mapped[List["Speaker"]] = relationship("Speaker", back_populates="transcript", cascade="all, delete-orphan", order_by="Speaker.label")
-    clip_moments: Mapped[List["ClipMoment"]] = relationship("ClipMoment", back_populates="transcript", cascade="all, delete-orphan")
+    words: Mapped[list["TranscriptWord"]] = relationship("TranscriptWord", back_populates="transcript", cascade="all, delete-orphan", order_by="TranscriptWord.idx")
+    segments: Mapped[list["TranscriptSegment"]] = relationship("TranscriptSegment", back_populates="transcript", cascade="all, delete-orphan", order_by="TranscriptSegment.idx")
+    speakers: Mapped[list["Speaker"]] = relationship("Speaker", back_populates="transcript", cascade="all, delete-orphan", order_by="Speaker.label")
+    clip_moments: Mapped[list["ClipMoment"]] = relationship("ClipMoment", back_populates="transcript", cascade="all, delete-orphan")
 
     __table_args__ = (
         Index("ix_transcripts_video_id", "video_id"),
@@ -184,8 +184,8 @@ class TranscriptWord(Base):
     word: Mapped[str] = mapped_column(String(255), nullable=False)
     start_ms: Mapped[int] = mapped_column(BigInteger, nullable=False)
     end_ms: Mapped[int] = mapped_column(BigInteger, nullable=False)
-    speaker: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
-    confidence: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    speaker: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    confidence: Mapped[float | None] = mapped_column(Float, nullable=True)
 
     # Relationships
     transcript: Mapped["Transcript"] = relationship("Transcript", back_populates="words")
@@ -204,7 +204,7 @@ class TranscriptSegment(Base):
     idx: Mapped[int] = mapped_column(BigInteger, nullable=False)
     start_ms: Mapped[int] = mapped_column(BigInteger, nullable=False)
     end_ms: Mapped[int] = mapped_column(BigInteger, nullable=False)
-    speaker: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    speaker: Mapped[str | None] = mapped_column(String(64), nullable=True)
     text: Mapped[str] = mapped_column(Text, nullable=False)
 
     # Relationships
@@ -222,7 +222,7 @@ class Speaker(Base):
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     transcript_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("transcripts.id", ondelete="CASCADE"), nullable=False)
     label: Mapped[str] = mapped_column(String(64), nullable=False)  # SPEAKER_00
-    display_name: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    display_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
 
     # Relationships
     transcript: Mapped["Transcript"] = relationship("Transcript", back_populates="speakers")
@@ -242,15 +242,15 @@ class ClipMoment(Base):
     transcript_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("transcripts.id", ondelete="CASCADE"), nullable=False, index=True)
     start_ms: Mapped[int] = mapped_column(BigInteger, nullable=False)
     end_ms: Mapped[int] = mapped_column(BigInteger, nullable=False)
-    rank: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
-    final_score: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    rank: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    final_score: Mapped[float | None] = mapped_column(Float, nullable=True)
     status: Mapped[str] = mapped_column(String(32), default="candidate", nullable=False)  # candidate | scored | selected | rejected
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
 
     # Relationships
     video: Mapped["Video"] = relationship("Video", back_populates="clip_moments")
     transcript: Mapped["Transcript"] = relationship("Transcript", back_populates="clip_moments")
-    clips: Mapped[List["Clip"]] = relationship("Clip", back_populates="moment", cascade="all, delete-orphan")
+    clips: Mapped[list["Clip"]] = relationship("Clip", back_populates="moment", cascade="all, delete-orphan")
 
     __table_args__ = (
         Index("ix_clip_moments_video_status", "video_id", "status"),
@@ -267,7 +267,7 @@ class ScoringRun(Base):
     video_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("videos.id", ondelete="CASCADE"), nullable=False, index=True)
     prompt_version: Mapped[str] = mapped_column(String(64), nullable=False)
     scorer_version: Mapped[str] = mapped_column(String(64), nullable=False)
-    weights: Mapped[Dict[str, Any]] = mapped_column(JSON_TYPE, default=dict, nullable=False)
+    weights: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, default=dict, nullable=False)
     model: Mapped[str] = mapped_column(String(64), nullable=False)
     input_tokens: Mapped[int] = mapped_column(BigInteger, default=0, nullable=False)
     output_tokens: Mapped[int] = mapped_column(BigInteger, default=0, nullable=False)
@@ -276,7 +276,7 @@ class ScoringRun(Base):
 
     # Relationships
     video: Mapped["Video"] = relationship("Video", back_populates="scoring_runs")
-    clips: Mapped[List["Clip"]] = relationship("Clip", back_populates="scoring_run")
+    clips: Mapped[list["Clip"]] = relationship("Clip", back_populates="scoring_run")
 
     __table_args__ = (
         Index("ix_scoring_runs_video_created", "video_id", "created_at"),
@@ -290,14 +290,14 @@ class Clip(Base):
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     moment_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("clip_moments.id", ondelete="CASCADE"), nullable=False, index=True)
     video_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("videos.id", ondelete="CASCADE"), nullable=False, index=True)
-    scoring_run_id: Mapped[Optional[uuid.UUID]] = mapped_column(UUID(as_uuid=True), ForeignKey("scoring_runs.id", ondelete="SET NULL"), nullable=True, index=True)
+    scoring_run_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("scoring_runs.id", ondelete="SET NULL"), nullable=True, index=True)
     variant_length_s: Mapped[str] = mapped_column(String(16), default="auto", nullable=False)  # 15 | 30 | 45 | 60 | auto
     start_ms: Mapped[int] = mapped_column(BigInteger, nullable=False)
     end_ms: Mapped[int] = mapped_column(BigInteger, nullable=False)
     hook_text: Mapped[str] = mapped_column(Text, nullable=False)
     title: Mapped[str] = mapped_column(String(512), nullable=False)
     final_score: Mapped[float] = mapped_column(Float, nullable=False)
-    score_breakdown: Mapped[Dict[str, Any]] = mapped_column(JSON_TYPE, default=dict, nullable=False)  # hook, emotion, coherence, payoff, novelty, audio_energy, laughter, pause_penalty
+    score_breakdown: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, default=dict, nullable=False)  # hook, emotion, coherence, payoff, novelty, audio_energy, laughter, pause_penalty
     reason: Mapped[str] = mapped_column(Text, nullable=False)
     model: Mapped[str] = mapped_column(String(64), nullable=False)
     prompt_version: Mapped[str] = mapped_column(String(64), nullable=False)
@@ -308,7 +308,7 @@ class Clip(Base):
     moment: Mapped["ClipMoment"] = relationship("ClipMoment", back_populates="clips")
     video: Mapped["Video"] = relationship("Video", back_populates="clips")
     scoring_run: Mapped[Optional["ScoringRun"]] = relationship("ScoringRun", back_populates="clips")
-    feedback: Mapped[List["ClipFeedback"]] = relationship("ClipFeedback", back_populates="clip", cascade="all, delete-orphan")
+    feedback: Mapped[list["ClipFeedback"]] = relationship("ClipFeedback", back_populates="clip", cascade="all, delete-orphan")
 
     __table_args__ = (
         Index("ix_clips_video_score", "video_id", "final_score"),
@@ -325,7 +325,7 @@ class ClipFeedback(Base):
     clip_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("clips.id", ondelete="CASCADE"), nullable=False, index=True)
     user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
     value: Mapped[str] = mapped_column(String(16), nullable=False)  # up | down
-    reason_tag: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)  # boring | no_context | bad_start | bad_end | off_topic | other
+    reason_tag: Mapped[str | None] = mapped_column(String(64), nullable=True)  # boring | no_context | bad_start | bad_end | off_topic | other
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
 
     # Relationships
@@ -345,7 +345,7 @@ class AudioFeatures(Base):
     video_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("videos.id", ondelete="CASCADE"), nullable=False, index=True)
     version: Mapped[str] = mapped_column(String(32), default="v1", nullable=False)
     frames_key: Mapped[str] = mapped_column(String(1024), nullable=False)  # users/{uid}/videos/{vid}/features/audio_v{n}.npz
-    summary: Mapped[Dict[str, Any]] = mapped_column(JSON_TYPE, default=dict, nullable=False)
+    summary: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, default=dict, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
 
     # Relationships
@@ -364,9 +364,9 @@ class EvalVideo(Base):
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     slug: Mapped[str] = mapped_column(String(128), unique=True, nullable=False, index=True)
     title: Mapped[str] = mapped_column(String(255), nullable=False)
-    source_url: Mapped[Optional[str]] = mapped_column(String(1024), nullable=True)
-    duration_seconds: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
-    meta: Mapped[Dict[str, Any]] = mapped_column(JSON_TYPE, default=dict, nullable=False)
+    source_url: Mapped[str | None] = mapped_column(String(1024), nullable=True)
+    duration_seconds: Mapped[float | None] = mapped_column(Float, nullable=True)
+    meta: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, default=dict, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
 
 
@@ -378,10 +378,10 @@ class EvalClipRating(Base):
     video_slug: Mapped[str] = mapped_column(String(128), nullable=False, index=True)
     start_ms: Mapped[int] = mapped_column(BigInteger, nullable=False)
     end_ms: Mapped[int] = mapped_column(BigInteger, nullable=False)
-    clip_id: Mapped[Optional[uuid.UUID]] = mapped_column(UUID(as_uuid=True), nullable=True)
+    clip_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), nullable=True)
     rater_id: Mapped[str] = mapped_column(String(64), nullable=False)
     score: Mapped[int] = mapped_column(Integer, nullable=False)  # 1 to 5
-    comment: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    comment: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
 
     __table_args__ = (
@@ -395,8 +395,8 @@ class Usage(Base):
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
-    video_id: Mapped[Optional[uuid.UUID]] = mapped_column(UUID(as_uuid=True), ForeignKey("videos.id", ondelete="SET NULL"), nullable=True, index=True)
-    job_id: Mapped[Optional[uuid.UUID]] = mapped_column(UUID(as_uuid=True), ForeignKey("jobs.id", ondelete="CASCADE"), nullable=True, index=True)
+    video_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("videos.id", ondelete="SET NULL"), nullable=True, index=True)
+    job_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("jobs.id", ondelete="CASCADE"), nullable=True, index=True)
     metric: Mapped[str] = mapped_column(String(64), nullable=False)  # source_minutes, gpu_seconds, llm_tokens, etc.
     quantity: Mapped[Decimal] = mapped_column(Numeric(14, 4), nullable=False)
     cost_inr: Mapped[Decimal] = mapped_column(Numeric(12, 4), default=Decimal("0.0000"), nullable=False)

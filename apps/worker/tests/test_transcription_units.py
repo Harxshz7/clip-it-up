@@ -1,8 +1,7 @@
-import pytest
-from worker.transcription.base import WordItem, SegmentItem, SpeakerItem, TranscriptionResult
-from worker.transcription.segment_builder import build_segments_from_words
-from worker.transcription.export import export_txt, export_srt, export_vtt, export_json
+from worker.transcription.base import SegmentItem, SpeakerItem, TranscriptionResult, WordItem
 from worker.transcription.deepgram_backend import DeepgramBackend
+from worker.transcription.export import export_json, export_srt, export_txt, export_vtt
+from worker.transcription.segment_builder import build_segments_from_words
 
 
 def test_segment_builder_punctuation_and_speaker_change():

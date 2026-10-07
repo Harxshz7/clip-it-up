@@ -1,4 +1,3 @@
-from typing import Dict, Any, List, Optional
 from pydantic import BaseModel, Field
 
 
@@ -16,7 +15,7 @@ class Pass1CoarseScore(BaseModel):
 
 
 class Pass1BatchResponse(BaseModel):
-    scores: List[Pass1CoarseScore]
+    scores: list[Pass1CoarseScore]
 
 
 class ClipScoreFlags(BaseModel):
@@ -41,7 +40,7 @@ class Pass2CandidateScore(BaseModel):
     flags: ClipScoreFlags = Field(default_factory=ClipScoreFlags)
 
 
-def build_pass1_prompt(candidates: List[Pass1CandidateItem], video_summary: str) -> str:
+def build_pass1_prompt(candidates: list[Pass1CandidateItem], video_summary: str) -> str:
     candidates_formatted = "\n\n".join(
         f"[{c.id}] ({c.start_ms/1000:.1f}s - {c.end_ms/1000:.1f}s):\n\"{c.text}\""
         for c in candidates
@@ -65,7 +64,7 @@ def build_pass2_prompt(
     start_ms: int,
     end_ms: int,
     text: str,
-    speaker: Optional[str],
+    speaker: str | None,
     video_summary: str,
 ) -> str:
     return f"""You are an elite short-form video editor for TikTok, YouTube Shorts, and Instagram Reels.

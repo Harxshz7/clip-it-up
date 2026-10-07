@@ -1,14 +1,14 @@
 import re
-from typing import List
-from worker.transcription.base import WordItem, SegmentItem
+
+from worker.transcription.base import SegmentItem, WordItem
 
 
 def build_segments_from_words(
-    words: List[WordItem],
+    words: list[WordItem],
     max_words: int = 18,
     max_duration_ms: int = 7000,
     pause_threshold_ms: int = 1200,
-) -> List[SegmentItem]:
+) -> list[SegmentItem]:
     """
     Group sequential words into clean sentence/clause level segments.
     Boundary conditions:
@@ -20,8 +20,8 @@ def build_segments_from_words(
     if not words:
         return []
 
-    segments: List[SegmentItem] = []
-    current_words: List[WordItem] = []
+    segments: list[SegmentItem] = []
+    current_words: list[WordItem] = []
     current_speaker = words[0].speaker
     segment_idx = 0
 

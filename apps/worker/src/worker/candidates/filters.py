@@ -1,7 +1,8 @@
 import math
 import re
 from collections import Counter
-from typing import List, Dict, Any, Tuple, Optional
+from typing import Any
+
 from worker.candidates.window_generator import CandidateWindow
 
 COMMON_FILLERS = {
@@ -75,7 +76,7 @@ def is_excessive_fillers(text: str, max_filler_ratio: float = 0.25) -> bool:
 
 def is_excessive_silence(
     window: CandidateWindow,
-    words: List[Dict[str, Any]],
+    words: list[dict[str, Any]],
     max_silence_ratio: float = 0.30,
 ) -> bool:
     """Check if the window contains >30% silence (based on timed words)."""
@@ -94,7 +95,7 @@ def is_excessive_silence(
 
 def is_single_speaker_compliant(
     window: CandidateWindow,
-    segments: List[Dict[str, Any]],
+    segments: list[dict[str, Any]],
     min_speaker_ratio: float = 0.90,
 ) -> bool:
     """
@@ -125,13 +126,13 @@ def is_single_speaker_compliant(
 
 
 def filter_candidate_windows(
-    windows: List[CandidateWindow],
-    words: Optional[List[Dict[str, Any]]] = None,
-    segments: Optional[List[Dict[str, Any]]] = None,
+    windows: list[CandidateWindow],
+    words: list[dict[str, Any]] | None = None,
+    segments: list[dict[str, Any]] | None = None,
     require_single_speaker: bool = False,
-) -> List[CandidateWindow]:
+) -> list[CandidateWindow]:
     """Apply all quality guardrails to candidate windows."""
-    passed: List[CandidateWindow] = []
+    passed: list[CandidateWindow] = []
 
     for w in windows:
         # 1. Topic Coherence
@@ -156,10 +157,10 @@ def filter_candidate_windows(
 
 
 def cluster_and_deduplicate_candidates(
-    windows: List[CandidateWindow],
+    windows: list[CandidateWindow],
     iou_threshold: float = 0.50,
     max_candidates: int = 60,
-) -> List[CandidateWindow]:
+) -> list[CandidateWindow]:
     """
     Cluster overlapping windows (IoU > 0.5) and keep the highest scoring candidate per cluster.
     Caps results to max_candidates.
@@ -169,7 +170,7 @@ def cluster_and_deduplicate_candidates(
 
     # Sort by heuristic score descending
     sorted_windows = sorted(windows, key=lambda w: (w.heuristic_score, w.duration_seconds), reverse=True)
-    selected: List[CandidateWindow] = []
+    selected: list[CandidateWindow] = []
 
     for cand in sorted_windows:
         overlap = False

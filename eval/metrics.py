@@ -1,5 +1,6 @@
 import math
-from typing import List, Dict, Any, Tuple, Optional
+from typing import Any
+
 import numpy as np
 
 
@@ -16,7 +17,7 @@ def compute_iou(s1: int, e1: int, s2: int, e2: int) -> float:
     return inter / union
 
 
-def is_usable_clip(ratings_for_clip: List[int], threshold: int = 4, min_raters_agree: int = 2) -> bool:
+def is_usable_clip(ratings_for_clip: list[int], threshold: int = 4, min_raters_agree: int = 2) -> bool:
     """
     Usable rule: A clip is considered 'usable' (1) if at least 2 of 3 raters give >= 4.
     If fewer raters exist, requires majority >= 4.
@@ -29,11 +30,11 @@ def is_usable_clip(ratings_for_clip: List[int], threshold: int = 4, min_raters_a
 
 
 def compute_precision_at_k(
-    ranked_clips: List[Dict[str, Any]],
-    ground_truth_ratings: List[Dict[str, Any]],
+    ranked_clips: list[dict[str, Any]],
+    ground_truth_ratings: list[dict[str, Any]],
     k: int = 5,
     overlap_threshold: float = 0.60,
-) -> Tuple[float, int, int]:
+) -> tuple[float, int, int]:
     """
     Compute Precision@K for a single video.
     Returns: (precision, usable_count, total_k)
@@ -48,7 +49,7 @@ def compute_precision_at_k(
         c_end = clip["end_ms"]
 
         # Find matching human ratings
-        matched_scores: List[int] = []
+        matched_scores: list[int] = []
         for r in ground_truth_ratings:
             r_start = r["start_ms"]
             r_end = r["end_ms"]
@@ -70,7 +71,7 @@ def compute_precision_at_k(
     return precision, usable_count, len(top_k)
 
 
-def compute_auc_roc(scores: List[float], labels: List[int]) -> float:
+def compute_auc_roc(scores: list[float], labels: list[int]) -> float:
     """
     Compute Area Under ROC Curve using Wilcoxon-Mann-Whitney rank-sum statistic.
     Handles tied scores gracefully.
@@ -78,8 +79,8 @@ def compute_auc_roc(scores: List[float], labels: List[int]) -> float:
     if not scores or not labels or len(scores) != len(labels):
         return 0.5
 
-    positives = [s for s, l in zip(scores, labels) if l == 1]
-    negatives = [s for s, l in zip(scores, labels) if l == 0]
+    positives = [s for s, lbl in zip(scores, labels, strict=False) if lbl == 1]
+    negatives = [s for s, lbl in zip(scores, labels, strict=False) if lbl == 0]
 
     n_pos = len(positives)
     n_neg = len(negatives)
@@ -100,8 +101,8 @@ def compute_auc_roc(scores: List[float], labels: List[int]) -> float:
 
 
 def compute_correlations(
-    feature_values: List[float],
-    binary_labels: List[int],
+    feature_values: list[float],
+    binary_labels: list[int],
 ) -> float:
     """Compute Pearson correlation between a continuous feature and binary usable labels."""
     if len(feature_values) < 2 or len(binary_labels) < 2:
@@ -121,8 +122,8 @@ def compute_correlations(
 
 
 def compute_inter_rater_agreement(
-    ratings_by_item: Dict[str, Dict[str, int]],
-) -> Dict[str, float]:
+    ratings_by_item: dict[str, dict[str, int]],
+) -> dict[str, float]:
     """
     Compute pairwise agreement percentage and average difference across raters.
     ratings_by_item: {item_key: {rater_id: score}}
@@ -130,7 +131,7 @@ def compute_inter_rater_agreement(
     pairwise_agreements = []
     differences = []
 
-    for item_key, rater_dict in ratings_by_item.items():
+    for _item_key, rater_dict in ratings_by_item.items():
         raters = list(rater_dict.keys())
         for i in range(len(raters)):
             for j in range(i + 1, len(raters)):

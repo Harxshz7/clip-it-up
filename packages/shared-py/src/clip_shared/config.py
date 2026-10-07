@@ -1,5 +1,6 @@
 from functools import lru_cache
-from typing import List, Literal, Optional
+from typing import Literal
+
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -26,7 +27,7 @@ class Settings(BaseSettings):
 
     # Storage (S3 / MinIO / Cloudflare R2)
     S3_ENDPOINT_URL: str = "http://localhost:9000"
-    S3_PUBLIC_ENDPOINT_URL: Optional[str] = "http://localhost:9000"
+    S3_PUBLIC_ENDPOINT_URL: str | None = "http://localhost:9000"
     S3_ACCESS_KEY_ID: str = "minioadmin"
     S3_SECRET_ACCESS_KEY: str = "minioadmin"
     S3_BUCKET_NAME: str = "clip-it-up-videos"
@@ -34,10 +35,10 @@ class Settings(BaseSettings):
     S3_USE_SSL: bool = False
 
     # Auth (Clerk)
-    CLERK_SECRET_KEY: Optional[str] = None
-    CLERK_PUBLISHABLE_KEY: Optional[str] = None
-    CLERK_JWKS_URL: Optional[str] = "https://api.clerk.com/v1/jwks"
-    CLERK_ISSUER: Optional[str] = None
+    CLERK_SECRET_KEY: str | None = None
+    CLERK_PUBLISHABLE_KEY: str | None = None
+    CLERK_JWKS_URL: str | None = "https://api.clerk.com/v1/jwks"
+    CLERK_ISSUER: str | None = None
 
     # Dev Auth Bypass
     DEV_AUTH_BYPASS: bool = True
@@ -55,7 +56,7 @@ class Settings(BaseSettings):
     MULTIPART_PART_SIZE_BYTES: int = 10 * 1024 * 1024  # 10 MB per part
     PRESIGNED_URL_EXPIRY_SECONDS: int = 3600
 
-    ALLOWED_CONTENT_TYPES: List[str] = Field(
+    ALLOWED_CONTENT_TYPES: list[str] = Field(
         default_factory=lambda: [
             "video/mp4",
             "video/quicktime",
@@ -71,17 +72,17 @@ class Settings(BaseSettings):
 
     # Transcription Backend & Models
     TRANSCRIBE_BACKEND: Literal["whisperx", "deepgram", "mock"] = "mock"
-    HF_TOKEN: Optional[str] = None
+    HF_TOKEN: str | None = None
     WHISPER_MODEL: str = "large-v3"
     WHISPER_COMPUTE_TYPE: str = "float16"
     WHISPER_BATCH_SIZE: int = 16
     DIARIZATION_ENABLED: bool = True
-    MIN_SPEAKERS: Optional[int] = 1
-    MAX_SPEAKERS: Optional[int] = 10
-    DEEPGRAM_API_KEY: Optional[str] = None
+    MIN_SPEAKERS: int | None = 1
+    MAX_SPEAKERS: int | None = 10
+    DEEPGRAM_API_KEY: str | None = None
 
     # LLM & Scoring (Anthropic Claude API)
-    ANTHROPIC_API_KEY: Optional[str] = None
+    ANTHROPIC_API_KEY: str | None = None
     LLM_PASS1_MODEL: str = "claude-3-haiku-20240307"
     LLM_PASS2_MODEL: str = "claude-3-5-sonnet-20241022"
     LLM_SCORER_BACKEND: Literal["anthropic", "mock"] = "mock"
@@ -92,10 +93,10 @@ class Settings(BaseSettings):
     USD_TO_INR_RATE: float = 85.0
 
     # Sentry
-    SENTRY_DSN: Optional[str] = None
+    SENTRY_DSN: str | None = None
 
     @property
-    def cors_origins_list(self) -> List[str]:
+    def cors_origins_list(self) -> list[str]:
         return [origin.strip() for origin in self.CORS_ORIGINS.split(",") if origin.strip()]
 
     @field_validator("DEV_AUTH_BYPASS")
@@ -105,23 +106,24 @@ class Settings(BaseSettings):
         return v
 
 
-@lru_cache()
+@lru_cache
 def get_settings() -> Settings:
     return Settings()
 
 
-def load_scoring_weights(custom_weights_path: Optional[str] = None) -> dict:
+def load_scoring_weights(custom_weights_path: str | None = None) -> dict:
     """Load scoring weights and thresholds from YAML configuration file."""
     import os
+
     import yaml
 
     if custom_weights_path and os.path.exists(custom_weights_path):
-        with open(custom_weights_path, "r", encoding="utf-8") as f:
+        with open(custom_weights_path, encoding="utf-8") as f:
             return yaml.safe_load(f)
 
     default_path = os.path.join(os.path.dirname(__file__), "config", "scoring_weights.yaml")
     if os.path.exists(default_path):
-        with open(default_path, "r", encoding="utf-8") as f:
+        with open(default_path, encoding="utf-8") as f:
             return yaml.safe_load(f)
 
     # Fallback dictionary if file not found

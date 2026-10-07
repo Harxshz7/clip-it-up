@@ -1,7 +1,8 @@
 import uuid
 from datetime import datetime
 from decimal import Decimal
-from typing import Any, Dict, List, Optional
+from typing import Any
+
 from pydantic import BaseModel, ConfigDict
 
 
@@ -11,11 +12,11 @@ class JobStageResponse(BaseModel):
     name: str
     status: str
     progress: int
-    started_at: Optional[datetime] = None
-    finished_at: Optional[datetime] = None
-    duration_ms: Optional[int] = None
+    started_at: datetime | None = None
+    finished_at: datetime | None = None
+    duration_ms: int | None = None
     cost_inr: Decimal
-    meta: Dict[str, Any]
+    meta: dict[str, Any]
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -25,13 +26,13 @@ class JobResponse(BaseModel):
     video_id: uuid.UUID
     user_id: uuid.UUID
     status: str
-    current_stage: Optional[str] = None
+    current_stage: str | None = None
     progress: int
-    error: Optional[str] = None
+    error: str | None = None
     created_at: datetime
-    started_at: Optional[datetime] = None
-    finished_at: Optional[datetime] = None
-    stages: Optional[List[JobStageResponse]] = None
+    started_at: datetime | None = None
+    finished_at: datetime | None = None
+    stages: list[JobStageResponse] | None = None
 
     model_config = ConfigDict(from_attributes=True)
 

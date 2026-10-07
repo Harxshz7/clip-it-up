@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-from typing import List, Optional, Literal
+
 from pydantic import BaseModel, ConfigDict, Field
 
 
@@ -8,7 +8,7 @@ class SpeakerResponse(BaseModel):
     id: uuid.UUID
     transcript_id: uuid.UUID
     label: str
-    display_name: Optional[str] = None
+    display_name: str | None = None
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -24,8 +24,8 @@ class TranscriptWordResponse(BaseModel):
     word: str
     start_ms: int
     end_ms: int
-    speaker: Optional[str] = None
-    confidence: Optional[float] = None
+    speaker: str | None = None
+    confidence: float | None = None
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -36,9 +36,9 @@ class TranscriptSegmentResponse(BaseModel):
     idx: int
     start_ms: int
     end_ms: int
-    speaker: Optional[str] = None
+    speaker: str | None = None
     text: str
-    words: Optional[List[TranscriptWordResponse]] = None
+    words: list[TranscriptWordResponse] | None = None
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -46,10 +46,10 @@ class TranscriptSegmentResponse(BaseModel):
 class TranscriptMetadataResponse(BaseModel):
     id: uuid.UUID
     video_id: uuid.UUID
-    language: Optional[str] = None
+    language: str | None = None
     status: str
-    model: Optional[str] = None
-    backend: Optional[str] = None
+    model: str | None = None
+    backend: str | None = None
     word_count: int
     created_at: datetime
 
@@ -58,16 +58,16 @@ class TranscriptMetadataResponse(BaseModel):
 
 class TranscriptDetailResponse(BaseModel):
     transcript: TranscriptMetadataResponse
-    speakers: List[SpeakerResponse]
-    segments: List[TranscriptSegmentResponse]
+    speakers: list[SpeakerResponse]
+    segments: list[TranscriptSegmentResponse]
     total_segments: int
     has_more: bool = False
 
 
 class TranscriptWordsRangeResponse(BaseModel):
-    words: List[TranscriptWordResponse]
-    from_ms: Optional[int] = None
-    to_ms: Optional[int] = None
+    words: list[TranscriptWordResponse]
+    from_ms: int | None = None
+    to_ms: int | None = None
     total: int
 
 

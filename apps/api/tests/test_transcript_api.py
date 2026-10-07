@@ -1,9 +1,11 @@
 import uuid
+
 import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
-from clip_shared.db.models import Video, Transcript, TranscriptWord, TranscriptSegment, Speaker
+
 from clip_shared.db.base import utc_now
+from clip_shared.db.models import Speaker, Transcript, TranscriptSegment, TranscriptWord, Video
 
 
 @pytest.mark.asyncio

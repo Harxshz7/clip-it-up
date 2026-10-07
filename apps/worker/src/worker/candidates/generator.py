@@ -1,14 +1,13 @@
-import math
 import uuid
-from typing import List, Dict, Any, Optional
+
 import structlog
 from sqlalchemy.orm import Session
 
 from clip_shared.config import get_settings
 from clip_shared.db.base import utc_now
-from clip_shared.db.models import ClipMoment, TranscriptSegment, TranscriptWord, Video, Transcript
-from worker.candidates.window_generator import generate_candidate_windows, CandidateWindow
-from worker.candidates.filters import filter_candidate_windows, cluster_and_deduplicate_candidates
+from clip_shared.db.models import ClipMoment, TranscriptSegment, TranscriptWord
+from worker.candidates.filters import cluster_and_deduplicate_candidates, filter_candidate_windows
+from worker.candidates.window_generator import CandidateWindow, generate_candidate_windows
 
 logger = structlog.get_logger()
 settings = get_settings()
@@ -19,8 +18,8 @@ def run_candidate_generation(
     transcript_id: uuid.UUID,
     db: Session,
     single_speaker_mode: bool = False,
-    max_candidates_override: Optional[int] = None,
-) -> List[CandidateWindow]:
+    max_candidates_override: int | None = None,
+) -> list[CandidateWindow]:
     """
     Candidate stage pipeline:
     1. Fetch transcript segments and words from DB.
@@ -72,7 +71,7 @@ def run_candidate_generation(
     # Calculate target candidate cap based on duration
     total_duration_s = (segments[-1]["end_ms"] - segments[0]["start_ms"]) / 1000.0
     duration_hours = max(0.1, total_duration_s / 3600.0)
-    
+
     if max_candidates_override is not None:
         target_max_candidates = max_candidates_override
     else:

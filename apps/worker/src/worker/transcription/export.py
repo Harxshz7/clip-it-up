@@ -1,6 +1,6 @@
 import json
-from typing import Dict, List, Any
-from worker.transcription.base import SegmentItem, SpeakerItem, TranscriptionResult
+
+from worker.transcription.base import SegmentItem, TranscriptionResult
 
 
 def _ms_to_srt_time(ms: int) -> str:
@@ -19,7 +19,7 @@ def _ms_to_vtt_time(ms: int) -> str:
     return f"{hours:02d}:{minutes:02d}:{seconds:02d}.{milliseconds:03d}"
 
 
-def export_txt(segments: List[SegmentItem], speakers_map: Dict[str, str] = None) -> str:
+def export_txt(segments: list[SegmentItem], speakers_map: dict[str, str] = None) -> str:
     """Export transcript as readable text with speaker labels."""
     speakers_map = speakers_map or {}
     lines = []
@@ -36,7 +36,7 @@ def export_txt(segments: List[SegmentItem], speakers_map: Dict[str, str] = None)
     return "\n".join(lines).strip()
 
 
-def export_srt(segments: List[SegmentItem], speakers_map: Dict[str, str] = None) -> str:
+def export_srt(segments: list[SegmentItem], speakers_map: dict[str, str] = None) -> str:
     """Export transcript as SubRip (.srt) subtitle format."""
     speakers_map = speakers_map or {}
     entries = []
@@ -52,7 +52,7 @@ def export_srt(segments: List[SegmentItem], speakers_map: Dict[str, str] = None)
     return "\n".join(entries).strip()
 
 
-def export_vtt(segments: List[SegmentItem], speakers_map: Dict[str, str] = None) -> str:
+def export_vtt(segments: list[SegmentItem], speakers_map: dict[str, str] = None) -> str:
     """Export transcript as WebVTT (.vtt) format."""
     speakers_map = speakers_map or {}
     entries = ["WEBVTT\n"]
@@ -68,7 +68,7 @@ def export_vtt(segments: List[SegmentItem], speakers_map: Dict[str, str] = None)
     return "\n".join(entries).strip()
 
 
-def export_json(result: TranscriptionResult, speakers_map: Dict[str, str] = None) -> str:
+def export_json(result: TranscriptionResult, speakers_map: dict[str, str] = None) -> str:
     """Export raw structured JSON with applied speaker display names."""
     speakers_map = speakers_map or {}
     data = result.to_dict()

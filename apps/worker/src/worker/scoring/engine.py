@@ -1,26 +1,24 @@
-import os
 import uuid
-from datetime import datetime, timezone
+from collections.abc import Callable
+from datetime import UTC, datetime
 from decimal import Decimal
-from typing import List, Dict, Any, Optional, Callable
+from typing import Any
+
 import structlog
 from sqlalchemy.orm import Session
 
 from clip_shared.config import get_settings, load_scoring_weights
 from clip_shared.db.base import utc_now
 from clip_shared.db.models import (
+    AudioFeatures,
     Clip,
     ClipMoment,
     ScoringRun,
     Transcript,
     TranscriptSegment,
-    TranscriptWord,
-    Video,
-    AudioFeatures,
 )
 from clip_shared.media.audio_features import (
     AudioFeaturesResult,
-    extract_audio_features,
 )
 from clip_shared.prompts.clip_score_v1 import (
     Pass1BatchResponse,
@@ -68,7 +66,7 @@ def publish_clip_scored_event(
         "partial_results": {
             "clips_count": scored_count,
         },
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
     }
     publish_job_event_sync(str(job_id), payload)
 
@@ -77,10 +75,10 @@ def run_scoring_pipeline(
     video_id: uuid.UUID,
     job_id: uuid.UUID,
     db: Session,
-    weights_override: Optional[Dict[str, Any]] = None,
-    prompt_version_override: Optional[str] = None,
-    progress_cb: Optional[Callable[[int], None]] = None,
-) -> Dict[str, Any]:
+    weights_override: dict[str, Any] | None = None,
+    prompt_version_override: str | None = None,
+    progress_cb: Callable[[int], None] | None = None,
+) -> dict[str, Any]:
     """
     Two-pass virality and quality scoring pipeline:
     1. Load audio features & cached candidate moments.
@@ -144,8 +142,8 @@ def run_scoring_pipeline(
         .filter(AudioFeatures.video_id == video_id, AudioFeatures.version == "v1")
         .first()
     )
-    
-    audio_feat_res: Optional[AudioFeaturesResult] = None
+
+    audio_feat_res: AudioFeaturesResult | None = None
     if audio_feat_record:
         try:
             npz_bytes = s3.download_bytes(audio_feat_record.frames_key)
@@ -194,12 +192,12 @@ def run_scoring_pipeline(
 
     pass1_model = settings.LLM_PASS1_MODEL
     batch_size = 6
-    pass1_scores_map: Dict[str, float] = {}
+    pass1_scores_map: dict[str, float] = {}
 
     for b_idx in range(0, len(pass1_items), batch_size):
         batch = pass1_items[b_idx : b_idx + batch_size]
         p1_prompt = build_pass1_prompt(batch, video_summary)
-        
+
         parsed, in_tok, out_tok, cost, _ = llm.call_structured(
             prompt=p1_prompt,
             model=pass1_model,
@@ -240,7 +238,7 @@ def run_scoring_pipeline(
 
     # 4. PASS 2: Deep Structured Scoring & Streaming
     pass2_model = settings.LLM_PASS2_MODEL
-    scored_moments_data: List[Dict[str, Any]] = []
+    scored_moments_data: list[dict[str, Any]] = []
 
     for i, cand in enumerate(pass2_candidates):
         cand_text = " ".join(s["text"] for s in segments if s["start_ms"] >= cand.start_ms and s["end_ms"] <= cand.end_ms)
@@ -345,7 +343,7 @@ def run_scoring_pipeline(
     db.flush()
 
     # 7. Generate and Persist Variants for each Selected Moment
-    all_created_clips: List[Clip] = []
+    all_created_clips: list[Clip] = []
 
     for sel in selected_moments:
         variants = generate_moment_variants(

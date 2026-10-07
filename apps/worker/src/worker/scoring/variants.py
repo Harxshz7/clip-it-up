@@ -1,6 +1,5 @@
-import uuid
 from dataclasses import dataclass
-from typing import List, Dict, Any, Optional
+from typing import Any
 
 
 @dataclass
@@ -11,7 +10,7 @@ class ClipVariantData:
     hook_text: str
     title: str
     final_score: float
-    score_breakdown: Dict[str, Any]
+    score_breakdown: dict[str, Any]
     reason: str
 
 
@@ -21,11 +20,11 @@ def generate_moment_variants(
     base_hook_text: str,
     base_title: str,
     base_score: float,
-    base_breakdown: Dict[str, Any],
+    base_breakdown: dict[str, Any],
     base_reason: str,
-    segments: List[Dict[str, Any]],
-    target_lengths: Optional[List[int]] = None,
-) -> List[ClipVariantData]:
+    segments: list[dict[str, Any]],
+    target_lengths: list[int] | None = None,
+) -> list[ClipVariantData]:
     """
     Generate 15s, 30s, 45s, 60s, and auto variants for a selected moment.
     Trims to sentence boundaries while retaining hook and payoff.
@@ -43,7 +42,7 @@ def generate_moment_variants(
             {"start_ms": moment_start_ms, "end_ms": moment_end_ms, "text": base_hook_text}
         ]
 
-    variants: List[ClipVariantData] = []
+    variants: list[ClipVariantData] = []
 
     # 1. Always include 'auto' variant (optimal model suggested range)
     variants.append(

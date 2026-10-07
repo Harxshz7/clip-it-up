@@ -1,6 +1,7 @@
 """Script to populate 10 starter eval dataset videos with metadata, cached transcripts, and ratings."""
 import json
 import os
+
 import yaml
 
 EVAL_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "eval")

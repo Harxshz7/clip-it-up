@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Video, Job, JobEventPayload } from "@clip-it-up/shared";
@@ -40,7 +40,7 @@ export default function VideoDetailPage() {
   const playerRef = useRef<VideoPlayerRef | null>(null);
 
   // Initial fetch for video and associated active/latest job
-  const fetchVideoAndJob = async () => {
+  const fetchVideoAndJob = useCallback(async () => {
     try {
       setLoading(true);
       const videoData = await api.getVideo(videoId);
@@ -71,13 +71,13 @@ export default function VideoDetailPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [videoId]);
 
   useEffect(() => {
     if (videoId) {
       fetchVideoAndJob();
     }
-  }, [videoId]);
+  }, [videoId, fetchVideoAndJob]);
 
   // Hook into SSE stream for realtime pipeline & stage updates
   const { isConnected } = useJobSSE({

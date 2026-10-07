@@ -1,33 +1,31 @@
 import os
-import random
 import shutil
 import tempfile
 import time
 import uuid
-from datetime import datetime, timezone
-from decimal import Decimal
-from typing import Dict, Any, List, Optional, Callable
+from collections.abc import Callable
+from datetime import UTC, datetime
+from typing import Any
+
 import structlog
 from celery import shared_task
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 
 from clip_shared.config import get_settings
-from clip_shared.db.session import get_sync_db
+from clip_shared.db.base import utc_now
 from clip_shared.db.models import (
+    AudioFeatures,
     Job,
     JobStage,
-    Video,
-    Usage,
-    Transcript,
-    TranscriptWord,
-    TranscriptSegment,
     Speaker,
-    AudioFeatures,
-    ClipMoment,
-    Clip,
-    ScoringRun,
+    Transcript,
+    TranscriptSegment,
+    TranscriptWord,
+    Usage,
+    Video,
 )
-from clip_shared.db.base import utc_now
+from clip_shared.db.session import get_sync_db
+from clip_shared.media.audio_features import extract_audio_features
 from clip_shared.media.ffmpeg import (
     MediaValidationError,
     VideoMetadata,
@@ -35,13 +33,12 @@ from clip_shared.media.ffmpeg import (
     probe_video,
     run_parallel_audio_and_proxy,
 )
-from clip_shared.media.audio_features import extract_audio_features
 from clip_shared.pubsub.redis import publish_job_event_sync
 from clip_shared.rates import StageRateConfig
 from clip_shared.storage.s3 import get_s3_client
-from worker.transcription import get_transcription_backend
 from worker.candidates.generator import run_candidate_generation
 from worker.scoring.engine import run_scoring_pipeline
+from worker.transcription import get_transcription_backend
 
 logger = structlog.get_logger()
 settings = get_settings()
@@ -65,7 +62,7 @@ STAGE_QUEUES = {
 }
 
 
-def build_job_event_payload(job: Job, stages: List[JobStage]) -> Dict[str, Any]:
+def build_job_event_payload(job: Job, stages: list[JobStage]) -> dict[str, Any]:
     """Helper to construct serializable event payload for SSE / Redis."""
     stages_data = [
         {
@@ -95,7 +92,7 @@ def build_job_event_payload(job: Job, stages: List[JobStage]) -> Dict[str, Any]:
         "started_at": job.started_at.isoformat() if job.started_at else None,
         "finished_at": job.finished_at.isoformat() if job.finished_at else None,
         "stages": stages_data,
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
     }
 
 
@@ -107,7 +104,7 @@ def publish_transcript_ready_event(job: Job, transcript_id: uuid.UUID) -> None:
         "video_id": str(job.video_id),
         "transcript_id": str(transcript_id),
         "partial_results": {"transcript": True},
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
     }
     publish_job_event_sync(str(job.id), payload)
 
@@ -125,7 +122,7 @@ def _execute_ingest_stage(
     stage: JobStage,
     work_dir: str,
     publish_progress_cb: Callable[[int], None],
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Ingest stage: Stream video from S3, run ffprobe, validate codec/duration/streams,
     and save video metadata.
@@ -142,7 +139,7 @@ def _execute_ingest_stage(
     logger.info("ingest_downloading_source", storage_key=video.storage_key, local_path=local_source_path)
     try:
         s3.download_file_stream(video.storage_key, local_source_path)
-    except Exception as ex:
+    except Exception:
         pass
 
     if not os.path.exists(local_source_path):
@@ -156,7 +153,7 @@ def _execute_ingest_stage(
         meta = probe_video(local_source_path, max_duration_min=settings.MAX_DURATION_MIN)
     except MediaValidationError:
         raise
-    except Exception as e:
+    except Exception:
         # If ffprobe binary is missing in non-docker test environment, fallback gracefully to mock metadata
         meta = VideoMetadata(
             duration_seconds=video.duration_seconds or 300.0,
@@ -197,7 +194,7 @@ def _execute_proxy_stage(
     stage: JobStage,
     work_dir: str,
     publish_progress_cb: Callable[[int], None],
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Proxy stage: Generate 16kHz mono WAV audio and 720p H.264 preview proxy in parallel.
     Uploads outputs to S3 and updates proxy_key and audio_key on video.
@@ -269,7 +266,7 @@ def _execute_transcribe_stage(
     work_dir: str,
     db_session: Any,
     publish_progress_cb: Callable[[int], None],
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Transcribe stage: Run speech recognition (WhisperX / Deepgram / Mock),
     save raw JSON to S3, persist transcript/words/segments/speakers to DB in one transaction,
@@ -391,7 +388,7 @@ def _execute_candidates_stage(
     work_dir: str,
     db_session: Any,
     publish_progress_cb: Callable[[int], None],
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Candidates stage:
     1. Extract per-second audio features (RMS energy, spectral flux, pitch variance, laughter, pause map),
@@ -475,7 +472,7 @@ def _execute_score_stage(
     work_dir: str,
     db_session: Any,
     publish_progress_cb: Callable[[int], None],
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Score stage:
     1. Run 2-pass LLM scoring (Pass 1 coarse filter -> Pass 2 structured scoring).
@@ -545,7 +542,7 @@ def run_stage(self, job_id_str: str, stage_name: str):
     os.makedirs(work_dir, exist_ok=True)
 
     start_time = time.time()
-    stage_meta: Dict[str, Any] = {}
+    stage_meta: dict[str, Any] = {}
 
     with get_sync_db() as db:
         job = db.query(Job).filter(Job.id == job_id).first()

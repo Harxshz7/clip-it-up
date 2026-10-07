@@ -1,13 +1,13 @@
 import time
-from typing import Callable, List, Optional
+from collections.abc import Callable
+
 from worker.transcription.base import (
     BaseTranscriptionBackend,
-    WordItem,
     SpeakerItem,
     TranscriptionResult,
+    WordItem,
 )
 from worker.transcription.segment_builder import build_segments_from_words
-
 
 MOCK_TRANSCRIPT_DIALOGUE = [
     ("SPEAKER_00", "Welcome back to the creator podcast today we are discussing short form video algorithms."),
@@ -31,7 +31,7 @@ class MockTranscriptionBackend(BaseTranscriptionBackend):
     def transcribe(
         self,
         audio_path: str,
-        progress_cb: Optional[Callable[[str, float], None]] = None,
+        progress_cb: Callable[[str, float], None] | None = None,
     ) -> TranscriptionResult:
         sub_steps = [
             ("load_audio", 15.0),
@@ -47,7 +47,7 @@ class MockTranscriptionBackend(BaseTranscriptionBackend):
             if progress_cb:
                 progress_cb(step_name, pct)
 
-        words: List[WordItem] = []
+        words: list[WordItem] = []
         current_time_ms = 400
         word_idx = 0
 

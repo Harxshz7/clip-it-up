@@ -1,6 +1,6 @@
 import re
 from dataclasses import dataclass, field
-from typing import List, Dict, Any, Optional
+from typing import Any
 
 
 @dataclass
@@ -11,9 +11,9 @@ class CandidateWindow:
     start_segment_idx: int
     end_segment_idx: int
     text: str
-    speaker: Optional[str] = None
+    speaker: str | None = None
     heuristic_score: float = 0.0
-    reasons: List[str] = field(default_factory=list)
+    reasons: list[str] = field(default_factory=list)
 
     @property
     def duration_ms(self) -> int:
@@ -89,11 +89,11 @@ def score_window_end_heuristics(segment_text: str, gap_after_ms: int) -> tuple[f
 
 
 def generate_candidate_windows(
-    segments: List[Dict[str, Any]],
+    segments: list[dict[str, Any]],
     min_length_s: float = 15.0,
     max_length_s: float = 90.0,
     min_sentences: int = 1,
-) -> List[CandidateWindow]:
+) -> list[CandidateWindow]:
     """
     Generate sliding sentence-boundary windows within [min_length_s, max_length_s].
     Never start or end mid-sentence.
@@ -101,14 +101,14 @@ def generate_candidate_windows(
     if not segments:
         return []
 
-    windows: List[CandidateWindow] = []
+    windows: list[CandidateWindow] = []
     num_segments = len(segments)
 
     for i in range(num_segments):
         start_seg = segments[i]
         start_ms = start_seg["start_ms"]
         is_speaker_turn = (i == 0) or (segments[i - 1].get("speaker") != start_seg.get("speaker"))
-        
+
         start_score, start_reasons = score_window_start_heuristics(
             start_seg.get("text", ""),
             is_speaker_turn=is_speaker_turn,
@@ -141,7 +141,7 @@ def generate_candidate_windows(
             # Build concatenated text
             window_segments = segments[i : j + 1]
             window_text = " ".join(s.get("text", "").strip() for s in window_segments if s.get("text", "").strip())
-            
+
             # Base length penalty / preference: sweet spot 30-60s
             length_bonus = 0.10 if 25.0 <= duration_s <= 65.0 else 0.0
 

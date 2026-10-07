@@ -3,6 +3,7 @@ import argparse
 import json
 import os
 import sys
+
 import yaml
 
 # Ensure project packages on python path
@@ -16,13 +17,13 @@ for p in [
     if p not in sys.path:
         sys.path.insert(0, p)
 
-from worker.transcription import get_transcription_backend
+from worker.transcription import get_transcription_backend  # noqa: E402
 
 EVAL_DIR = os.path.join(repo_root, "eval")
 VIDEOS_DIR = os.path.join(EVAL_DIR, "videos")
 
 
-def add_eval_video(slug: str, title: str, v_type: str, audio_path: Optional[str] = None, source_url: Optional[str] = None):
+def add_eval_video(slug: str, title: str, v_type: str, audio_path: str | None = None, source_url: str | None = None):
     slug_dir = os.path.join(VIDEOS_DIR, slug)
     os.makedirs(slug_dir, exist_ok=True)
 

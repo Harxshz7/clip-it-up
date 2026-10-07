@@ -1,21 +1,21 @@
 import asyncio
 import json
 import uuid
-from typing import Optional
-from fastapi import APIRouter, Depends, HTTPException, Header, Query, Request, status
+
+from fastapi import APIRouter, Depends, Header, HTTPException, Request, status
 from fastapi.responses import StreamingResponse
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from api.dependencies import get_current_user
 from clip_shared.config import get_settings
-from clip_shared.db.session import get_db, AsyncSessionLocal
-from clip_shared.db.models import Job, JobStage
 from clip_shared.db.base import utc_now
+from clip_shared.db.models import Job
+from clip_shared.db.session import AsyncSessionLocal, get_db
+from clip_shared.pubsub.redis import publish_job_event_sync, subscribe_job_events_async
 from clip_shared.schemas.auth import AuthenticatedUser
 from clip_shared.schemas.jobs import JobResponse
-from clip_shared.pubsub.redis import subscribe_job_events_async, publish_job_event_sync
-from api.dependencies import get_current_user
 
 router = APIRouter(prefix="/jobs", tags=["jobs"])
 settings = get_settings()
@@ -24,8 +24,8 @@ settings = get_settings()
 async def get_job_snapshot_data(
     job_id: uuid.UUID,
     user_id: uuid.UUID,
-    session: Optional[AsyncSession] = None,
-) -> Optional[dict]:
+    session: AsyncSession | None = None,
+) -> dict | None:
     """Fetch complete job and stages data snapshot."""
     async def _fetch(s: AsyncSession):
         stmt = (
@@ -103,7 +103,7 @@ async def stream_job_events(
     job_id: uuid.UUID,
     request: Request,
     user: AuthenticatedUser = Depends(get_current_user),
-    last_event_id: Optional[str] = Header(None, alias="Last-Event-ID"),
+    last_event_id: str | None = Header(None, alias="Last-Event-ID"),
     db: AsyncSession = Depends(get_db),
 ):
     """
@@ -123,7 +123,7 @@ async def stream_job_events(
 
     async def event_generator():
         event_counter = 0
-        
+
         # 1. Send initial snapshot immediately
         event_counter += 1
         yield f"id: {event_counter}\nevent: snapshot\ndata: {json.dumps(initial_snapshot)}\n\n"
@@ -134,10 +134,10 @@ async def stream_job_events(
 
         # 2. Subscribe to Redis pubsub and multiplex with 15s heartbeat
         pubsub_gen = subscribe_job_events_async(str(job_id))
-        
+
         try:
             pubsub_task = asyncio.create_task(pubsub_gen.__anext__())
-            
+
             while True:
                 # Wait for pub/sub message or 15s heartbeat timeout
                 done, pending = await asyncio.wait(

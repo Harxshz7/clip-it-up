@@ -1,21 +1,22 @@
-from contextlib import asynccontextmanager
 import time
 import uuid
-from typing import AsyncGenerator
-from fastapi import FastAPI, Request, status, HTTPException
+from collections.abc import AsyncGenerator
+from contextlib import asynccontextmanager
+
+import sentry_sdk
+import structlog
+from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-import structlog
-import sentry_sdk
 
-from clip_shared.config import get_settings
-from api.routes.health import router as health_router
-from api.routes.videos import router as videos_router
-from api.routes.jobs import router as jobs_router
-from api.routes.usage import router as usage_router
 from api.routes.clips import router as clips_router
 from api.routes.eval import router as eval_router
+from api.routes.health import router as health_router
+from api.routes.jobs import router as jobs_router
+from api.routes.usage import router as usage_router
+from api.routes.videos import router as videos_router
+from clip_shared.config import get_settings
 
 settings = get_settings()
 

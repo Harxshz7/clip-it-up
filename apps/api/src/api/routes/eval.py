@@ -1,30 +1,29 @@
 import csv
 import io
 import uuid
-from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException, status, Query, UploadFile, File
+
+from fastapi import APIRouter, Depends, Query
 from fastapi.responses import Response
-from sqlalchemy import select, desc
+from sqlalchemy import desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from api.dependencies import get_current_user
 from clip_shared.config import get_settings
-from clip_shared.db.session import get_db
 from clip_shared.db.base import utc_now
-from clip_shared.db.models import EvalVideo, EvalClipRating, Clip
+from clip_shared.db.models import EvalClipRating, EvalVideo
+from clip_shared.db.session import get_db
 from clip_shared.schemas.auth import AuthenticatedUser
 from clip_shared.schemas.eval import (
-    EvalVideoResponse,
     EvalClipRatingRequest,
     EvalClipRatingResponse,
-    EvalRatingsExportResponse,
+    EvalVideoResponse,
 )
-from api.dependencies import get_current_user
 
 router = APIRouter(prefix="/eval", tags=["eval"])
 settings = get_settings()
 
 
-@router.get("/videos", response_model=List[EvalVideoResponse])
+@router.get("/videos", response_model=list[EvalVideoResponse])
 async def list_eval_videos(
     user: AuthenticatedUser = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
@@ -77,10 +76,10 @@ async def submit_eval_rating(
     return rating
 
 
-@router.get("/ratings", response_model=List[EvalClipRatingResponse])
+@router.get("/ratings", response_model=list[EvalClipRatingResponse])
 async def list_eval_ratings(
-    video_slug: Optional[str] = Query(None),
-    rater_id: Optional[str] = Query(None),
+    video_slug: str | None = Query(None),
+    rater_id: str | None = Query(None),
     user: AuthenticatedUser = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):

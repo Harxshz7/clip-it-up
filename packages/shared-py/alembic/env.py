@@ -1,6 +1,6 @@
-from logging.config import fileConfig
 import os
 import sys
+from logging.config import fileConfig
 
 from alembic import context
 from sqlalchemy import engine_from_config, pool
@@ -10,7 +10,6 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..",
 
 from clip_shared.config import get_settings
 from clip_shared.db.base import Base
-from clip_shared.db.models import User, Project, Video, Job, JobStage, Usage
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

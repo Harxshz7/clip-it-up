@@ -1,46 +1,46 @@
 import math
 import uuid
-from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException, status, Query
-from sqlalchemy import select, desc
+
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from sqlalchemy import desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from api.dependencies import get_current_user
 from clip_shared.config import get_settings
-from clip_shared.db.session import get_db
+from clip_shared.db.base import utc_now
 from clip_shared.db.models import (
-    Video,
     Job,
     JobStage,
     Project,
-    Transcript,
-    TranscriptWord,
-    TranscriptSegment,
     Speaker,
+    Transcript,
+    TranscriptSegment,
+    TranscriptWord,
+    Video,
 )
-from clip_shared.db.base import utc_now
+from clip_shared.db.session import get_db
 from clip_shared.schemas.auth import AuthenticatedUser
+from clip_shared.schemas.jobs import CompleteUploadResponse, JobResponse
+from clip_shared.schemas.transcripts import (
+    ProxyUrlResponse,
+    SpeakerResponse,
+    TranscriptDetailResponse,
+    TranscriptMetadataResponse,
+    TranscriptSegmentResponse,
+    TranscriptWordResponse,
+    TranscriptWordsRangeResponse,
+    UpdateSpeakerRequest,
+)
 from clip_shared.schemas.videos import (
-    UploadUrlRequest,
-    UploadUrlResponse,
+    MultipartCompleteRequest,
     MultipartPartInfo,
     MultipartPartUrlRequest,
     MultipartPartUrlResponse,
-    MultipartCompleteRequest,
+    UploadUrlRequest,
+    UploadUrlResponse,
     VideoResponse,
 )
-from clip_shared.schemas.jobs import CompleteUploadResponse, JobResponse
-from clip_shared.schemas.transcripts import (
-    SpeakerResponse,
-    UpdateSpeakerRequest,
-    TranscriptWordResponse,
-    TranscriptSegmentResponse,
-    TranscriptMetadataResponse,
-    TranscriptDetailResponse,
-    TranscriptWordsRangeResponse,
-    ProxyUrlResponse,
-)
 from clip_shared.storage.s3 import get_s3_client, get_storage_key, sanitize_filename
-from api.dependencies import get_current_user
 
 router = APIRouter(prefix="/videos", tags=["videos"])
 settings = get_settings()
@@ -140,7 +140,7 @@ async def create_upload_url(
         part_size = settings.MULTIPART_PART_SIZE_BYTES
         total_parts = math.ceil(payload.size_bytes / part_size)
 
-        part_urls: List[MultipartPartInfo] = []
+        part_urls: list[MultipartPartInfo] = []
         for part_num in range(1, total_parts + 1):
             p_url = s3.generate_presigned_part_url(
                 storage_key=storage_key,
@@ -214,7 +214,7 @@ async def complete_multipart(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail={"error": {"code": "MULTIPART_COMPLETE_FAILED", "message": f"Failed to complete multipart upload: {str(e)}"}},
-        )
+        ) from e
 
     return {"status": "multipart_completed", "video_id": str(video_id)}
 
@@ -270,7 +270,7 @@ async def complete_video_upload(
 
     # Create initial stages
     stages_order = ["ingest", "proxy", "transcribe", "candidates", "score", "render"]
-    created_stages: List[JobStage] = []
+    created_stages: list[JobStage] = []
     for stage_name in stages_order:
         stg = JobStage(
             id=uuid.uuid4(),
@@ -291,7 +291,7 @@ async def complete_video_upload(
     try:
         from worker.celery_app import celery_app
         celery_app.send_task("worker.tasks.pipeline.start_pipeline", args=[str(job.id)])
-    except Exception as e:
+    except Exception:
         # Log warning if celery broker is offline during unit testing
         pass
 
@@ -312,7 +312,7 @@ async def complete_video_upload(
     return CompleteUploadResponse(video_id=video.id, job=JobResponse.model_validate(job_dict))
 
 
-@router.get("", response_model=List[VideoResponse])
+@router.get("", response_model=list[VideoResponse])
 async def list_videos(
     user: AuthenticatedUser = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
@@ -373,8 +373,8 @@ async def get_video_proxy_url(
 @router.get("/{video_id}/transcript", response_model=TranscriptDetailResponse)
 async def get_video_transcript(
     video_id: uuid.UUID,
-    from_ms: Optional[int] = Query(None, description="Filter start time in milliseconds"),
-    to_ms: Optional[int] = Query(None, description="Filter end time in milliseconds"),
+    from_ms: int | None = Query(None, description="Filter start time in milliseconds"),
+    to_ms: int | None = Query(None, description="Filter end time in milliseconds"),
     user: AuthenticatedUser = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
@@ -437,8 +437,8 @@ async def get_video_transcript(
 @router.get("/{video_id}/transcript/words", response_model=TranscriptWordsRangeResponse)
 async def get_transcript_words_range(
     video_id: uuid.UUID,
-    from_ms: Optional[int] = Query(None, description="Start time filter in ms"),
-    to_ms: Optional[int] = Query(None, description="End time filter in ms"),
+    from_ms: int | None = Query(None, description="Start time filter in ms"),
+    to_ms: int | None = Query(None, description="End time filter in ms"),
     user: AuthenticatedUser = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
@@ -515,8 +515,9 @@ async def export_transcript(
 ):
     """Export transcript in requested format: txt, srt, vtt, or json."""
     from fastapi.responses import Response
-    from worker.transcription.export import export_txt, export_srt, export_vtt, export_json
-    from worker.transcription.base import SegmentItem, WordItem, SpeakerItem, TranscriptionResult
+
+    from worker.transcription.base import SegmentItem, SpeakerItem, TranscriptionResult, WordItem
+    from worker.transcription.export import export_json, export_srt, export_txt, export_vtt
 
     stmt = (
         select(Transcript)

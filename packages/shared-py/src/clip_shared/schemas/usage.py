@@ -1,5 +1,5 @@
 from decimal import Decimal
-from typing import List
+
 from pydantic import BaseModel
 
 
@@ -12,4 +12,4 @@ class MetricSummary(BaseModel):
 class UsageSummaryResponse(BaseModel):
     month: str
     total_cost_inr: Decimal
-    metrics: List[MetricSummary]
+    metrics: list[MetricSummary]

@@ -1,4 +1,4 @@
-from typing import List, Dict, Any
+from typing import Any
 
 
 def calculate_moment_iou(m1_start: int, m1_end: int, m2_start: int, m2_end: int) -> float:
@@ -15,13 +15,13 @@ def calculate_moment_iou(m1_start: int, m1_end: int, m2_start: int, m2_end: int)
 
 
 def select_top_moments(
-    scored_moments: List[Dict[str, Any]],
+    scored_moments: list[dict[str, Any]],
     max_selected: int = 10,
     iou_threshold: float = 0.30,
     diversity_window_minutes: float = 5.0,
     max_clips_per_window: int = 2,
     diversity_score_override: float = 0.85,
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """
     Select and rank the top moments enforcing:
     1. Score descending order
@@ -33,7 +33,7 @@ def select_top_moments(
 
     # Sort descending by final score
     sorted_moments = sorted(scored_moments, key=lambda m: m.get("final_score", 0.0), reverse=True)
-    selected: List[Dict[str, Any]] = []
+    selected: list[dict[str, Any]] = []
 
     window_ms = int(diversity_window_minutes * 60 * 1000)
 

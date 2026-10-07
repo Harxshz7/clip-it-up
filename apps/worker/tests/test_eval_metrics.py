@@ -1,10 +1,9 @@
-import pytest
 from eval.metrics import (
-    is_usable_clip,
-    compute_precision_at_k,
     compute_auc_roc,
     compute_correlations,
     compute_inter_rater_agreement,
+    compute_precision_at_k,
+    is_usable_clip,
 )
 
 

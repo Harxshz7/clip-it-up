@@ -23,6 +23,7 @@ dist/
 build/
 *.egg
 .eggs/
+.uv/
 
 # Testing, Linting & Type Checking
 .pytest_cache/
@@ -39,6 +40,7 @@ htmlcov/
 out/
 .turbo/
 .eslintcache
+coverage/
 
 # Playwright Test Artifacts
 test-results/
@@ -65,11 +67,12 @@ infra/.env
 infra/data/
 infra/minio/data/
 infra/postgres/data/
+infra/redis/data/
 *.sqlite
 *.sqlite3
 *.db
 
-# Local temporary media dumps
+# Local temporary media dumps & audio numpy arrays
 *.mp4
 *.mov
 *.mkv
@@ -77,6 +80,10 @@ infra/postgres/data/
 *.avi
 *.wav
 *.mp3
+*.m4a
+*.aac
+*.flac
+*.npz
 
 # ==========================================
 # Logs & System Files
@@ -85,6 +92,11 @@ infra/postgres/data/
 logs/
 celerybeat-schedule
 celerybeat.pid
+.freebuff/
+scratch/
+tmp/
+temp/
+.cache/
 
 # OS generated files
 .DS_Store
@@ -105,3 +117,8 @@ Desktop.ini
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+.agents/
+.gemini/
+*.swp
+*.swo
+*~

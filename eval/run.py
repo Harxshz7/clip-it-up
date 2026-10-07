@@ -3,8 +3,9 @@ import json
 import os
 import sys
 import time
-from datetime import datetime, timezone
-from typing import Dict, Any, List, Optional
+from datetime import UTC, datetime
+from typing import Any
+
 import numpy as np
 import yaml
 
@@ -19,28 +20,28 @@ for p in [
     if p not in sys.path:
         sys.path.insert(0, p)
 
-from clip_shared.config import load_scoring_weights, get_settings
-from clip_shared.prompts.clip_score_v1 import (
+from clip_shared.config import get_settings, load_scoring_weights  # noqa: E402
+from clip_shared.media.audio_features import AudioFeaturesResult  # noqa: E402
+from clip_shared.prompts.clip_score_v1 import (  # noqa: E402
     Pass1BatchResponse,
     Pass1CandidateItem,
     Pass2CandidateScore,
     build_pass1_prompt,
     build_pass2_prompt,
 )
-from clip_shared.media.audio_features import extract_audio_features, AudioFeaturesResult
-from worker.candidates.window_generator import generate_candidate_windows
-from worker.candidates.filters import filter_candidate_windows, cluster_and_deduplicate_candidates
-from worker.scoring.combiner import combine_signals
-from worker.scoring.llm_client import LLMClient
-from worker.scoring.selection import select_top_moments
-from eval.metrics import (
-    compute_precision_at_k,
+from eval.metrics import (  # noqa: E402
     compute_auc_roc,
     compute_correlations,
     compute_inter_rater_agreement,
-    is_usable_clip,
     compute_iou,
+    compute_precision_at_k,
+    is_usable_clip,
 )
+from worker.candidates.filters import cluster_and_deduplicate_candidates, filter_candidate_windows  # noqa: E402
+from worker.candidates.window_generator import generate_candidate_windows  # noqa: E402
+from worker.scoring.combiner import combine_signals  # noqa: E402
+from worker.scoring.llm_client import LLMClient  # noqa: E402
+from worker.scoring.selection import select_top_moments  # noqa: E402
 
 EVAL_DIR = os.path.dirname(os.path.abspath(__file__))
 VIDEOS_DIR = os.path.join(EVAL_DIR, "videos")
@@ -49,23 +50,23 @@ REPORTS_DIR = os.path.join(EVAL_DIR, "reports")
 os.makedirs(REPORTS_DIR, exist_ok=True)
 
 
-def load_previous_report() -> Optional[Dict[str, Any]]:
+def load_previous_report() -> dict[str, Any] | None:
     """Load the latest JSON report for diff calculation."""
     json_files = sorted(glob.glob(os.path.join(REPORTS_DIR, "*.json")))
     if not json_files:
         return None
     latest_file = json_files[-1]
     try:
-        with open(latest_file, "r", encoding="utf-8") as f:
+        with open(latest_file, encoding="utf-8") as f:
             return json.load(f)
     except Exception:
         return None
 
 
 def run_evaluation(
-    custom_weights: Optional[Dict[str, Any]] = None,
+    custom_weights: dict[str, Any] | None = None,
     prompt_version: str = "v1",
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Execute complete benchmark evaluation over all eval dataset videos."""
     start_eval_time = time.time()
     config_weights = load_scoring_weights()
@@ -77,12 +78,12 @@ def run_evaluation(
     ratings_file = os.path.join(RATINGS_DIR, "ground_truth.json")
     all_ratings = []
     if os.path.exists(ratings_file):
-        with open(ratings_file, "r", encoding="utf-8") as f:
+        with open(ratings_file, encoding="utf-8") as f:
             all_ratings = json.load(f)
 
     # Group ratings by video slug
-    ratings_by_slug: Dict[str, List[Dict[str, Any]]] = {}
-    ratings_by_item: Dict[str, Dict[str, int]] = {}
+    ratings_by_slug: dict[str, list[dict[str, Any]]] = {}
+    ratings_by_item: dict[str, dict[str, int]] = {}
     for r in all_ratings:
         slug = r["video_slug"]
         ratings_by_slug.setdefault(slug, []).append(r)
@@ -95,7 +96,7 @@ def run_evaluation(
     per_video_results = []
     all_final_scores = []
     all_binary_labels = []
-    all_signal_values: Dict[str, List[float]] = {
+    all_signal_values: dict[str, list[float]] = {
         "hook": [], "emotion": [], "coherence": [], "payoff": [],
         "novelty": [], "audio_energy": [], "laughter": [], "pause_penalty": []
     }
@@ -105,9 +106,9 @@ def run_evaluation(
     total_tokens_out = 0
     total_cost_inr = 0.0
 
-    print(f"\n================================================================================")
+    print("\n================================================================================")
     print(f"  CLIP-IT-UP EVAL HARNESS: EVALUATING {len(video_dirs)} BENCHMARK VIDEOS")
-    print(f"================================================================================\n")
+    print("================================================================================\n")
 
     for v_slug in video_dirs:
         v_path = os.path.join(VIDEOS_DIR, v_slug)
@@ -117,9 +118,9 @@ def run_evaluation(
         if not os.path.exists(meta_file) or not os.path.exists(trans_file):
             continue
 
-        with open(meta_file, "r", encoding="utf-8") as f:
+        with open(meta_file, encoding="utf-8") as f:
             meta = yaml.safe_load(f)
-        with open(trans_file, "r", encoding="utf-8") as f:
+        with open(trans_file, encoding="utf-8") as f:
             trans_data = json.load(f)
 
         duration_s = float(meta.get("duration_seconds", 1800.0))
@@ -242,8 +243,8 @@ def run_evaluation(
     overall_usable_rate = avg_precision_at_5
 
     # Discrimination validation: Mean score usable vs unusable
-    usable_scores = [s for s, l in zip(all_final_scores, all_binary_labels) if l == 1]
-    unusable_scores = [s for s, l in zip(all_final_scores, all_binary_labels) if l == 0]
+    usable_scores = [s for s, lbl in zip(all_final_scores, all_binary_labels, strict=False) if lbl == 1]
+    unusable_scores = [s for s, lbl in zip(all_final_scores, all_binary_labels, strict=False) if lbl == 0]
     mean_usable_score = round(float(np.mean(usable_scores)), 3) if usable_scores else 0.0
     mean_unusable_score = round(float(np.mean(unusable_scores)), 3) if unusable_scores else 0.0
 
@@ -264,7 +265,7 @@ def run_evaluation(
     cost_per_hour_usd = round(cost_per_hour_inr / get_settings().USD_TO_INR_RATE, 3)
     wall_time_per_source_hour = round(elapsed_wall_time / total_source_hours, 1)
 
-    timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+    timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
     prev_report = load_previous_report()
 
     delta_p5 = round((avg_precision_at_5 - prev_report.get("precision_at_5", avg_precision_at_5)) * 100.0, 1) if prev_report else 0.0
@@ -305,9 +306,9 @@ def run_evaluation(
     with open(md_path, "w", encoding="utf-8") as f:
         f.write(f"""# Clip-It-Up Quality Evaluation Report
 
-**Run Timestamp:** {timestamp} (UTC)  
-**Prompt Version:** `{prompt_version}`  
-**Dataset Size:** {len(per_video_results)} benchmark videos ({total_source_hours:.1f} source hours)  
+**Run Timestamp:** {timestamp} (UTC)
+**Prompt Version:** `{prompt_version}`
+**Dataset Size:** {len(per_video_results)} benchmark videos ({total_source_hours:.1f} source hours)
 **Target Goal:** &ge; 60% of top-5 clips rated usable &bull; **Status:** {'✅ PASSED' if avg_precision_at_5 >= 0.60 else '❌ FAILED'}
 
 ---
@@ -359,12 +360,12 @@ def run_evaluation(
 ```
 """)
 
-    print(f"\n================================================================================")
+    print("\n================================================================================")
     print(f"  EVALUATION SUMMARY: PRECISION@5 = {avg_precision_at_5*100:.1f}% | AUC = {auc:.3f}")
     print(f"  TARGET (>=60%): {'PASSED (SUCCESS)' if avg_precision_at_5 >= 0.60 else 'FAILED'}")
     print(f"  Cost / Source-Hour: Rs.{cost_per_hour_inr:.2f} (${cost_per_hour_usd:.3f}) | Time: {wall_time_per_source_hour:.1f}s")
     print(f"  Report written to: {md_path}")
-    print(f"================================================================================\n")
+    print("================================================================================\n")
 
     return report_data
 

@@ -1,6 +1,7 @@
 import os
 import uuid
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
+
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -12,7 +13,15 @@ os.environ["DATABASE_URL"] = "sqlite+aiosqlite:///:memory:"
 os.environ["DATABASE_SYNC_URL"] = "sqlite:///:memory:"
 
 from clip_shared.db.base import Base, utc_now
-from clip_shared.db.models import User, Video, Job, JobStage, Usage, Transcript, TranscriptWord, TranscriptSegment, Speaker
+from clip_shared.db.models import (
+    Job,
+    Speaker,
+    Transcript,
+    TranscriptSegment,
+    TranscriptWord,
+    User,
+    Video,
+)
 from worker.tasks.pipeline import run_stage
 
 
@@ -67,8 +76,8 @@ def test_transcribe_stage_and_idempotent_rerun(sync_db):
     with patch("worker.tasks.pipeline.get_sync_db") as mock_db, \
          patch("worker.tasks.pipeline.publish_job_event_sync") as mock_pub, \
          patch("worker.tasks.pipeline.get_s3_client") as mock_s3, \
-         patch("worker.tasks.pipeline.run_stage.apply_async") as mock_apply, \
-         patch("worker.tasks.pipeline.run_stage.delay") as mock_delay:
+         patch("worker.tasks.pipeline.run_stage.apply_async"), \
+         patch("worker.tasks.pipeline.run_stage.delay"):
 
         mock_db.return_value.__enter__.return_value = sync_db
         mock_db.return_value.__exit__.return_value = None

@@ -1,13 +1,16 @@
 import os
-from typing import Callable, Dict, List, Optional, Any
+from collections.abc import Callable
+from typing import Any
+
 import httpx
 import structlog
+
 from clip_shared.config import get_settings
 from worker.transcription.base import (
     BaseTranscriptionBackend,
-    WordItem,
     SpeakerItem,
     TranscriptionResult,
+    WordItem,
 )
 from worker.transcription.segment_builder import build_segments_from_words
 
@@ -20,14 +23,14 @@ class DeepgramBackend(BaseTranscriptionBackend):
     Maps Deepgram's word timestamps and diarization into unified TranscriptionResult.
     """
 
-    def __init__(self, api_key: Optional[str] = None):
+    def __init__(self, api_key: str | None = None):
         settings = get_settings()
         self.api_key = api_key or settings.DEEPGRAM_API_KEY
 
     def transcribe(
         self,
         audio_path: str,
-        progress_cb: Optional[Callable[[str, float], None]] = None,
+        progress_cb: Callable[[str, float], None] | None = None,
     ) -> TranscriptionResult:
         if not self.api_key:
             raise ValueError("DEEPGRAM_API_KEY is not configured.")
@@ -69,7 +72,7 @@ class DeepgramBackend(BaseTranscriptionBackend):
         return result
 
     @classmethod
-    def map_deepgram_response(cls, data: Dict[str, Any]) -> TranscriptionResult:
+    def map_deepgram_response(cls, data: dict[str, Any]) -> TranscriptionResult:
         """Parse raw Deepgram JSON payload into unified schema."""
         results = data.get("results", {})
         channels = results.get("channels", [])
@@ -90,7 +93,7 @@ class DeepgramBackend(BaseTranscriptionBackend):
         raw_words = alt.get("words", [])
         language = alt.get("languages", ["en"])[0] if alt.get("languages") else "en"
 
-        words: List[WordItem] = []
+        words: list[WordItem] = []
         speaker_labels = set()
 
         for idx, w in enumerate(raw_words):

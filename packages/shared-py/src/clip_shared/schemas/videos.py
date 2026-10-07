@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-from typing import List, Optional
+
 from pydantic import BaseModel, ConfigDict, Field
 
 
@@ -8,7 +8,7 @@ class UploadUrlRequest(BaseModel):
     filename: str = Field(..., min_length=1, max_length=512)
     content_type: str = Field(..., min_length=1, max_length=128)
     size_bytes: int = Field(..., ge=0)
-    project_id: Optional[uuid.UUID] = None
+    project_id: uuid.UUID | None = None
 
 
 class MultipartPartInfo(BaseModel):
@@ -20,11 +20,11 @@ class UploadUrlResponse(BaseModel):
     video_id: uuid.UUID
     storage_key: str
     upload_type: str  # direct_put | multipart
-    upload_url: Optional[str] = None
-    upload_id: Optional[str] = None
-    part_urls: Optional[List[MultipartPartInfo]] = None
-    part_size: Optional[int] = None
-    total_parts: Optional[int] = None
+    upload_url: str | None = None
+    upload_id: str | None = None
+    part_urls: list[MultipartPartInfo] | None = None
+    part_size: int | None = None
+    total_parts: int | None = None
 
 
 class MultipartPartUrlRequest(BaseModel):
@@ -47,23 +47,23 @@ class CompletedPartInput(BaseModel):
 
 class MultipartCompleteRequest(BaseModel):
     upload_id: str
-    parts: List[CompletedPartInput]
+    parts: list[CompletedPartInput]
 
 
 class VideoResponse(BaseModel):
     id: uuid.UUID
-    project_id: Optional[uuid.UUID] = None
+    project_id: uuid.UUID | None = None
     user_id: uuid.UUID
     original_filename: str
     storage_key: str
     size_bytes: int
-    duration_seconds: Optional[float] = None
-    width: Optional[int] = None
-    height: Optional[int] = None
-    fps: Optional[float] = None
+    duration_seconds: float | None = None
+    width: int | None = None
+    height: int | None = None
+    fps: float | None = None
     has_audio: bool = True
-    proxy_key: Optional[str] = None
-    audio_key: Optional[str] = None
+    proxy_key: str | None = None
+    audio_key: str | None = None
     content_type: str
     status: str
     created_at: datetime

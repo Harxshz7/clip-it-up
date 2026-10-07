@@ -11,7 +11,6 @@ Measures:
 """
 
 import argparse
-import os
 import sys
 import time
 from pathlib import Path
@@ -166,7 +165,7 @@ def main():
     wer_pct = None
     ref_path = Path(args.reference) if args.reference else None
     if ref_path and ref_path.exists():
-        with open(ref_path, "r", encoding="utf-8") as rf:
+        with open(ref_path, encoding="utf-8") as rf:
             ref_text = rf.read().strip()
         hyp_text = " ".join(seg.text for seg in result.segments)
         wer = calculate_wer(ref_text, hyp_text)

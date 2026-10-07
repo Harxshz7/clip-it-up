@@ -1,9 +1,11 @@
 import uuid
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
+
 import pytest
 from httpx import AsyncClient
-from clip_shared.db.models import Video, Job, JobStage
+
 from clip_shared.db.base import utc_now
+from clip_shared.db.models import Job, Video
 
 
 @pytest.mark.asyncio

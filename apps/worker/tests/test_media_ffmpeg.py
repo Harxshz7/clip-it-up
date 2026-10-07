@@ -1,13 +1,13 @@
-import os
+from unittest.mock import MagicMock, patch
+
 import pytest
-from unittest.mock import patch, MagicMock
+
 from clip_shared.media.ffmpeg import (
     MediaValidationError,
-    VideoMetadata,
-    probe_video,
     check_disk_space,
     extract_audio,
     generate_proxy,
+    probe_video,
 )
 
 

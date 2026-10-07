@@ -1,6 +1,7 @@
 import re
 import uuid
-from typing import Dict, List, Optional, Any
+from typing import Any
+
 import boto3
 from botocore.client import Config
 from botocore.exceptions import ClientError
@@ -26,8 +27,8 @@ def get_storage_key(user_id: uuid.UUID, video_id: uuid.UUID, filename: str) -> s
 class S3Client:
     def __init__(self):
         self.settings = get_settings()
-        
-        client_kwargs: Dict[str, Any] = {
+
+        client_kwargs: dict[str, Any] = {
             "service_name": "s3",
             "region_name": self.settings.S3_REGION,
             "aws_access_key_id": self.settings.S3_ACCESS_KEY_ID,
@@ -37,22 +38,22 @@ class S3Client:
                 s3={"addressing_style": "path"}
             ),
         }
-        
+
         if self.settings.S3_ENDPOINT_URL:
             client_kwargs["endpoint_url"] = self.settings.S3_ENDPOINT_URL
-            
+
         self.client = boto3.client(**client_kwargs)
 
     def generate_presigned_put_url(
         self,
         storage_key: str,
         content_type: str,
-        expires_in: Optional[int] = None,
+        expires_in: int | None = None,
     ) -> str:
         """Generate a presigned PUT URL for single-part direct upload."""
         if expires_in is None:
             expires_in = self.settings.PRESIGNED_URL_EXPIRY_SECONDS
-            
+
         url = self.client.generate_presigned_url(
             ClientMethod="put_object",
             Params={
@@ -62,12 +63,12 @@ class S3Client:
             },
             ExpiresIn=expires_in,
         )
-        
+
         # If public endpoint is configured differently from internal docker endpoint (e.g. localhost:9000 vs minio:9000)
         if self.settings.S3_PUBLIC_ENDPOINT_URL and self.settings.S3_ENDPOINT_URL:
             if self.settings.S3_PUBLIC_ENDPOINT_URL != self.settings.S3_ENDPOINT_URL:
                 url = url.replace(self.settings.S3_ENDPOINT_URL, self.settings.S3_PUBLIC_ENDPOINT_URL)
-                
+
         return url
 
     def create_multipart_upload(self, storage_key: str, content_type: str) -> str:
@@ -84,12 +85,12 @@ class S3Client:
         storage_key: str,
         upload_id: str,
         part_number: int,
-        expires_in: Optional[int] = None,
+        expires_in: int | None = None,
     ) -> str:
         """Generate a presigned PUT URL for a specific multipart upload part."""
         if expires_in is None:
             expires_in = self.settings.PRESIGNED_URL_EXPIRY_SECONDS
-            
+
         url = self.client.generate_presigned_url(
             ClientMethod="upload_part",
             Params={
@@ -100,25 +101,25 @@ class S3Client:
             },
             ExpiresIn=expires_in,
         )
-        
+
         if self.settings.S3_PUBLIC_ENDPOINT_URL and self.settings.S3_ENDPOINT_URL:
             if self.settings.S3_PUBLIC_ENDPOINT_URL != self.settings.S3_ENDPOINT_URL:
                 url = url.replace(self.settings.S3_ENDPOINT_URL, self.settings.S3_PUBLIC_ENDPOINT_URL)
-                
+
         return url
 
     def complete_multipart_upload(
         self,
         storage_key: str,
         upload_id: str,
-        parts: List[Dict[str, Any]],
-    ) -> Dict[str, Any]:
+        parts: list[dict[str, Any]],
+    ) -> dict[str, Any]:
         """Complete a multipart upload given sorted parts [{'PartNumber': 1, 'ETag': '...'}]."""
         formatted_parts = [
             {"PartNumber": p.get("part_number", p.get("PartNumber")), "ETag": p.get("etag", p.get("ETag"))}
             for p in sorted(parts, key=lambda x: x.get("part_number", x.get("PartNumber", 0)))
         ]
-        
+
         response = self.client.complete_multipart_upload(
             Bucket=self.settings.S3_BUCKET_NAME,
             Key=storage_key,
@@ -152,14 +153,14 @@ class S3Client:
     def generate_presigned_get_url(
         self,
         storage_key: str,
-        expires_in: Optional[int] = None,
-        response_content_disposition: Optional[str] = None,
+        expires_in: int | None = None,
+        response_content_disposition: str | None = None,
     ) -> str:
         """Generate a presigned GET URL for downloading or streaming media."""
         if expires_in is None:
             expires_in = self.settings.PRESIGNED_URL_EXPIRY_SECONDS
 
-        params: Dict[str, Any] = {
+        params: dict[str, Any] = {
             "Bucket": self.settings.S3_BUCKET_NAME,
             "Key": storage_key,
         }
@@ -189,7 +190,7 @@ class S3Client:
                     break
                 f.write(chunk)
 
-    def upload_file(self, file_path: str, storage_key: str, content_type: Optional[str] = None) -> None:
+    def upload_file(self, file_path: str, storage_key: str, content_type: str | None = None) -> None:
         """Upload a local file to S3 with content type."""
         extra_args = {}
         if content_type:
@@ -227,7 +228,7 @@ class S3Client:
             pass
 
 
-_s3_client_instance: Optional[S3Client] = None
+_s3_client_instance: S3Client | None = None
 
 
 def get_s3_client() -> S3Client:

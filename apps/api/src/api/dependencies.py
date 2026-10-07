@@ -1,31 +1,32 @@
 import time
 import uuid
-from typing import Dict, Optional, Any
+from typing import Any
+
 import httpx
-from jose import jwt, JWTError
-from fastapi import Depends, HTTPException, Security, Request, Query
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi import Depends, HTTPException, Query, Request, Security
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from jose import JWTError, jwt
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from clip_shared.config import get_settings
+from clip_shared.db.models import Project, User
 from clip_shared.db.session import get_db
-from clip_shared.db.models import User, Project
 from clip_shared.schemas.auth import AuthenticatedUser
 
 settings = get_settings()
 security = HTTPBearer(auto_error=False)
 
 # In-memory cache for Clerk JWKS
-_jwks_cache: Dict[str, Any] = {}
+_jwks_cache: dict[str, Any] = {}
 _jwks_cache_expiry: float = 0
 
 
-async def get_clerk_jwks() -> Dict[str, Any]:
+async def get_clerk_jwks() -> dict[str, Any]:
     """Fetch and cache Clerk JWKS keys."""
     global _jwks_cache, _jwks_cache_expiry
     now = time.time()
-    
+
     if _jwks_cache and now < _jwks_cache_expiry:
         return _jwks_cache
 
@@ -45,13 +46,13 @@ async def get_clerk_jwks() -> Dict[str, Any]:
             raise HTTPException(
                 status_code=503,
                 detail={"error": {"code": "AUTH_JWKS_UNAVAILABLE", "message": f"Unable to reach auth provider: {str(e)}"}},
-            )
+            ) from e
 
 
 async def get_current_user(
     request: Request,
-    auth_header: Optional[HTTPAuthorizationCredentials] = Security(security),
-    token_query: Optional[str] = Query(None, alias="token"),
+    auth_header: HTTPAuthorizationCredentials | None = Security(security),
+    token_query: str | None = Query(None, alias="token"),
     db: AsyncSession = Depends(get_db),
 ) -> AuthenticatedUser:
     """
@@ -71,14 +72,14 @@ async def get_current_user(
                 status_code=403,
                 detail={"error": {"code": "DEV_BYPASS_FORBIDDEN", "message": "Dev auth bypass is forbidden outside development environment."}},
             )
-        
+
         dev_user_id = uuid.UUID(settings.DEV_USER_ID)
-        
+
         # Ensure dev user exists in DB
         user_stmt = select(User).where(User.id == dev_user_id)
         result = await db.execute(user_stmt)
         user = result.scalar_one_or_none()
-        
+
         if not user:
             user = User(
                 id=dev_user_id,
@@ -132,14 +133,14 @@ async def get_current_user(
             "verify_nbf": True,
             "verify_iat": True,
         }
-        
-        decode_kwargs: Dict[str, Any] = {
+
+        decode_kwargs: dict[str, Any] = {
             "token": token,
             "key": key,
             "algorithms": ["RS256"],
             "options": verify_options,
         }
-        
+
         if settings.CLERK_ISSUER:
             decode_kwargs["issuer"] = settings.CLERK_ISSUER
 
@@ -182,4 +183,4 @@ async def get_current_user(
         raise HTTPException(
             status_code=401,
             detail={"error": {"code": "INVALID_TOKEN", "message": f"Token validation failed: {str(e)}"}},
-        )
+        ) from e

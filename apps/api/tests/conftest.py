@@ -1,10 +1,11 @@
-import asyncio
 import os
 import uuid
-from typing import AsyncGenerator
-import pytest
-from httpx import AsyncClient, ASGITransport
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
+from collections.abc import AsyncGenerator
+from unittest.mock import patch
+
+import pytest_asyncio
+from httpx import ASGITransport, AsyncClient
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.pool import StaticPool
 
 # Set test environment
@@ -13,11 +14,11 @@ os.environ["DEV_AUTH_BYPASS"] = "true"
 os.environ["DATABASE_URL"] = "sqlite+aiosqlite:///:memory:"
 os.environ["DATABASE_SYNC_URL"] = "sqlite:///:memory:"
 
-from clip_shared.db.base import Base
 import clip_shared.db.session as db_session_module
-from clip_shared.db.session import get_db
-from clip_shared.db.models import User, Project, Video, Job, JobStage
 from api.main import app
+from clip_shared.db.base import Base
+from clip_shared.db.models import User
+from clip_shared.db.session import get_db
 
 test_engine = create_async_engine(
     "sqlite+aiosqlite:///:memory:",
@@ -32,8 +33,6 @@ TestingSessionLocal = async_sessionmaker(
 db_session_module.AsyncSessionLocal = TestingSessionLocal
 db_session_module.async_engine = test_engine
 
-import pytest_asyncio
-from unittest.mock import patch
 
 @pytest_asyncio.fixture(autouse=True)
 async def init_test_db():

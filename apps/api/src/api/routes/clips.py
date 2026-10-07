@@ -1,34 +1,33 @@
 import uuid
-from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException, status, Query
-from sqlalchemy import select, desc, and_, or_
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from sqlalchemy import desc, select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from api.dependencies import get_current_user
 from clip_shared.config import get_settings
-from clip_shared.db.session import get_db
 from clip_shared.db.base import utc_now
 from clip_shared.db.models import (
-    Video,
-    Job,
-    JobStage,
-    Transcript,
-    ClipMoment,
     Clip,
     ClipFeedback,
+    ClipMoment,
+    Job,
+    JobStage,
     ScoringRun,
+    Transcript,
+    Video,
 )
+from clip_shared.db.session import get_db
 from clip_shared.schemas.auth import AuthenticatedUser
 from clip_shared.schemas.clips import (
-    ClipResponse,
-    ClipMomentResponse,
-    VideoClipsResponse,
     ClipFeedbackRequest,
     ClipFeedbackResponse,
+    ClipMomentResponse,
+    ClipResponse,
     RescoreRequest,
     ScoringRunResponse,
+    VideoClipsResponse,
 )
-from api.dependencies import get_current_user
 
 router = APIRouter(tags=["clips"])
 settings = get_settings()
@@ -37,9 +36,9 @@ settings = get_settings()
 @router.get("/videos/{video_id}/clips", response_model=VideoClipsResponse)
 async def get_video_clips(
     video_id: uuid.UUID,
-    status_filter: Optional[str] = Query(None, alias="status", description="Filter by moment status (selected | scored | candidate | rejected)"),
-    min_score: Optional[float] = Query(None, ge=0.0, le=1.0, description="Minimum clip score"),
-    sort: Optional[str] = Query("score", pattern="^(score|time|rank)$", description="Sort moments by score, time, or rank"),
+    status_filter: str | None = Query(None, alias="status", description="Filter by moment status (selected | scored | candidate | rejected)"),
+    min_score: float | None = Query(None, ge=0.0, le=1.0, description="Minimum clip score"),
+    sort: str | None = Query("score", pattern="^(score|time|rank)$", description="Sort moments by score, time, or rank"),
     user: AuthenticatedUser = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
@@ -123,7 +122,7 @@ async def get_video_clips(
             )
             clips_by_moment[c.moment_id].append(c_resp)
 
-    moment_responses: List[ClipMomentResponse] = []
+    moment_responses: list[ClipMomentResponse] = []
     total_clips_count = 0
     for m in moments:
         m_clips = clips_by_moment.get(m.id, [])
@@ -332,7 +331,7 @@ async def rescore_video(
     }
 
 
-@router.get("/videos/{video_id}/scoring-runs", response_model=List[ScoringRunResponse])
+@router.get("/videos/{video_id}/scoring-runs", response_model=list[ScoringRunResponse])
 async def list_scoring_runs(
     video_id: uuid.UUID,
     user: AuthenticatedUser = Depends(get_current_user),

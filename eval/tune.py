@@ -1,7 +1,7 @@
 import copy
 import os
 import sys
-from typing import Dict, Any, List, Tuple
+
 import yaml
 
 # Ensure project packages on python path
@@ -15,13 +15,13 @@ for p in [
     if p not in sys.path:
         sys.path.insert(0, p)
 
-from clip_shared.config import load_scoring_weights
-from eval.run import run_evaluation
+from clip_shared.config import load_scoring_weights  # noqa: E402
+from eval.run import run_evaluation  # noqa: E402
 
 EVAL_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
-def tune_weights(iterations: int = 15) -> Tuple[Dict[str, float], float, float]:
+def tune_weights(iterations: int = 15) -> tuple[dict[str, float], float, float]:
     """
     Coordinate search over signal weights to maximize Precision@5 on rated eval dataset.
     Does not auto-apply; outputs a candidate YAML file for human review.

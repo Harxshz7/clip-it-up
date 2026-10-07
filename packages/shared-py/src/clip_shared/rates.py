@@ -2,14 +2,13 @@
 Rates are defined in Indian Rupees (INR - ₹) per source-hour of video.
 """
 from decimal import Decimal
-from typing import Dict, Any
 
 
 class StageRateConfig:
     """Config table of per-stage ₹ per source-hour rates."""
-    
+
     # Placeholder rates in INR (₹) per source-hour
-    RATES_PER_SOURCE_HOUR: Dict[str, Decimal] = {
+    RATES_PER_SOURCE_HOUR: dict[str, Decimal] = {
         "ingest": Decimal("0.50"),       # ₹0.50 / hr (S3 download, validation, metadata extraction)
         "proxy": Decimal("2.00"),        # ₹2.00 / hr (FFmpeg fast proxy generation)
         "transcribe": Decimal("12.00"),   # ₹12.00 / hr (Whisper ASR inference)
@@ -19,7 +18,7 @@ class StageRateConfig:
     }
 
     # Primary metric tracked per stage
-    STAGE_METRICS: Dict[str, str] = {
+    STAGE_METRICS: dict[str, str] = {
         "ingest": "source_minutes",
         "proxy": "cpu_seconds",
         "transcribe": "audio_minutes",

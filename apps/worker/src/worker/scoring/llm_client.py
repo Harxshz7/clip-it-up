@@ -1,16 +1,17 @@
 import hashlib
 import json
 import time
-from typing import Dict, Any, Optional, Tuple, Type, TypeVar
-from pydantic import BaseModel, ValidationError
+from typing import Any, TypeVar
+
 import structlog
+from pydantic import BaseModel, ValidationError
 
 from clip_shared.config import get_settings
 from clip_shared.prompts.clip_score_v1 import (
+    ClipScoreFlags,
     Pass1BatchResponse,
     Pass1CoarseScore,
     Pass2CandidateScore,
-    ClipScoreFlags,
 )
 
 logger = structlog.get_logger()
@@ -19,7 +20,7 @@ settings = get_settings()
 T = TypeVar("T", bound=BaseModel)
 
 # In-memory / process-level response cache (hash -> (data, in_tokens, out_tokens))
-_LLM_RESPONSE_CACHE: Dict[str, Tuple[Dict[str, Any], int, int]] = {}
+_LLM_RESPONSE_CACHE: dict[str, tuple[dict[str, Any], int, int]] = {}
 
 
 def compute_cache_key(prompt_version: str, model: str, content: str) -> str:
@@ -40,8 +41,8 @@ class LLMClient:
 
     def __init__(
         self,
-        api_key: Optional[str] = None,
-        backend: Optional[str] = None,
+        api_key: str | None = None,
+        backend: str | None = None,
         cache_enabled: bool = True,
     ):
         self.api_key = api_key or settings.ANTHROPIC_API_KEY
@@ -65,11 +66,11 @@ class LLMClient:
         self,
         prompt: str,
         model: str,
-        response_schema: Type[T],
+        response_schema: type[T],
         prompt_version: str = "v1",
-        system_prompt: Optional[str] = None,
+        system_prompt: str | None = None,
         max_retries: int = 2,
-    ) -> Tuple[T, int, int, float, bool]:
+    ) -> tuple[T, int, int, float, bool]:
         """
         Execute structured LLM call with Pydantic schema validation and response caching.
         Returns: (parsed_model, input_tokens, output_tokens, cost_inr, is_cache_hit)
@@ -149,7 +150,7 @@ class LLMClient:
         cost = self.calculate_cost_inr(model, in_tok, out_tok)
         return parsed, in_tok, out_tok, cost, False
 
-    def _generate_mock_response(self, prompt: str, schema: Type[T]) -> Tuple[T, int, int]:
+    def _generate_mock_response(self, prompt: str, schema: type[T]) -> tuple[T, int, int]:
         """Generate deterministic, realistic mock response based on prompt text."""
         in_tok = len(prompt.split()) * 2
         out_tok = 150
@@ -177,7 +178,7 @@ class LLMClient:
             import re
             id_match = re.search(r"ID:\s*([a-zA-Z0-9_\-]+)", prompt)
             candidate_id = id_match.group(1) if id_match else "cand_0"
-            
+
             start_m = re.search(r"Range:\s*(\d+)ms\s*to\s*(\d+)ms", prompt)
             start_ms = int(start_m.group(1)) if start_m else 0
             end_ms = int(start_m.group(2)) if start_m else 30000

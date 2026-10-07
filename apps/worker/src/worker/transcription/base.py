@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Callable, Dict, List, Optional, Any
+from typing import Any
 
 
 @dataclass
@@ -9,10 +10,10 @@ class WordItem:
     word: str
     start_ms: int
     end_ms: int
-    speaker: Optional[str] = None
-    confidence: Optional[float] = None
+    speaker: str | None = None
+    confidence: float | None = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "idx": self.idx,
             "word": self.word,
@@ -28,11 +29,11 @@ class SegmentItem:
     idx: int
     start_ms: int
     end_ms: int
-    speaker: Optional[str]
+    speaker: str | None
     text: str
-    words: List[WordItem] = field(default_factory=list)
+    words: list[WordItem] = field(default_factory=list)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "idx": self.idx,
             "start_ms": self.start_ms,
@@ -46,9 +47,9 @@ class SegmentItem:
 @dataclass
 class SpeakerItem:
     label: str
-    display_name: Optional[str] = None
+    display_name: str | None = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "label": self.label,
             "display_name": self.display_name,
@@ -62,12 +63,12 @@ class TranscriptionResult:
     model: str
     backend: str
     word_count: int
-    words: List[WordItem]
-    segments: List[SegmentItem]
-    speakers: List[SpeakerItem]
-    raw_response: Dict[str, Any] = field(default_factory=dict)
+    words: list[WordItem]
+    segments: list[SegmentItem]
+    speakers: list[SpeakerItem]
+    raw_response: dict[str, Any] = field(default_factory=dict)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "language": self.language,
             "status": self.status,
@@ -88,7 +89,7 @@ class BaseTranscriptionBackend(ABC):
     def transcribe(
         self,
         audio_path: str,
-        progress_cb: Optional[Callable[[str, float], None]] = None,
+        progress_cb: Callable[[str, float], None] | None = None,
     ) -> TranscriptionResult:
         """
         Transcribe the audio file and return word-level timestamps and speaker labels.

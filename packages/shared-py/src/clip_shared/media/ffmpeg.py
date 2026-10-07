@@ -1,11 +1,11 @@
 import json
 import os
-import re
 import shutil
 import subprocess
 import threading
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Callable, Dict, List, Optional, Any
+
 import structlog
 
 logger = structlog.get_logger()
@@ -27,7 +27,7 @@ class VideoMetadata:
     has_audio: bool
     has_video: bool
     video_codec: str
-    audio_codec: Optional[str] = None
+    audio_codec: str | None = None
 
 
 def check_disk_space(target_dir: str, required_bytes: int) -> None:
@@ -63,7 +63,7 @@ def probe_video(file_path: str, max_duration_min: int = 120) -> VideoMetadata:
         proc = subprocess.run(cmd, capture_output=True, text=True, check=False)
     except FileNotFoundError:
         # If ffprobe binary is missing in non-docker environment, raise FileNotFoundError
-        raise FileNotFoundError("ffprobe binary not found in worker environment.")
+        raise FileNotFoundError("ffprobe binary not found in worker environment.") from None
 
     if proc.returncode != 0:
         err_stderr = proc.stderr.strip()
@@ -72,8 +72,8 @@ def probe_video(file_path: str, max_duration_min: int = 120) -> VideoMetadata:
 
     try:
         data = json.loads(proc.stdout)
-    except json.JSONDecodeError:
-        raise MediaValidationError("CORRUPT_FILE", "Invalid ffprobe JSON response.")
+    except json.JSONDecodeError as e:
+        raise MediaValidationError("CORRUPT_FILE", "Invalid ffprobe JSON response.") from e
 
     streams = data.get("streams", [])
     format_info = data.get("format", {})
@@ -145,7 +145,7 @@ def _parse_time_to_seconds(time_str: str) -> float:
 def _monitor_ffmpeg_progress(
     process: subprocess.Popen,
     total_duration_seconds: float,
-    progress_cb: Optional[Callable[[float], None]],
+    progress_cb: Callable[[float], None] | None,
 ) -> None:
     """Read pipe:1 stdout lines from FFmpeg and invoke progress callback."""
     if not process.stdout:
@@ -183,7 +183,7 @@ def extract_audio(
     input_video: str,
     output_wav: str,
     duration_seconds: float = 0.0,
-    progress_cb: Optional[Callable[[float], None]] = None,
+    progress_cb: Callable[[float], None] | None = None,
 ) -> None:
     """
     Extract 16kHz mono 16-bit PCM WAV from input video using FFmpeg.
@@ -225,7 +225,7 @@ def generate_proxy(
     input_video: str,
     output_mp4: str,
     duration_seconds: float = 0.0,
-    progress_cb: Optional[Callable[[float], None]] = None,
+    progress_cb: Callable[[float], None] | None = None,
 ) -> None:
     """
     Generate 720p H.264 preview proxy with faststart for web playback.
@@ -271,7 +271,7 @@ def run_parallel_audio_and_proxy(
     output_wav: str,
     output_mp4: str,
     duration_seconds: float,
-    progress_cb: Optional[Callable[[float], None]] = None,
+    progress_cb: Callable[[float], None] | None = None,
 ) -> None:
     """
     Run audio extraction and proxy generation concurrently and aggregate progress.

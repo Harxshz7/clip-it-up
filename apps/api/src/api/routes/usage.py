@@ -1,14 +1,15 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from decimal import Decimal
+
 from fastapi import APIRouter, Depends
-from sqlalchemy import select, func, extract
+from sqlalchemy import extract, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from clip_shared.db.session import get_db
-from clip_shared.db.models import Usage
-from clip_shared.schemas.auth import AuthenticatedUser
-from clip_shared.schemas.usage import UsageSummaryResponse, MetricSummary
 from api.dependencies import get_current_user
+from clip_shared.db.models import Usage
+from clip_shared.db.session import get_db
+from clip_shared.schemas.auth import AuthenticatedUser
+from clip_shared.schemas.usage import MetricSummary, UsageSummaryResponse
 
 router = APIRouter(prefix="/usage", tags=["usage"])
 
@@ -21,7 +22,7 @@ async def get_usage_summary(
     """
     Get aggregated usage metrics and INR costs for current billing month for the authenticated user.
     """
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     current_year = now.year
     current_month = now.month
     month_str = now.strftime("%Y-%m")

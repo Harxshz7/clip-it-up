@@ -1,7 +1,8 @@
 import uuid
-from clip_shared.db.session import get_sync_db
-from clip_shared.db.models import User, Project
+
 from clip_shared.config import get_settings
+from clip_shared.db.models import Project, User
+from clip_shared.db.session import get_sync_db
 
 settings = get_settings()
 

@@ -1,9 +1,10 @@
-from typing import Dict, Any
+from typing import Any
+
+import redis.asyncio as aioredis
 from fastapi import APIRouter, Depends, status
 from fastapi.responses import JSONResponse
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
-import redis.asyncio as aioredis
 
 from clip_shared.config import get_settings
 from clip_shared.db.session import get_db
@@ -19,7 +20,7 @@ async def health_check(db: AsyncSession = Depends(get_db)) -> JSONResponse:
     Health check verifying database connection, Redis responsiveness, and S3 connectivity.
     Returns 200 if all are healthy, 503 if any dependency is degraded.
     """
-    checks: Dict[str, Any] = {
+    checks: dict[str, Any] = {
         "status": "ok",
         "database": "unknown",
         "redis": "unknown",
