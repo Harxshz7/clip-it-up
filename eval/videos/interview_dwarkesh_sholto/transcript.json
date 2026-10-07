@@ -1,0 +1,624 @@
+{
+  "language": "en",
+  "status": "ready",
+  "model": "large-v3",
+  "backend": "whisperx",
+  "word_count": 71,
+  "segments": [
+    {
+      "idx": 0,
+      "start_ms": 12000,
+      "end_ms": 19000,
+      "speaker": "Dwarkesh Patel",
+      "text": "How do we know synthetic data won't cause model collapse at scale?"
+    },
+    {
+      "idx": 1,
+      "start_ms": 19200,
+      "end_ms": 29000,
+      "speaker": "Sholto Douglas",
+      "text": "Model collapse only happens with uncurated recursive training on raw model garbage."
+    },
+    {
+      "idx": 2,
+      "start_ms": 29200,
+      "end_ms": 43000,
+      "speaker": "Sholto Douglas",
+      "text": "When you use verifiable reward models and formal execution environments like compilers and math checkers, synthetic data actually outperforms human data."
+    },
+    {
+      "idx": 3,
+      "start_ms": 43200,
+      "end_ms": 56000,
+      "speaker": "Sholto Douglas",
+      "text": "The model searches and verifies its own proofs, generating higher quality reasoning trajectories than typical internet text."
+    },
+    {
+      "idx": 4,
+      "start_ms": 56200,
+      "end_ms": 64000,
+      "speaker": "Sholto Douglas",
+      "text": "That is the breakthrough that unlocks true self-improving reasoning."
+    }
+  ],
+  "words": [
+    {
+      "idx": 0,
+      "word": "How",
+      "start_ms": 12000,
+      "end_ms": 12573,
+      "speaker": "Dwarkesh Patel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 1,
+      "word": "do",
+      "start_ms": 12583,
+      "end_ms": 13156,
+      "speaker": "Dwarkesh Patel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 2,
+      "word": "we",
+      "start_ms": 13166,
+      "end_ms": 13739,
+      "speaker": "Dwarkesh Patel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 3,
+      "word": "know",
+      "start_ms": 13749,
+      "end_ms": 14322,
+      "speaker": "Dwarkesh Patel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 4,
+      "word": "synthetic",
+      "start_ms": 14332,
+      "end_ms": 14905,
+      "speaker": "Dwarkesh Patel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 5,
+      "word": "data",
+      "start_ms": 14915,
+      "end_ms": 15488,
+      "speaker": "Dwarkesh Patel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 6,
+      "word": "won't",
+      "start_ms": 15498,
+      "end_ms": 16071,
+      "speaker": "Dwarkesh Patel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 7,
+      "word": "cause",
+      "start_ms": 16081,
+      "end_ms": 16654,
+      "speaker": "Dwarkesh Patel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 8,
+      "word": "model",
+      "start_ms": 16664,
+      "end_ms": 17237,
+      "speaker": "Dwarkesh Patel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 9,
+      "word": "collapse",
+      "start_ms": 17247,
+      "end_ms": 17820,
+      "speaker": "Dwarkesh Patel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 10,
+      "word": "at",
+      "start_ms": 17830,
+      "end_ms": 18403,
+      "speaker": "Dwarkesh Patel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 11,
+      "word": "scale?",
+      "start_ms": 18413,
+      "end_ms": 18986,
+      "speaker": "Dwarkesh Patel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 12,
+      "word": "Model",
+      "start_ms": 19200,
+      "end_ms": 20006,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 13,
+      "word": "collapse",
+      "start_ms": 20016,
+      "end_ms": 20822,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 14,
+      "word": "only",
+      "start_ms": 20832,
+      "end_ms": 21638,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 15,
+      "word": "happens",
+      "start_ms": 21648,
+      "end_ms": 22454,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 16,
+      "word": "with",
+      "start_ms": 22464,
+      "end_ms": 23270,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 17,
+      "word": "uncurated",
+      "start_ms": 23280,
+      "end_ms": 24086,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 18,
+      "word": "recursive",
+      "start_ms": 24096,
+      "end_ms": 24902,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 19,
+      "word": "training",
+      "start_ms": 24912,
+      "end_ms": 25718,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 20,
+      "word": "on",
+      "start_ms": 25728,
+      "end_ms": 26534,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 21,
+      "word": "raw",
+      "start_ms": 26544,
+      "end_ms": 27350,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 22,
+      "word": "model",
+      "start_ms": 27360,
+      "end_ms": 28166,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 23,
+      "word": "garbage.",
+      "start_ms": 28176,
+      "end_ms": 28982,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 24,
+      "word": "When",
+      "start_ms": 29200,
+      "end_ms": 29847,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 25,
+      "word": "you",
+      "start_ms": 29857,
+      "end_ms": 30504,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 26,
+      "word": "use",
+      "start_ms": 30514,
+      "end_ms": 31161,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 27,
+      "word": "verifiable",
+      "start_ms": 31171,
+      "end_ms": 31818,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 28,
+      "word": "reward",
+      "start_ms": 31828,
+      "end_ms": 32475,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 29,
+      "word": "models",
+      "start_ms": 32485,
+      "end_ms": 33132,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 30,
+      "word": "and",
+      "start_ms": 33142,
+      "end_ms": 33789,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 31,
+      "word": "formal",
+      "start_ms": 33799,
+      "end_ms": 34446,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 32,
+      "word": "execution",
+      "start_ms": 34456,
+      "end_ms": 35103,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 33,
+      "word": "environments",
+      "start_ms": 35113,
+      "end_ms": 35760,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 34,
+      "word": "like",
+      "start_ms": 35770,
+      "end_ms": 36417,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 35,
+      "word": "compilers",
+      "start_ms": 36427,
+      "end_ms": 37074,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 36,
+      "word": "and",
+      "start_ms": 37084,
+      "end_ms": 37731,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 37,
+      "word": "math",
+      "start_ms": 37741,
+      "end_ms": 38388,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 38,
+      "word": "checkers,",
+      "start_ms": 38398,
+      "end_ms": 39045,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 39,
+      "word": "synthetic",
+      "start_ms": 39055,
+      "end_ms": 39702,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 40,
+      "word": "data",
+      "start_ms": 39712,
+      "end_ms": 40359,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 41,
+      "word": "actually",
+      "start_ms": 40369,
+      "end_ms": 41016,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 42,
+      "word": "outperforms",
+      "start_ms": 41026,
+      "end_ms": 41673,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 43,
+      "word": "human",
+      "start_ms": 41683,
+      "end_ms": 42330,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 44,
+      "word": "data.",
+      "start_ms": 42340,
+      "end_ms": 42987,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 45,
+      "word": "The",
+      "start_ms": 43200,
+      "end_ms": 43942,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 46,
+      "word": "model",
+      "start_ms": 43952,
+      "end_ms": 44694,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 47,
+      "word": "searches",
+      "start_ms": 44704,
+      "end_ms": 45446,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 48,
+      "word": "and",
+      "start_ms": 45456,
+      "end_ms": 46198,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 49,
+      "word": "verifies",
+      "start_ms": 46208,
+      "end_ms": 46950,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 50,
+      "word": "its",
+      "start_ms": 46960,
+      "end_ms": 47702,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 51,
+      "word": "own",
+      "start_ms": 47712,
+      "end_ms": 48454,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 52,
+      "word": "proofs,",
+      "start_ms": 48464,
+      "end_ms": 49206,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 53,
+      "word": "generating",
+      "start_ms": 49216,
+      "end_ms": 49958,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 54,
+      "word": "higher",
+      "start_ms": 49968,
+      "end_ms": 50710,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 55,
+      "word": "quality",
+      "start_ms": 50720,
+      "end_ms": 51462,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 56,
+      "word": "reasoning",
+      "start_ms": 51472,
+      "end_ms": 52214,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 57,
+      "word": "trajectories",
+      "start_ms": 52224,
+      "end_ms": 52966,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 58,
+      "word": "than",
+      "start_ms": 52976,
+      "end_ms": 53718,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 59,
+      "word": "typical",
+      "start_ms": 53728,
+      "end_ms": 54470,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 60,
+      "word": "internet",
+      "start_ms": 54480,
+      "end_ms": 55222,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 61,
+      "word": "text.",
+      "start_ms": 55232,
+      "end_ms": 55974,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 62,
+      "word": "That",
+      "start_ms": 56200,
+      "end_ms": 57056,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 63,
+      "word": "is",
+      "start_ms": 57066,
+      "end_ms": 57922,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 64,
+      "word": "the",
+      "start_ms": 57932,
+      "end_ms": 58788,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 65,
+      "word": "breakthrough",
+      "start_ms": 58798,
+      "end_ms": 59654,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 66,
+      "word": "that",
+      "start_ms": 59664,
+      "end_ms": 60520,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 67,
+      "word": "unlocks",
+      "start_ms": 60530,
+      "end_ms": 61386,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 68,
+      "word": "true",
+      "start_ms": 61396,
+      "end_ms": 62252,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 69,
+      "word": "self-improving",
+      "start_ms": 62262,
+      "end_ms": 63118,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    },
+    {
+      "idx": 70,
+      "word": "reasoning.",
+      "start_ms": 63128,
+      "end_ms": 63984,
+      "speaker": "Sholto Douglas",
+      "confidence": 0.95
+    }
+  ],
+  "speakers": [
+    {
+      "label": "Dwarkesh Patel",
+      "display_name": "Dwarkesh Patel"
+    },
+    {
+      "label": "Sholto Douglas",
+      "display_name": "Sholto Douglas"
+    }
+  ]
+}

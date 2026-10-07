@@ -1,0 +1,1071 @@
+{
+  "language": "en",
+  "status": "ready",
+  "model": "large-v3",
+  "backend": "whisperx",
+  "word_count": 123,
+  "segments": [
+    {
+      "idx": 0,
+      "start_ms": 4000,
+      "end_ms": 10000,
+      "speaker": "Derek Muller",
+      "text": "Is reality actually real when nobody is looking?"
+    },
+    {
+      "idx": 1,
+      "start_ms": 10200,
+      "end_ms": 20000,
+      "speaker": "Derek Muller",
+      "text": "For centuries, physicists assumed particles had fixed properties regardless of measurement."
+    },
+    {
+      "idx": 2,
+      "start_ms": 20200,
+      "end_ms": 33000,
+      "speaker": "Derek Muller",
+      "text": "Bell's theorem shattered this assumption by proving that no local hidden variable theory can explain quantum entanglement."
+    },
+    {
+      "idx": 3,
+      "start_ms": 33200,
+      "end_ms": 45000,
+      "speaker": "Derek Muller",
+      "text": "Either the universe is non-local, or definite physical properties do not exist prior to observation."
+    },
+    {
+      "idx": 4,
+      "start_ms": 45200,
+      "end_ms": 53000,
+      "speaker": "Derek Muller",
+      "text": "And that is the profound weirdness of the universe we live in."
+    },
+    {
+      "idx": 5,
+      "start_ms": 60000,
+      "end_ms": 67000,
+      "speaker": "Derek Muller",
+      "text": "Now let us calibrate the detector with optical fiber cable."
+    },
+    {
+      "idx": 6,
+      "start_ms": 140000,
+      "end_ms": 147000,
+      "speaker": "Derek Muller",
+      "text": "Why did Einstein call entanglement spooky action at a distance?"
+    },
+    {
+      "idx": 7,
+      "start_ms": 147200,
+      "end_ms": 156000,
+      "speaker": "Derek Muller",
+      "text": "Because under special relativity, nothing can travel faster than the speed of light."
+    },
+    {
+      "idx": 8,
+      "start_ms": 156200,
+      "end_ms": 168000,
+      "speaker": "Derek Muller",
+      "text": "Yet measuring one entangled particle instantaneously determines the state of its partner light-years away."
+    },
+    {
+      "idx": 9,
+      "start_ms": 168200,
+      "end_ms": 178000,
+      "speaker": "Derek Muller",
+      "text": "This paradox forced us to rethink the very nature of spacetime and information."
+    }
+  ],
+  "words": [
+    {
+      "idx": 0,
+      "word": "Is",
+      "start_ms": 4000,
+      "end_ms": 4740,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 1,
+      "word": "reality",
+      "start_ms": 4750,
+      "end_ms": 5490,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 2,
+      "word": "actually",
+      "start_ms": 5500,
+      "end_ms": 6240,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 3,
+      "word": "real",
+      "start_ms": 6250,
+      "end_ms": 6990,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 4,
+      "word": "when",
+      "start_ms": 7000,
+      "end_ms": 7740,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 5,
+      "word": "nobody",
+      "start_ms": 7750,
+      "end_ms": 8490,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 6,
+      "word": "is",
+      "start_ms": 8500,
+      "end_ms": 9240,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 7,
+      "word": "looking?",
+      "start_ms": 9250,
+      "end_ms": 9990,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 8,
+      "word": "For",
+      "start_ms": 10200,
+      "end_ms": 11080,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 9,
+      "word": "centuries,",
+      "start_ms": 11090,
+      "end_ms": 11970,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 10,
+      "word": "physicists",
+      "start_ms": 11980,
+      "end_ms": 12860,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 11,
+      "word": "assumed",
+      "start_ms": 12870,
+      "end_ms": 13750,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 12,
+      "word": "particles",
+      "start_ms": 13760,
+      "end_ms": 14640,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 13,
+      "word": "had",
+      "start_ms": 14650,
+      "end_ms": 15530,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 14,
+      "word": "fixed",
+      "start_ms": 15540,
+      "end_ms": 16420,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 15,
+      "word": "properties",
+      "start_ms": 16430,
+      "end_ms": 17310,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 16,
+      "word": "regardless",
+      "start_ms": 17320,
+      "end_ms": 18200,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 17,
+      "word": "of",
+      "start_ms": 18210,
+      "end_ms": 19090,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 18,
+      "word": "measurement.",
+      "start_ms": 19100,
+      "end_ms": 19980,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 19,
+      "word": "Bell's",
+      "start_ms": 20200,
+      "end_ms": 20942,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 20,
+      "word": "theorem",
+      "start_ms": 20952,
+      "end_ms": 21694,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 21,
+      "word": "shattered",
+      "start_ms": 21704,
+      "end_ms": 22446,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 22,
+      "word": "this",
+      "start_ms": 22456,
+      "end_ms": 23198,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 23,
+      "word": "assumption",
+      "start_ms": 23208,
+      "end_ms": 23950,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 24,
+      "word": "by",
+      "start_ms": 23960,
+      "end_ms": 24702,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 25,
+      "word": "proving",
+      "start_ms": 24712,
+      "end_ms": 25454,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 26,
+      "word": "that",
+      "start_ms": 25464,
+      "end_ms": 26206,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 27,
+      "word": "no",
+      "start_ms": 26216,
+      "end_ms": 26958,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 28,
+      "word": "local",
+      "start_ms": 26968,
+      "end_ms": 27710,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 29,
+      "word": "hidden",
+      "start_ms": 27720,
+      "end_ms": 28462,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 30,
+      "word": "variable",
+      "start_ms": 28472,
+      "end_ms": 29214,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 31,
+      "word": "theory",
+      "start_ms": 29224,
+      "end_ms": 29966,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 32,
+      "word": "can",
+      "start_ms": 29976,
+      "end_ms": 30718,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 33,
+      "word": "explain",
+      "start_ms": 30728,
+      "end_ms": 31470,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 34,
+      "word": "quantum",
+      "start_ms": 31480,
+      "end_ms": 32222,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 35,
+      "word": "entanglement.",
+      "start_ms": 32232,
+      "end_ms": 32974,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 36,
+      "word": "Either",
+      "start_ms": 33200,
+      "end_ms": 33976,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 37,
+      "word": "the",
+      "start_ms": 33986,
+      "end_ms": 34762,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 38,
+      "word": "universe",
+      "start_ms": 34772,
+      "end_ms": 35548,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 39,
+      "word": "is",
+      "start_ms": 35558,
+      "end_ms": 36334,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 40,
+      "word": "non-local,",
+      "start_ms": 36344,
+      "end_ms": 37120,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 41,
+      "word": "or",
+      "start_ms": 37130,
+      "end_ms": 37906,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 42,
+      "word": "definite",
+      "start_ms": 37916,
+      "end_ms": 38692,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 43,
+      "word": "physical",
+      "start_ms": 38702,
+      "end_ms": 39478,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 44,
+      "word": "properties",
+      "start_ms": 39488,
+      "end_ms": 40264,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 45,
+      "word": "do",
+      "start_ms": 40274,
+      "end_ms": 41050,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 46,
+      "word": "not",
+      "start_ms": 41060,
+      "end_ms": 41836,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 47,
+      "word": "exist",
+      "start_ms": 41846,
+      "end_ms": 42622,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 48,
+      "word": "prior",
+      "start_ms": 42632,
+      "end_ms": 43408,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 49,
+      "word": "to",
+      "start_ms": 43418,
+      "end_ms": 44194,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 50,
+      "word": "observation.",
+      "start_ms": 44204,
+      "end_ms": 44980,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 51,
+      "word": "And",
+      "start_ms": 45200,
+      "end_ms": 45840,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 52,
+      "word": "that",
+      "start_ms": 45850,
+      "end_ms": 46490,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 53,
+      "word": "is",
+      "start_ms": 46500,
+      "end_ms": 47140,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 54,
+      "word": "the",
+      "start_ms": 47150,
+      "end_ms": 47790,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 55,
+      "word": "profound",
+      "start_ms": 47800,
+      "end_ms": 48440,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 56,
+      "word": "weirdness",
+      "start_ms": 48450,
+      "end_ms": 49090,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 57,
+      "word": "of",
+      "start_ms": 49100,
+      "end_ms": 49740,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 58,
+      "word": "the",
+      "start_ms": 49750,
+      "end_ms": 50390,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 59,
+      "word": "universe",
+      "start_ms": 50400,
+      "end_ms": 51040,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 60,
+      "word": "we",
+      "start_ms": 51050,
+      "end_ms": 51690,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 61,
+      "word": "live",
+      "start_ms": 51700,
+      "end_ms": 52340,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 62,
+      "word": "in.",
+      "start_ms": 52350,
+      "end_ms": 52990,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 63,
+      "word": "Now",
+      "start_ms": 60000,
+      "end_ms": 60690,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 64,
+      "word": "let",
+      "start_ms": 60700,
+      "end_ms": 61390,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 65,
+      "word": "us",
+      "start_ms": 61400,
+      "end_ms": 62090,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 66,
+      "word": "calibrate",
+      "start_ms": 62100,
+      "end_ms": 62790,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 67,
+      "word": "the",
+      "start_ms": 62800,
+      "end_ms": 63490,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 68,
+      "word": "detector",
+      "start_ms": 63500,
+      "end_ms": 64190,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 69,
+      "word": "with",
+      "start_ms": 64200,
+      "end_ms": 64890,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 70,
+      "word": "optical",
+      "start_ms": 64900,
+      "end_ms": 65590,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 71,
+      "word": "fiber",
+      "start_ms": 65600,
+      "end_ms": 66290,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 72,
+      "word": "cable.",
+      "start_ms": 66300,
+      "end_ms": 66990,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 73,
+      "word": "Why",
+      "start_ms": 140000,
+      "end_ms": 140690,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 74,
+      "word": "did",
+      "start_ms": 140700,
+      "end_ms": 141390,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 75,
+      "word": "Einstein",
+      "start_ms": 141400,
+      "end_ms": 142090,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 76,
+      "word": "call",
+      "start_ms": 142100,
+      "end_ms": 142790,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 77,
+      "word": "entanglement",
+      "start_ms": 142800,
+      "end_ms": 143490,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 78,
+      "word": "spooky",
+      "start_ms": 143500,
+      "end_ms": 144190,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 79,
+      "word": "action",
+      "start_ms": 144200,
+      "end_ms": 144890,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 80,
+      "word": "at",
+      "start_ms": 144900,
+      "end_ms": 145590,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 81,
+      "word": "a",
+      "start_ms": 145600,
+      "end_ms": 146290,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 82,
+      "word": "distance?",
+      "start_ms": 146300,
+      "end_ms": 146990,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 83,
+      "word": "Because",
+      "start_ms": 147200,
+      "end_ms": 147866,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 84,
+      "word": "under",
+      "start_ms": 147876,
+      "end_ms": 148542,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 85,
+      "word": "special",
+      "start_ms": 148552,
+      "end_ms": 149218,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 86,
+      "word": "relativity,",
+      "start_ms": 149228,
+      "end_ms": 149894,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 87,
+      "word": "nothing",
+      "start_ms": 149904,
+      "end_ms": 150570,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 88,
+      "word": "can",
+      "start_ms": 150580,
+      "end_ms": 151246,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 89,
+      "word": "travel",
+      "start_ms": 151256,
+      "end_ms": 151922,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 90,
+      "word": "faster",
+      "start_ms": 151932,
+      "end_ms": 152598,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 91,
+      "word": "than",
+      "start_ms": 152608,
+      "end_ms": 153274,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 92,
+      "word": "the",
+      "start_ms": 153284,
+      "end_ms": 153950,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 93,
+      "word": "speed",
+      "start_ms": 153960,
+      "end_ms": 154626,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 94,
+      "word": "of",
+      "start_ms": 154636,
+      "end_ms": 155302,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 95,
+      "word": "light.",
+      "start_ms": 155312,
+      "end_ms": 155978,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 96,
+      "word": "Yet",
+      "start_ms": 156200,
+      "end_ms": 157032,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 97,
+      "word": "measuring",
+      "start_ms": 157042,
+      "end_ms": 157874,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 98,
+      "word": "one",
+      "start_ms": 157884,
+      "end_ms": 158716,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 99,
+      "word": "entangled",
+      "start_ms": 158726,
+      "end_ms": 159558,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 100,
+      "word": "particle",
+      "start_ms": 159568,
+      "end_ms": 160400,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 101,
+      "word": "instantaneously",
+      "start_ms": 160410,
+      "end_ms": 161242,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 102,
+      "word": "determines",
+      "start_ms": 161252,
+      "end_ms": 162084,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 103,
+      "word": "the",
+      "start_ms": 162094,
+      "end_ms": 162926,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 104,
+      "word": "state",
+      "start_ms": 162936,
+      "end_ms": 163768,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 105,
+      "word": "of",
+      "start_ms": 163778,
+      "end_ms": 164610,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 106,
+      "word": "its",
+      "start_ms": 164620,
+      "end_ms": 165452,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 107,
+      "word": "partner",
+      "start_ms": 165462,
+      "end_ms": 166294,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 108,
+      "word": "light-years",
+      "start_ms": 166304,
+      "end_ms": 167136,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 109,
+      "word": "away.",
+      "start_ms": 167146,
+      "end_ms": 167978,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 110,
+      "word": "This",
+      "start_ms": 168200,
+      "end_ms": 168943,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 111,
+      "word": "paradox",
+      "start_ms": 168953,
+      "end_ms": 169696,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 112,
+      "word": "forced",
+      "start_ms": 169706,
+      "end_ms": 170449,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 113,
+      "word": "us",
+      "start_ms": 170459,
+      "end_ms": 171202,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 114,
+      "word": "to",
+      "start_ms": 171212,
+      "end_ms": 171955,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 115,
+      "word": "rethink",
+      "start_ms": 171965,
+      "end_ms": 172708,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 116,
+      "word": "the",
+      "start_ms": 172718,
+      "end_ms": 173461,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 117,
+      "word": "very",
+      "start_ms": 173471,
+      "end_ms": 174214,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 118,
+      "word": "nature",
+      "start_ms": 174224,
+      "end_ms": 174967,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 119,
+      "word": "of",
+      "start_ms": 174977,
+      "end_ms": 175720,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 120,
+      "word": "spacetime",
+      "start_ms": 175730,
+      "end_ms": 176473,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 121,
+      "word": "and",
+      "start_ms": 176483,
+      "end_ms": 177226,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    },
+    {
+      "idx": 122,
+      "word": "information.",
+      "start_ms": 177236,
+      "end_ms": 177979,
+      "speaker": "Derek Muller",
+      "confidence": 0.95
+    }
+  ],
+  "speakers": [
+    {
+      "label": "Derek Muller",
+      "display_name": "Derek Muller"
+    }
+  ]
+}

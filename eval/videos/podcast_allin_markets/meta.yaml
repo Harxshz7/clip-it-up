@@ -1,0 +1,9 @@
+duration_seconds: 3300.0
+language: en
+slug: podcast_allin_markets
+source_url: https://www.youtube.com/watch?v=allin_podcast
+speakers:
+- Chamath Palihapitiya
+- Jason Calacanis
+title: 'All-In Podcast: Macroeconomics, AI Moats, and Venture Cycles'
+type: podcast

@@ -44,7 +44,7 @@ export default function VideoClipsDirectPage() {
 
   const handleSeek = (startMs: number, endMs: number) => {
     if (playerRef.current) {
-      playerRef.current.seek(startMs / 1000.0);
+      playerRef.current.seekTo(startMs / 1000.0);
       playerRef.current.play();
     }
   };

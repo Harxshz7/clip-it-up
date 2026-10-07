@@ -1,0 +1,9 @@
+duration_seconds: 2700.0
+language: en
+slug: podcast_lex_altman
+source_url: https://www.youtube.com/watch?v=L_Guz73e6fw
+speakers:
+- Lex Fridman
+- Sam Altman
+title: 'Lex Fridman Podcast #367: Sam Altman on OpenAI, GPT-4, and Future'
+type: podcast

@@ -1,0 +1,338 @@
+[
+  {
+    "video_slug": "podcast_lex_altman",
+    "start_ms": 5000,
+    "end_ms": 50000,
+    "rater_id": "rater_1",
+    "score": 5,
+    "comment": "Exceptional exponential technology hook and clear pacing."
+  },
+  {
+    "video_slug": "podcast_lex_altman",
+    "start_ms": 5000,
+    "end_ms": 50000,
+    "rater_id": "rater_2",
+    "score": 5,
+    "comment": "Great insight, stands completely on its own."
+  },
+  {
+    "video_slug": "podcast_lex_altman",
+    "start_ms": 5000,
+    "end_ms": 50000,
+    "rater_id": "rater_3",
+    "score": 4,
+    "comment": "Good ending, very relevant."
+  },
+  {
+    "video_slug": "podcast_lex_altman",
+    "start_ms": 120000,
+    "end_ms": 163000,
+    "rater_id": "rater_1",
+    "score": 5,
+    "comment": "Strong engineering career advice."
+  },
+  {
+    "video_slug": "podcast_lex_altman",
+    "start_ms": 120000,
+    "end_ms": 163000,
+    "rater_id": "rater_2",
+    "score": 4,
+    "comment": "Actionable takeaway."
+  },
+  {
+    "video_slug": "podcast_lex_altman",
+    "start_ms": 120000,
+    "end_ms": 163000,
+    "rater_id": "rater_3",
+    "score": 5,
+    "comment": "Punchy delivery."
+  },
+  {
+    "video_slug": "podcast_lex_altman",
+    "start_ms": 55000,
+    "end_ms": 70000,
+    "rater_id": "rater_1",
+    "score": 2,
+    "comment": "Casual filler about old database setup."
+  },
+  {
+    "video_slug": "podcast_lex_altman",
+    "start_ms": 55000,
+    "end_ms": 70000,
+    "rater_id": "rater_2",
+    "score": 1,
+    "comment": "No hook, boring banter."
+  },
+  {
+    "video_slug": "podcast_lex_altman",
+    "start_ms": 55000,
+    "end_ms": 70000,
+    "rater_id": "rater_3",
+    "score": 2,
+    "comment": "Weak payoff."
+  },
+  {
+    "video_slug": "interview_huberman_focus",
+    "start_ms": 8000,
+    "end_ms": 56000,
+    "rater_id": "rater_1",
+    "score": 5,
+    "comment": "Morning sunlight hook with immediate practical protocol."
+  },
+  {
+    "video_slug": "interview_huberman_focus",
+    "start_ms": 8000,
+    "end_ms": 56000,
+    "rater_id": "rater_2",
+    "score": 5,
+    "comment": "Viral health hook, clear explanation."
+  },
+  {
+    "video_slug": "interview_huberman_focus",
+    "start_ms": 8000,
+    "end_ms": 56000,
+    "rater_id": "rater_3",
+    "score": 4,
+    "comment": "Solid advice."
+  },
+  {
+    "video_slug": "interview_huberman_focus",
+    "start_ms": 180000,
+    "end_ms": 220000,
+    "rater_id": "rater_1",
+    "score": 5,
+    "comment": "Dopamine stacking mistake is highly counterintuitive."
+  },
+  {
+    "video_slug": "interview_huberman_focus",
+    "start_ms": 180000,
+    "end_ms": 220000,
+    "rater_id": "rater_2",
+    "score": 4,
+    "comment": "Great scientific breakdown."
+  },
+  {
+    "video_slug": "interview_huberman_focus",
+    "start_ms": 180000,
+    "end_ms": 220000,
+    "rater_id": "rater_3",
+    "score": 4,
+    "comment": "Good narrative flow."
+  },
+  {
+    "video_slug": "edu_veritasium_quantum",
+    "start_ms": 4000,
+    "end_ms": 53000,
+    "rater_id": "rater_1",
+    "score": 5,
+    "comment": "Bells theorem hook is fascinating."
+  },
+  {
+    "video_slug": "edu_veritasium_quantum",
+    "start_ms": 4000,
+    "end_ms": 53000,
+    "rater_id": "rater_2",
+    "score": 4,
+    "comment": "High curiosity opening."
+  },
+  {
+    "video_slug": "edu_veritasium_quantum",
+    "start_ms": 4000,
+    "end_ms": 53000,
+    "rater_id": "rater_3",
+    "score": 4,
+    "comment": "Mind-bending conclusion."
+  },
+  {
+    "video_slug": "vlog_ali_productivity",
+    "start_ms": 6000,
+    "end_ms": 42000,
+    "rater_id": "rater_1",
+    "score": 4,
+    "comment": "Manage energy not time is classic productivity hook."
+  },
+  {
+    "video_slug": "vlog_ali_productivity",
+    "start_ms": 6000,
+    "end_ms": 42000,
+    "rater_id": "rater_2",
+    "score": 5,
+    "comment": "Clean punchy delivery."
+  },
+  {
+    "video_slug": "vlog_ali_productivity",
+    "start_ms": 6000,
+    "end_ms": 42000,
+    "rater_id": "rater_3",
+    "score": 4,
+    "comment": "Solid takeaway."
+  },
+  {
+    "video_slug": "vlog_ali_productivity",
+    "start_ms": 110000,
+    "end_ms": 153000,
+    "rater_id": "rater_1",
+    "score": 5,
+    "comment": "Consistency vs intensity truth."
+  },
+  {
+    "video_slug": "vlog_ali_productivity",
+    "start_ms": 110000,
+    "end_ms": 153000,
+    "rater_id": "rater_2",
+    "score": 4,
+    "comment": "Good pacing."
+  },
+  {
+    "video_slug": "vlog_ali_productivity",
+    "start_ms": 110000,
+    "end_ms": 153000,
+    "rater_id": "rater_3",
+    "score": 5,
+    "comment": "Clear lesson."
+  },
+  {
+    "video_slug": "podcast_allin_markets",
+    "start_ms": 10000,
+    "end_ms": 59000,
+    "rater_id": "rater_1",
+    "score": 5,
+    "comment": "AI moat insight is spot on."
+  },
+  {
+    "video_slug": "podcast_allin_markets",
+    "start_ms": 10000,
+    "end_ms": 59000,
+    "rater_id": "rater_2",
+    "score": 4,
+    "comment": "Clear macro conclusion."
+  },
+  {
+    "video_slug": "podcast_allin_markets",
+    "start_ms": 10000,
+    "end_ms": 59000,
+    "rater_id": "rater_3",
+    "score": 4,
+    "comment": "High interest topic."
+  },
+  {
+    "video_slug": "interview_dwarkesh_sholto",
+    "start_ms": 12000,
+    "end_ms": 64000,
+    "rater_id": "rater_1",
+    "score": 5,
+    "comment": "Synthetic data model collapse refutation."
+  },
+  {
+    "video_slug": "interview_dwarkesh_sholto",
+    "start_ms": 12000,
+    "end_ms": 64000,
+    "rater_id": "rater_2",
+    "score": 5,
+    "comment": "Dense technical clarity."
+  },
+  {
+    "video_slug": "interview_dwarkesh_sholto",
+    "start_ms": 12000,
+    "end_ms": 64000,
+    "rater_id": "rater_3",
+    "score": 4,
+    "comment": "High novelty."
+  },
+  {
+    "video_slug": "edu_3blue1brown_linear",
+    "start_ms": 8000,
+    "end_ms": 52000,
+    "rater_id": "rater_1",
+    "score": 5,
+    "comment": "Eigenvalue geometric intuition."
+  },
+  {
+    "video_slug": "edu_3blue1brown_linear",
+    "start_ms": 8000,
+    "end_ms": 52000,
+    "rater_id": "rater_2",
+    "score": 4,
+    "comment": "Elegant explanation."
+  },
+  {
+    "video_slug": "edu_3blue1brown_linear",
+    "start_ms": 8000,
+    "end_ms": 52000,
+    "rater_id": "rater_3",
+    "score": 4,
+    "comment": "Strong educational clip."
+  },
+  {
+    "video_slug": "vlog_casey_storytelling",
+    "start_ms": 5000,
+    "end_ms": 42000,
+    "rater_id": "rater_1",
+    "score": 5,
+    "comment": "Story is king duct tape camera hook."
+  },
+  {
+    "video_slug": "vlog_casey_storytelling",
+    "start_ms": 5000,
+    "end_ms": 42000,
+    "rater_id": "rater_2",
+    "score": 5,
+    "comment": "Classic viral advice."
+  },
+  {
+    "video_slug": "vlog_casey_storytelling",
+    "start_ms": 5000,
+    "end_ms": 42000,
+    "rater_id": "rater_3",
+    "score": 5,
+    "comment": "Relentless pacing."
+  },
+  {
+    "video_slug": "podcast_myfirstmillion_growth",
+    "start_ms": 9000,
+    "end_ms": 51000,
+    "rater_id": "rater_1",
+    "score": 5,
+    "comment": "Clunky software modernization playbook."
+  },
+  {
+    "video_slug": "podcast_myfirstmillion_growth",
+    "start_ms": 9000,
+    "end_ms": 51000,
+    "rater_id": "rater_2",
+    "score": 4,
+    "comment": "Very practical startup insight."
+  },
+  {
+    "video_slug": "podcast_myfirstmillion_growth",
+    "start_ms": 9000,
+    "end_ms": 51000,
+    "rater_id": "rater_3",
+    "score": 4,
+    "comment": "Engaging hook."
+  },
+  {
+    "video_slug": "interview_ycombinator_advice",
+    "start_ms": 7000,
+    "end_ms": 55000,
+    "rater_id": "rater_1",
+    "score": 5,
+    "comment": "Co-founder dispute mortality rate is high stakes."
+  },
+  {
+    "video_slug": "interview_ycombinator_advice",
+    "start_ms": 7000,
+    "end_ms": 55000,
+    "rater_id": "rater_2",
+    "score": 5,
+    "comment": "Unfiltered startup truth."
+  },
+  {
+    "video_slug": "interview_ycombinator_advice",
+    "start_ms": 7000,
+    "end_ms": 55000,
+    "rater_id": "rater_3",
+    "score": 4,
+    "comment": "Clear takeaway."
+  }
+]

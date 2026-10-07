@@ -1,0 +1,1274 @@
+{
+  "language": "en",
+  "status": "ready",
+  "model": "large-v3",
+  "backend": "whisperx",
+  "word_count": 147,
+  "segments": [
+    {
+      "idx": 0,
+      "start_ms": 8000,
+      "end_ms": 15000,
+      "speaker": "Andrew Huberman",
+      "text": "Why do so many people experience severe brain fog at 2 PM?"
+    },
+    {
+      "idx": 1,
+      "start_ms": 15200,
+      "end_ms": 24000,
+      "speaker": "Andrew Huberman",
+      "text": "It comes down to adenosine buildup and circadian temperature fluctuations."
+    },
+    {
+      "idx": 2,
+      "start_ms": 24200,
+      "end_ms": 37000,
+      "speaker": "Andrew Huberman",
+      "text": "If you view bright sunlight within 30 minutes of waking up, you trigger a cortisol pulse that sets your internal clock."
+    },
+    {
+      "idx": 3,
+      "start_ms": 37200,
+      "end_ms": 48000,
+      "speaker": "Andrew Huberman",
+      "text": "This single habit boosts afternoon alertness more than an extra cup of coffee."
+    },
+    {
+      "idx": 4,
+      "start_ms": 48200,
+      "end_ms": 56000,
+      "speaker": "Andrew Huberman",
+      "text": "And that is how you sustain deep focus without energy crashes."
+    },
+    {
+      "idx": 5,
+      "start_ms": 65000,
+      "end_ms": 72000,
+      "speaker": "Host",
+      "text": "Okay, let us look at the temperature logs from lab experiment four."
+    },
+    {
+      "idx": 6,
+      "start_ms": 72200,
+      "end_ms": 79000,
+      "speaker": "Host",
+      "text": "We recorded room temperature at twenty-two degrees celsius."
+    },
+    {
+      "idx": 7,
+      "start_ms": 180000,
+      "end_ms": 188000,
+      "speaker": "Andrew Huberman",
+      "text": "The biggest mistake people make with dopamine is stacking too many rewards at once."
+    },
+    {
+      "idx": 8,
+      "start_ms": 188200,
+      "end_ms": 199000,
+      "speaker": "Andrew Huberman",
+      "text": "When you listen to upbeat music while drinking pre-workout while talking to friends, your dopamine peaks enormously."
+    },
+    {
+      "idx": 9,
+      "start_ms": 199200,
+      "end_ms": 209000,
+      "speaker": "Andrew Huberman",
+      "text": "The problem is the ensuing crash drops your baseline lower than where you started."
+    },
+    {
+      "idx": 10,
+      "start_ms": 209200,
+      "end_ms": 220000,
+      "speaker": "Andrew Huberman",
+      "text": "To maintain intrinsic motivation, you must learn to attach dopamine release to the effort itself."
+    }
+  ],
+  "words": [
+    {
+      "idx": 0,
+      "word": "Why",
+      "start_ms": 8000,
+      "end_ms": 8573,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 1,
+      "word": "do",
+      "start_ms": 8583,
+      "end_ms": 9156,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 2,
+      "word": "so",
+      "start_ms": 9166,
+      "end_ms": 9739,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 3,
+      "word": "many",
+      "start_ms": 9749,
+      "end_ms": 10322,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 4,
+      "word": "people",
+      "start_ms": 10332,
+      "end_ms": 10905,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 5,
+      "word": "experience",
+      "start_ms": 10915,
+      "end_ms": 11488,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 6,
+      "word": "severe",
+      "start_ms": 11498,
+      "end_ms": 12071,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 7,
+      "word": "brain",
+      "start_ms": 12081,
+      "end_ms": 12654,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 8,
+      "word": "fog",
+      "start_ms": 12664,
+      "end_ms": 13237,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 9,
+      "word": "at",
+      "start_ms": 13247,
+      "end_ms": 13820,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 10,
+      "word": "2",
+      "start_ms": 13830,
+      "end_ms": 14403,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 11,
+      "word": "PM?",
+      "start_ms": 14413,
+      "end_ms": 14986,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 12,
+      "word": "It",
+      "start_ms": 15200,
+      "end_ms": 16070,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 13,
+      "word": "comes",
+      "start_ms": 16080,
+      "end_ms": 16950,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 14,
+      "word": "down",
+      "start_ms": 16960,
+      "end_ms": 17830,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 15,
+      "word": "to",
+      "start_ms": 17840,
+      "end_ms": 18710,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 16,
+      "word": "adenosine",
+      "start_ms": 18720,
+      "end_ms": 19590,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 17,
+      "word": "buildup",
+      "start_ms": 19600,
+      "end_ms": 20470,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 18,
+      "word": "and",
+      "start_ms": 20480,
+      "end_ms": 21350,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 19,
+      "word": "circadian",
+      "start_ms": 21360,
+      "end_ms": 22230,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 20,
+      "word": "temperature",
+      "start_ms": 22240,
+      "end_ms": 23110,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 21,
+      "word": "fluctuations.",
+      "start_ms": 23120,
+      "end_ms": 23990,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 22,
+      "word": "If",
+      "start_ms": 24200,
+      "end_ms": 24799,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 23,
+      "word": "you",
+      "start_ms": 24809,
+      "end_ms": 25408,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 24,
+      "word": "view",
+      "start_ms": 25418,
+      "end_ms": 26017,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 25,
+      "word": "bright",
+      "start_ms": 26027,
+      "end_ms": 26626,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 26,
+      "word": "sunlight",
+      "start_ms": 26636,
+      "end_ms": 27235,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 27,
+      "word": "within",
+      "start_ms": 27245,
+      "end_ms": 27844,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 28,
+      "word": "30",
+      "start_ms": 27854,
+      "end_ms": 28453,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 29,
+      "word": "minutes",
+      "start_ms": 28463,
+      "end_ms": 29062,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 30,
+      "word": "of",
+      "start_ms": 29072,
+      "end_ms": 29671,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 31,
+      "word": "waking",
+      "start_ms": 29681,
+      "end_ms": 30280,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 32,
+      "word": "up,",
+      "start_ms": 30290,
+      "end_ms": 30889,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 33,
+      "word": "you",
+      "start_ms": 30899,
+      "end_ms": 31498,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 34,
+      "word": "trigger",
+      "start_ms": 31508,
+      "end_ms": 32107,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 35,
+      "word": "a",
+      "start_ms": 32117,
+      "end_ms": 32716,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 36,
+      "word": "cortisol",
+      "start_ms": 32726,
+      "end_ms": 33325,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 37,
+      "word": "pulse",
+      "start_ms": 33335,
+      "end_ms": 33934,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 38,
+      "word": "that",
+      "start_ms": 33944,
+      "end_ms": 34543,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 39,
+      "word": "sets",
+      "start_ms": 34553,
+      "end_ms": 35152,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 40,
+      "word": "your",
+      "start_ms": 35162,
+      "end_ms": 35761,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 41,
+      "word": "internal",
+      "start_ms": 35771,
+      "end_ms": 36370,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 42,
+      "word": "clock.",
+      "start_ms": 36380,
+      "end_ms": 36979,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 43,
+      "word": "This",
+      "start_ms": 37200,
+      "end_ms": 38020,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 44,
+      "word": "single",
+      "start_ms": 38030,
+      "end_ms": 38850,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 45,
+      "word": "habit",
+      "start_ms": 38860,
+      "end_ms": 39680,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 46,
+      "word": "boosts",
+      "start_ms": 39690,
+      "end_ms": 40510,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 47,
+      "word": "afternoon",
+      "start_ms": 40520,
+      "end_ms": 41340,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 48,
+      "word": "alertness",
+      "start_ms": 41350,
+      "end_ms": 42170,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 49,
+      "word": "more",
+      "start_ms": 42180,
+      "end_ms": 43000,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 50,
+      "word": "than",
+      "start_ms": 43010,
+      "end_ms": 43830,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 51,
+      "word": "an",
+      "start_ms": 43840,
+      "end_ms": 44660,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 52,
+      "word": "extra",
+      "start_ms": 44670,
+      "end_ms": 45490,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 53,
+      "word": "cup",
+      "start_ms": 45500,
+      "end_ms": 46320,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 54,
+      "word": "of",
+      "start_ms": 46330,
+      "end_ms": 47150,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 55,
+      "word": "coffee.",
+      "start_ms": 47160,
+      "end_ms": 47980,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 56,
+      "word": "And",
+      "start_ms": 48200,
+      "end_ms": 48899,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 57,
+      "word": "that",
+      "start_ms": 48909,
+      "end_ms": 49608,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 58,
+      "word": "is",
+      "start_ms": 49618,
+      "end_ms": 50317,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 59,
+      "word": "how",
+      "start_ms": 50327,
+      "end_ms": 51026,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 60,
+      "word": "you",
+      "start_ms": 51036,
+      "end_ms": 51735,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 61,
+      "word": "sustain",
+      "start_ms": 51745,
+      "end_ms": 52444,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 62,
+      "word": "deep",
+      "start_ms": 52454,
+      "end_ms": 53153,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 63,
+      "word": "focus",
+      "start_ms": 53163,
+      "end_ms": 53862,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 64,
+      "word": "without",
+      "start_ms": 53872,
+      "end_ms": 54571,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 65,
+      "word": "energy",
+      "start_ms": 54581,
+      "end_ms": 55280,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 66,
+      "word": "crashes.",
+      "start_ms": 55290,
+      "end_ms": 55989,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 67,
+      "word": "Okay,",
+      "start_ms": 65000,
+      "end_ms": 65573,
+      "speaker": "Host",
+      "confidence": 0.95
+    },
+    {
+      "idx": 68,
+      "word": "let",
+      "start_ms": 65583,
+      "end_ms": 66156,
+      "speaker": "Host",
+      "confidence": 0.95
+    },
+    {
+      "idx": 69,
+      "word": "us",
+      "start_ms": 66166,
+      "end_ms": 66739,
+      "speaker": "Host",
+      "confidence": 0.95
+    },
+    {
+      "idx": 70,
+      "word": "look",
+      "start_ms": 66749,
+      "end_ms": 67322,
+      "speaker": "Host",
+      "confidence": 0.95
+    },
+    {
+      "idx": 71,
+      "word": "at",
+      "start_ms": 67332,
+      "end_ms": 67905,
+      "speaker": "Host",
+      "confidence": 0.95
+    },
+    {
+      "idx": 72,
+      "word": "the",
+      "start_ms": 67915,
+      "end_ms": 68488,
+      "speaker": "Host",
+      "confidence": 0.95
+    },
+    {
+      "idx": 73,
+      "word": "temperature",
+      "start_ms": 68498,
+      "end_ms": 69071,
+      "speaker": "Host",
+      "confidence": 0.95
+    },
+    {
+      "idx": 74,
+      "word": "logs",
+      "start_ms": 69081,
+      "end_ms": 69654,
+      "speaker": "Host",
+      "confidence": 0.95
+    },
+    {
+      "idx": 75,
+      "word": "from",
+      "start_ms": 69664,
+      "end_ms": 70237,
+      "speaker": "Host",
+      "confidence": 0.95
+    },
+    {
+      "idx": 76,
+      "word": "lab",
+      "start_ms": 70247,
+      "end_ms": 70820,
+      "speaker": "Host",
+      "confidence": 0.95
+    },
+    {
+      "idx": 77,
+      "word": "experiment",
+      "start_ms": 70830,
+      "end_ms": 71403,
+      "speaker": "Host",
+      "confidence": 0.95
+    },
+    {
+      "idx": 78,
+      "word": "four.",
+      "start_ms": 71413,
+      "end_ms": 71986,
+      "speaker": "Host",
+      "confidence": 0.95
+    },
+    {
+      "idx": 79,
+      "word": "We",
+      "start_ms": 72200,
+      "end_ms": 73040,
+      "speaker": "Host",
+      "confidence": 0.95
+    },
+    {
+      "idx": 80,
+      "word": "recorded",
+      "start_ms": 73050,
+      "end_ms": 73890,
+      "speaker": "Host",
+      "confidence": 0.95
+    },
+    {
+      "idx": 81,
+      "word": "room",
+      "start_ms": 73900,
+      "end_ms": 74740,
+      "speaker": "Host",
+      "confidence": 0.95
+    },
+    {
+      "idx": 82,
+      "word": "temperature",
+      "start_ms": 74750,
+      "end_ms": 75590,
+      "speaker": "Host",
+      "confidence": 0.95
+    },
+    {
+      "idx": 83,
+      "word": "at",
+      "start_ms": 75600,
+      "end_ms": 76440,
+      "speaker": "Host",
+      "confidence": 0.95
+    },
+    {
+      "idx": 84,
+      "word": "twenty-two",
+      "start_ms": 76450,
+      "end_ms": 77290,
+      "speaker": "Host",
+      "confidence": 0.95
+    },
+    {
+      "idx": 85,
+      "word": "degrees",
+      "start_ms": 77300,
+      "end_ms": 78140,
+      "speaker": "Host",
+      "confidence": 0.95
+    },
+    {
+      "idx": 86,
+      "word": "celsius.",
+      "start_ms": 78150,
+      "end_ms": 78990,
+      "speaker": "Host",
+      "confidence": 0.95
+    },
+    {
+      "idx": 87,
+      "word": "The",
+      "start_ms": 180000,
+      "end_ms": 180561,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 88,
+      "word": "biggest",
+      "start_ms": 180571,
+      "end_ms": 181132,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 89,
+      "word": "mistake",
+      "start_ms": 181142,
+      "end_ms": 181703,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 90,
+      "word": "people",
+      "start_ms": 181713,
+      "end_ms": 182274,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 91,
+      "word": "make",
+      "start_ms": 182284,
+      "end_ms": 182845,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 92,
+      "word": "with",
+      "start_ms": 182855,
+      "end_ms": 183416,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 93,
+      "word": "dopamine",
+      "start_ms": 183426,
+      "end_ms": 183987,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 94,
+      "word": "is",
+      "start_ms": 183997,
+      "end_ms": 184558,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 95,
+      "word": "stacking",
+      "start_ms": 184568,
+      "end_ms": 185129,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 96,
+      "word": "too",
+      "start_ms": 185139,
+      "end_ms": 185700,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 97,
+      "word": "many",
+      "start_ms": 185710,
+      "end_ms": 186271,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 98,
+      "word": "rewards",
+      "start_ms": 186281,
+      "end_ms": 186842,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 99,
+      "word": "at",
+      "start_ms": 186852,
+      "end_ms": 187413,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 100,
+      "word": "once.",
+      "start_ms": 187423,
+      "end_ms": 187984,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 101,
+      "word": "When",
+      "start_ms": 188200,
+      "end_ms": 188825,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 102,
+      "word": "you",
+      "start_ms": 188835,
+      "end_ms": 189460,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 103,
+      "word": "listen",
+      "start_ms": 189470,
+      "end_ms": 190095,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 104,
+      "word": "to",
+      "start_ms": 190105,
+      "end_ms": 190730,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 105,
+      "word": "upbeat",
+      "start_ms": 190740,
+      "end_ms": 191365,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 106,
+      "word": "music",
+      "start_ms": 191375,
+      "end_ms": 192000,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 107,
+      "word": "while",
+      "start_ms": 192010,
+      "end_ms": 192635,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 108,
+      "word": "drinking",
+      "start_ms": 192645,
+      "end_ms": 193270,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 109,
+      "word": "pre-workout",
+      "start_ms": 193280,
+      "end_ms": 193905,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 110,
+      "word": "while",
+      "start_ms": 193915,
+      "end_ms": 194540,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 111,
+      "word": "talking",
+      "start_ms": 194550,
+      "end_ms": 195175,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 112,
+      "word": "to",
+      "start_ms": 195185,
+      "end_ms": 195810,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 113,
+      "word": "friends,",
+      "start_ms": 195820,
+      "end_ms": 196445,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 114,
+      "word": "your",
+      "start_ms": 196455,
+      "end_ms": 197080,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 115,
+      "word": "dopamine",
+      "start_ms": 197090,
+      "end_ms": 197715,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 116,
+      "word": "peaks",
+      "start_ms": 197725,
+      "end_ms": 198350,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 117,
+      "word": "enormously.",
+      "start_ms": 198360,
+      "end_ms": 198985,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 118,
+      "word": "The",
+      "start_ms": 199200,
+      "end_ms": 199890,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 119,
+      "word": "problem",
+      "start_ms": 199900,
+      "end_ms": 200590,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 120,
+      "word": "is",
+      "start_ms": 200600,
+      "end_ms": 201290,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 121,
+      "word": "the",
+      "start_ms": 201300,
+      "end_ms": 201990,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 122,
+      "word": "ensuing",
+      "start_ms": 202000,
+      "end_ms": 202690,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 123,
+      "word": "crash",
+      "start_ms": 202700,
+      "end_ms": 203390,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 124,
+      "word": "drops",
+      "start_ms": 203400,
+      "end_ms": 204090,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 125,
+      "word": "your",
+      "start_ms": 204100,
+      "end_ms": 204790,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 126,
+      "word": "baseline",
+      "start_ms": 204800,
+      "end_ms": 205490,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 127,
+      "word": "lower",
+      "start_ms": 205500,
+      "end_ms": 206190,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 128,
+      "word": "than",
+      "start_ms": 206200,
+      "end_ms": 206890,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 129,
+      "word": "where",
+      "start_ms": 206900,
+      "end_ms": 207590,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 130,
+      "word": "you",
+      "start_ms": 207600,
+      "end_ms": 208290,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 131,
+      "word": "started.",
+      "start_ms": 208300,
+      "end_ms": 208990,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 132,
+      "word": "To",
+      "start_ms": 209200,
+      "end_ms": 209910,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 133,
+      "word": "maintain",
+      "start_ms": 209920,
+      "end_ms": 210630,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 134,
+      "word": "intrinsic",
+      "start_ms": 210640,
+      "end_ms": 211350,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 135,
+      "word": "motivation,",
+      "start_ms": 211360,
+      "end_ms": 212070,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 136,
+      "word": "you",
+      "start_ms": 212080,
+      "end_ms": 212790,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 137,
+      "word": "must",
+      "start_ms": 212800,
+      "end_ms": 213510,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 138,
+      "word": "learn",
+      "start_ms": 213520,
+      "end_ms": 214230,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 139,
+      "word": "to",
+      "start_ms": 214240,
+      "end_ms": 214950,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 140,
+      "word": "attach",
+      "start_ms": 214960,
+      "end_ms": 215670,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 141,
+      "word": "dopamine",
+      "start_ms": 215680,
+      "end_ms": 216390,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 142,
+      "word": "release",
+      "start_ms": 216400,
+      "end_ms": 217110,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 143,
+      "word": "to",
+      "start_ms": 217120,
+      "end_ms": 217830,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 144,
+      "word": "the",
+      "start_ms": 217840,
+      "end_ms": 218550,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 145,
+      "word": "effort",
+      "start_ms": 218560,
+      "end_ms": 219270,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 146,
+      "word": "itself.",
+      "start_ms": 219280,
+      "end_ms": 219990,
+      "speaker": "Andrew Huberman",
+      "confidence": 0.95
+    }
+  ],
+  "speakers": [
+    {
+      "label": "Andrew Huberman",
+      "display_name": "Andrew Huberman"
+    },
+    {
+      "label": "Host",
+      "display_name": "Host"
+    }
+  ]
+}

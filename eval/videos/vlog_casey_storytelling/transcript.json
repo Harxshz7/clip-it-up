@@ -1,0 +1,493 @@
+{
+  "language": "en",
+  "status": "ready",
+  "model": "large-v3",
+  "backend": "whisperx",
+  "word_count": 56,
+  "segments": [
+    {
+      "idx": 0,
+      "start_ms": 5000,
+      "end_ms": 11000,
+      "speaker": "Casey Neistat",
+      "text": "Gear does not matter. Story is king."
+    },
+    {
+      "idx": 1,
+      "start_ms": 11200,
+      "end_ms": 21000,
+      "speaker": "Casey Neistat",
+      "text": "I shot my most viewed videos on a cracked point-and-shoot camera held together with duct tape."
+    },
+    {
+      "idx": 2,
+      "start_ms": 21200,
+      "end_ms": 34000,
+      "speaker": "Casey Neistat",
+      "text": "If you do not hook the viewer with a clear conflict in the first five seconds, having an eight-thousand dollar cinema lens will not save you."
+    },
+    {
+      "idx": 3,
+      "start_ms": 34200,
+      "end_ms": 42000,
+      "speaker": "Casey Neistat",
+      "text": "Focus on emotional honesty and relentless pacing."
+    }
+  ],
+  "words": [
+    {
+      "idx": 0,
+      "word": "Gear",
+      "start_ms": 5000,
+      "end_ms": 5847,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 1,
+      "word": "does",
+      "start_ms": 5857,
+      "end_ms": 6704,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 2,
+      "word": "not",
+      "start_ms": 6714,
+      "end_ms": 7561,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 3,
+      "word": "matter.",
+      "start_ms": 7571,
+      "end_ms": 8418,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 4,
+      "word": "Story",
+      "start_ms": 8428,
+      "end_ms": 9275,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 5,
+      "word": "is",
+      "start_ms": 9285,
+      "end_ms": 10132,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 6,
+      "word": "king.",
+      "start_ms": 10142,
+      "end_ms": 10989,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 7,
+      "word": "I",
+      "start_ms": 11200,
+      "end_ms": 11802,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 8,
+      "word": "shot",
+      "start_ms": 11812,
+      "end_ms": 12414,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 9,
+      "word": "my",
+      "start_ms": 12424,
+      "end_ms": 13026,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 10,
+      "word": "most",
+      "start_ms": 13036,
+      "end_ms": 13638,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 11,
+      "word": "viewed",
+      "start_ms": 13648,
+      "end_ms": 14250,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 12,
+      "word": "videos",
+      "start_ms": 14260,
+      "end_ms": 14862,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 13,
+      "word": "on",
+      "start_ms": 14872,
+      "end_ms": 15474,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 14,
+      "word": "a",
+      "start_ms": 15484,
+      "end_ms": 16086,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 15,
+      "word": "cracked",
+      "start_ms": 16096,
+      "end_ms": 16698,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 16,
+      "word": "point-and-shoot",
+      "start_ms": 16708,
+      "end_ms": 17310,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 17,
+      "word": "camera",
+      "start_ms": 17320,
+      "end_ms": 17922,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 18,
+      "word": "held",
+      "start_ms": 17932,
+      "end_ms": 18534,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 19,
+      "word": "together",
+      "start_ms": 18544,
+      "end_ms": 19146,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 20,
+      "word": "with",
+      "start_ms": 19156,
+      "end_ms": 19758,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 21,
+      "word": "duct",
+      "start_ms": 19768,
+      "end_ms": 20370,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 22,
+      "word": "tape.",
+      "start_ms": 20380,
+      "end_ms": 20982,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 23,
+      "word": "If",
+      "start_ms": 21200,
+      "end_ms": 21682,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 24,
+      "word": "you",
+      "start_ms": 21692,
+      "end_ms": 22174,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 25,
+      "word": "do",
+      "start_ms": 22184,
+      "end_ms": 22666,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 26,
+      "word": "not",
+      "start_ms": 22676,
+      "end_ms": 23158,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 27,
+      "word": "hook",
+      "start_ms": 23168,
+      "end_ms": 23650,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 28,
+      "word": "the",
+      "start_ms": 23660,
+      "end_ms": 24142,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 29,
+      "word": "viewer",
+      "start_ms": 24152,
+      "end_ms": 24634,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 30,
+      "word": "with",
+      "start_ms": 24644,
+      "end_ms": 25126,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 31,
+      "word": "a",
+      "start_ms": 25136,
+      "end_ms": 25618,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 32,
+      "word": "clear",
+      "start_ms": 25628,
+      "end_ms": 26110,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 33,
+      "word": "conflict",
+      "start_ms": 26120,
+      "end_ms": 26602,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 34,
+      "word": "in",
+      "start_ms": 26612,
+      "end_ms": 27094,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 35,
+      "word": "the",
+      "start_ms": 27104,
+      "end_ms": 27586,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 36,
+      "word": "first",
+      "start_ms": 27596,
+      "end_ms": 28078,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 37,
+      "word": "five",
+      "start_ms": 28088,
+      "end_ms": 28570,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 38,
+      "word": "seconds,",
+      "start_ms": 28580,
+      "end_ms": 29062,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 39,
+      "word": "having",
+      "start_ms": 29072,
+      "end_ms": 29554,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 40,
+      "word": "an",
+      "start_ms": 29564,
+      "end_ms": 30046,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 41,
+      "word": "eight-thousand",
+      "start_ms": 30056,
+      "end_ms": 30538,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 42,
+      "word": "dollar",
+      "start_ms": 30548,
+      "end_ms": 31030,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 43,
+      "word": "cinema",
+      "start_ms": 31040,
+      "end_ms": 31522,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 44,
+      "word": "lens",
+      "start_ms": 31532,
+      "end_ms": 32014,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 45,
+      "word": "will",
+      "start_ms": 32024,
+      "end_ms": 32506,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 46,
+      "word": "not",
+      "start_ms": 32516,
+      "end_ms": 32998,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 47,
+      "word": "save",
+      "start_ms": 33008,
+      "end_ms": 33490,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 48,
+      "word": "you.",
+      "start_ms": 33500,
+      "end_ms": 33982,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 49,
+      "word": "Focus",
+      "start_ms": 34200,
+      "end_ms": 35304,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 50,
+      "word": "on",
+      "start_ms": 35314,
+      "end_ms": 36418,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 51,
+      "word": "emotional",
+      "start_ms": 36428,
+      "end_ms": 37532,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 52,
+      "word": "honesty",
+      "start_ms": 37542,
+      "end_ms": 38646,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 53,
+      "word": "and",
+      "start_ms": 38656,
+      "end_ms": 39760,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 54,
+      "word": "relentless",
+      "start_ms": 39770,
+      "end_ms": 40874,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    },
+    {
+      "idx": 55,
+      "word": "pacing.",
+      "start_ms": 40884,
+      "end_ms": 41988,
+      "speaker": "Casey Neistat",
+      "confidence": 0.95
+    }
+  ],
+  "speakers": [
+    {
+      "label": "Casey Neistat",
+      "display_name": "Casey Neistat"
+    }
+  ]
+}

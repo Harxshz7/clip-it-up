@@ -1,0 +1,8 @@
+duration_seconds: 1500.0
+language: en
+slug: edu_3blue1brown_linear
+source_url: https://www.youtube.com/watch?v=3b1b_linear
+speakers:
+- Grant Sanderson
+title: '3Blue1Brown: The Essence of Linear Algebra and Eigenvectors'
+type: educational

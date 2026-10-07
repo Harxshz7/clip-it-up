@@ -1,0 +1,528 @@
+{
+  "language": "en",
+  "status": "ready",
+  "model": "large-v3",
+  "backend": "whisperx",
+  "word_count": 59,
+  "segments": [
+    {
+      "idx": 0,
+      "start_ms": 7000,
+      "end_ms": 14000,
+      "speaker": "Michael Seibel",
+      "text": "What kills more early-stage startups than competition or lack of funding?"
+    },
+    {
+      "idx": 1,
+      "start_ms": 14200,
+      "end_ms": 22000,
+      "speaker": "Michael Seibel",
+      "text": "Co-founder disputes and misaligned long-term expectations."
+    },
+    {
+      "idx": 2,
+      "start_ms": 22200,
+      "end_ms": 35000,
+      "speaker": "Michael Seibel",
+      "text": "Never pick a co-founder solely based on technical resume. Pick someone you have history working with through high-stress adversity."
+    },
+    {
+      "idx": 3,
+      "start_ms": 35200,
+      "end_ms": 47000,
+      "speaker": "Michael Seibel",
+      "text": "Shared values and resilience under pressure matter ten times more than domain expertise."
+    },
+    {
+      "idx": 4,
+      "start_ms": 47200,
+      "end_ms": 55000,
+      "speaker": "Michael Seibel",
+      "text": "And that is the number one predictor of startup survival."
+    }
+  ],
+  "words": [
+    {
+      "idx": 0,
+      "word": "What",
+      "start_ms": 7000,
+      "end_ms": 7626,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 1,
+      "word": "kills",
+      "start_ms": 7636,
+      "end_ms": 8262,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 2,
+      "word": "more",
+      "start_ms": 8272,
+      "end_ms": 8898,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 3,
+      "word": "early-stage",
+      "start_ms": 8908,
+      "end_ms": 9534,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 4,
+      "word": "startups",
+      "start_ms": 9544,
+      "end_ms": 10170,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 5,
+      "word": "than",
+      "start_ms": 10180,
+      "end_ms": 10806,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 6,
+      "word": "competition",
+      "start_ms": 10816,
+      "end_ms": 11442,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 7,
+      "word": "or",
+      "start_ms": 11452,
+      "end_ms": 12078,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 8,
+      "word": "lack",
+      "start_ms": 12088,
+      "end_ms": 12714,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 9,
+      "word": "of",
+      "start_ms": 12724,
+      "end_ms": 13350,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 10,
+      "word": "funding?",
+      "start_ms": 13360,
+      "end_ms": 13986,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 11,
+      "word": "Co-founder",
+      "start_ms": 14200,
+      "end_ms": 15490,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 12,
+      "word": "disputes",
+      "start_ms": 15500,
+      "end_ms": 16790,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 13,
+      "word": "and",
+      "start_ms": 16800,
+      "end_ms": 18090,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 14,
+      "word": "misaligned",
+      "start_ms": 18100,
+      "end_ms": 19390,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 15,
+      "word": "long-term",
+      "start_ms": 19400,
+      "end_ms": 20690,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 16,
+      "word": "expectations.",
+      "start_ms": 20700,
+      "end_ms": 21990,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 17,
+      "word": "Never",
+      "start_ms": 22200,
+      "end_ms": 22863,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 18,
+      "word": "pick",
+      "start_ms": 22873,
+      "end_ms": 23536,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 19,
+      "word": "a",
+      "start_ms": 23546,
+      "end_ms": 24209,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 20,
+      "word": "co-founder",
+      "start_ms": 24219,
+      "end_ms": 24882,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 21,
+      "word": "solely",
+      "start_ms": 24892,
+      "end_ms": 25555,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 22,
+      "word": "based",
+      "start_ms": 25565,
+      "end_ms": 26228,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 23,
+      "word": "on",
+      "start_ms": 26238,
+      "end_ms": 26901,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 24,
+      "word": "technical",
+      "start_ms": 26911,
+      "end_ms": 27574,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 25,
+      "word": "resume.",
+      "start_ms": 27584,
+      "end_ms": 28247,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 26,
+      "word": "Pick",
+      "start_ms": 28257,
+      "end_ms": 28920,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 27,
+      "word": "someone",
+      "start_ms": 28930,
+      "end_ms": 29593,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 28,
+      "word": "you",
+      "start_ms": 29603,
+      "end_ms": 30266,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 29,
+      "word": "have",
+      "start_ms": 30276,
+      "end_ms": 30939,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 30,
+      "word": "history",
+      "start_ms": 30949,
+      "end_ms": 31612,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 31,
+      "word": "working",
+      "start_ms": 31622,
+      "end_ms": 32285,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 32,
+      "word": "with",
+      "start_ms": 32295,
+      "end_ms": 32958,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 33,
+      "word": "through",
+      "start_ms": 32968,
+      "end_ms": 33631,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 34,
+      "word": "high-stress",
+      "start_ms": 33641,
+      "end_ms": 34304,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 35,
+      "word": "adversity.",
+      "start_ms": 34314,
+      "end_ms": 34977,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 36,
+      "word": "Shared",
+      "start_ms": 35200,
+      "end_ms": 36097,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 37,
+      "word": "values",
+      "start_ms": 36107,
+      "end_ms": 37004,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 38,
+      "word": "and",
+      "start_ms": 37014,
+      "end_ms": 37911,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 39,
+      "word": "resilience",
+      "start_ms": 37921,
+      "end_ms": 38818,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 40,
+      "word": "under",
+      "start_ms": 38828,
+      "end_ms": 39725,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 41,
+      "word": "pressure",
+      "start_ms": 39735,
+      "end_ms": 40632,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 42,
+      "word": "matter",
+      "start_ms": 40642,
+      "end_ms": 41539,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 43,
+      "word": "ten",
+      "start_ms": 41549,
+      "end_ms": 42446,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 44,
+      "word": "times",
+      "start_ms": 42456,
+      "end_ms": 43353,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 45,
+      "word": "more",
+      "start_ms": 43363,
+      "end_ms": 44260,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 46,
+      "word": "than",
+      "start_ms": 44270,
+      "end_ms": 45167,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 47,
+      "word": "domain",
+      "start_ms": 45177,
+      "end_ms": 46074,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 48,
+      "word": "expertise.",
+      "start_ms": 46084,
+      "end_ms": 46981,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 49,
+      "word": "And",
+      "start_ms": 47200,
+      "end_ms": 47970,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 50,
+      "word": "that",
+      "start_ms": 47980,
+      "end_ms": 48750,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 51,
+      "word": "is",
+      "start_ms": 48760,
+      "end_ms": 49530,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 52,
+      "word": "the",
+      "start_ms": 49540,
+      "end_ms": 50310,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 53,
+      "word": "number",
+      "start_ms": 50320,
+      "end_ms": 51090,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 54,
+      "word": "one",
+      "start_ms": 51100,
+      "end_ms": 51870,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 55,
+      "word": "predictor",
+      "start_ms": 51880,
+      "end_ms": 52650,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 56,
+      "word": "of",
+      "start_ms": 52660,
+      "end_ms": 53430,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 57,
+      "word": "startup",
+      "start_ms": 53440,
+      "end_ms": 54210,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    },
+    {
+      "idx": 58,
+      "word": "survival.",
+      "start_ms": 54220,
+      "end_ms": 54990,
+      "speaker": "Michael Seibel",
+      "confidence": 0.95
+    }
+  ],
+  "speakers": [
+    {
+      "label": "Michael Seibel",
+      "display_name": "Michael Seibel"
+    },
+    {
+      "label": "Host",
+      "display_name": "Host"
+    }
+  ]
+}

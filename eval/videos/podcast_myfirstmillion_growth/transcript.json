@@ -1,0 +1,553 @@
+{
+  "language": "en",
+  "status": "ready",
+  "model": "large-v3",
+  "backend": "whisperx",
+  "word_count": 63,
+  "segments": [
+    {
+      "idx": 0,
+      "start_ms": 9000,
+      "end_ms": 17000,
+      "speaker": "Shaan Puri",
+      "text": "Here is the secret to finding million dollar business opportunities before anyone else."
+    },
+    {
+      "idx": 1,
+      "start_ms": 17200,
+      "end_ms": 29000,
+      "speaker": "Shaan Puri",
+      "text": "Look for terrible software that people are forced to use because it solves an excruciating pain point."
+    },
+    {
+      "idx": 2,
+      "start_ms": 29200,
+      "end_ms": 42000,
+      "speaker": "Shaan Puri",
+      "text": "If an ugly forum or clunky Excel sheet is making two million dollars a year, that is your exact roadmap to build a modern SaaS."
+    },
+    {
+      "idx": 3,
+      "start_ms": 42200,
+      "end_ms": 51000,
+      "speaker": "Shaan Puri",
+      "text": "Don't invent new demand. Modernize existing desperate demand."
+    }
+  ],
+  "words": [
+    {
+      "idx": 0,
+      "word": "Here",
+      "start_ms": 9000,
+      "end_ms": 9605,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 1,
+      "word": "is",
+      "start_ms": 9615,
+      "end_ms": 10220,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 2,
+      "word": "the",
+      "start_ms": 10230,
+      "end_ms": 10835,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 3,
+      "word": "secret",
+      "start_ms": 10845,
+      "end_ms": 11450,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 4,
+      "word": "to",
+      "start_ms": 11460,
+      "end_ms": 12065,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 5,
+      "word": "finding",
+      "start_ms": 12075,
+      "end_ms": 12680,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 6,
+      "word": "million",
+      "start_ms": 12690,
+      "end_ms": 13295,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 7,
+      "word": "dollar",
+      "start_ms": 13305,
+      "end_ms": 13910,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 8,
+      "word": "business",
+      "start_ms": 13920,
+      "end_ms": 14525,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 9,
+      "word": "opportunities",
+      "start_ms": 14535,
+      "end_ms": 15140,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 10,
+      "word": "before",
+      "start_ms": 15150,
+      "end_ms": 15755,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 11,
+      "word": "anyone",
+      "start_ms": 15765,
+      "end_ms": 16370,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 12,
+      "word": "else.",
+      "start_ms": 16380,
+      "end_ms": 16985,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 13,
+      "word": "Look",
+      "start_ms": 17200,
+      "end_ms": 17884,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 14,
+      "word": "for",
+      "start_ms": 17894,
+      "end_ms": 18578,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 15,
+      "word": "terrible",
+      "start_ms": 18588,
+      "end_ms": 19272,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 16,
+      "word": "software",
+      "start_ms": 19282,
+      "end_ms": 19966,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 17,
+      "word": "that",
+      "start_ms": 19976,
+      "end_ms": 20660,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 18,
+      "word": "people",
+      "start_ms": 20670,
+      "end_ms": 21354,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 19,
+      "word": "are",
+      "start_ms": 21364,
+      "end_ms": 22048,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 20,
+      "word": "forced",
+      "start_ms": 22058,
+      "end_ms": 22742,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 21,
+      "word": "to",
+      "start_ms": 22752,
+      "end_ms": 23436,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 22,
+      "word": "use",
+      "start_ms": 23446,
+      "end_ms": 24130,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 23,
+      "word": "because",
+      "start_ms": 24140,
+      "end_ms": 24824,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 24,
+      "word": "it",
+      "start_ms": 24834,
+      "end_ms": 25518,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 25,
+      "word": "solves",
+      "start_ms": 25528,
+      "end_ms": 26212,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 26,
+      "word": "an",
+      "start_ms": 26222,
+      "end_ms": 26906,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 27,
+      "word": "excruciating",
+      "start_ms": 26916,
+      "end_ms": 27600,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 28,
+      "word": "pain",
+      "start_ms": 27610,
+      "end_ms": 28294,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 29,
+      "word": "point.",
+      "start_ms": 28304,
+      "end_ms": 28988,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 30,
+      "word": "If",
+      "start_ms": 29200,
+      "end_ms": 29702,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 31,
+      "word": "an",
+      "start_ms": 29712,
+      "end_ms": 30214,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 32,
+      "word": "ugly",
+      "start_ms": 30224,
+      "end_ms": 30726,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 33,
+      "word": "forum",
+      "start_ms": 30736,
+      "end_ms": 31238,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 34,
+      "word": "or",
+      "start_ms": 31248,
+      "end_ms": 31750,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 35,
+      "word": "clunky",
+      "start_ms": 31760,
+      "end_ms": 32262,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 36,
+      "word": "Excel",
+      "start_ms": 32272,
+      "end_ms": 32774,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 37,
+      "word": "sheet",
+      "start_ms": 32784,
+      "end_ms": 33286,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 38,
+      "word": "is",
+      "start_ms": 33296,
+      "end_ms": 33798,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 39,
+      "word": "making",
+      "start_ms": 33808,
+      "end_ms": 34310,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 40,
+      "word": "two",
+      "start_ms": 34320,
+      "end_ms": 34822,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 41,
+      "word": "million",
+      "start_ms": 34832,
+      "end_ms": 35334,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 42,
+      "word": "dollars",
+      "start_ms": 35344,
+      "end_ms": 35846,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 43,
+      "word": "a",
+      "start_ms": 35856,
+      "end_ms": 36358,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 44,
+      "word": "year,",
+      "start_ms": 36368,
+      "end_ms": 36870,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 45,
+      "word": "that",
+      "start_ms": 36880,
+      "end_ms": 37382,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 46,
+      "word": "is",
+      "start_ms": 37392,
+      "end_ms": 37894,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 47,
+      "word": "your",
+      "start_ms": 37904,
+      "end_ms": 38406,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 48,
+      "word": "exact",
+      "start_ms": 38416,
+      "end_ms": 38918,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 49,
+      "word": "roadmap",
+      "start_ms": 38928,
+      "end_ms": 39430,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 50,
+      "word": "to",
+      "start_ms": 39440,
+      "end_ms": 39942,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 51,
+      "word": "build",
+      "start_ms": 39952,
+      "end_ms": 40454,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 52,
+      "word": "a",
+      "start_ms": 40464,
+      "end_ms": 40966,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 53,
+      "word": "modern",
+      "start_ms": 40976,
+      "end_ms": 41478,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 54,
+      "word": "SaaS.",
+      "start_ms": 41488,
+      "end_ms": 41990,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 55,
+      "word": "Don't",
+      "start_ms": 42200,
+      "end_ms": 43290,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 56,
+      "word": "invent",
+      "start_ms": 43300,
+      "end_ms": 44390,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 57,
+      "word": "new",
+      "start_ms": 44400,
+      "end_ms": 45490,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 58,
+      "word": "demand.",
+      "start_ms": 45500,
+      "end_ms": 46590,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 59,
+      "word": "Modernize",
+      "start_ms": 46600,
+      "end_ms": 47690,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 60,
+      "word": "existing",
+      "start_ms": 47700,
+      "end_ms": 48790,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 61,
+      "word": "desperate",
+      "start_ms": 48800,
+      "end_ms": 49890,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    },
+    {
+      "idx": 62,
+      "word": "demand.",
+      "start_ms": 49900,
+      "end_ms": 50990,
+      "speaker": "Shaan Puri",
+      "confidence": 0.95
+    }
+  ],
+  "speakers": [
+    {
+      "label": "Shaan Puri",
+      "display_name": "Shaan Puri"
+    },
+    {
+      "label": "Sam Parr",
+      "display_name": "Sam Parr"
+    }
+  ]
+}

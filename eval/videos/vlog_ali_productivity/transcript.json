@@ -1,0 +1,1063 @@
+{
+  "language": "en",
+  "status": "ready",
+  "model": "large-v3",
+  "backend": "whisperx",
+  "word_count": 122,
+  "segments": [
+    {
+      "idx": 0,
+      "start_ms": 6000,
+      "end_ms": 13000,
+      "speaker": "Ali Abdaal",
+      "text": "Stop trying to manage your time and start managing your energy."
+    },
+    {
+      "idx": 1,
+      "start_ms": 13200,
+      "end_ms": 23000,
+      "speaker": "Ali Abdaal",
+      "text": "Most people have four hours of high-cognitive output every day, not eight or ten."
+    },
+    {
+      "idx": 2,
+      "start_ms": 23200,
+      "end_ms": 35000,
+      "speaker": "Ali Abdaal",
+      "text": "If you protect your top two hours in the morning for your highest-leverage project, you outperform 99% of your peers."
+    },
+    {
+      "idx": 3,
+      "start_ms": 35200,
+      "end_ms": 42000,
+      "speaker": "Ali Ali",
+      "text": "That is the entire secret to exponential productivity."
+    },
+    {
+      "idx": 4,
+      "start_ms": 50000,
+      "end_ms": 57000,
+      "speaker": "Ali Abdaal",
+      "text": "Anyway, let me check my calendar for next Tuesday afternoon."
+    },
+    {
+      "idx": 5,
+      "start_ms": 110000,
+      "end_ms": 116000,
+      "speaker": "Ali Abdaal",
+      "text": "Why is consistency so much harder than intensity?"
+    },
+    {
+      "idx": 6,
+      "start_ms": 116200,
+      "end_ms": 127000,
+      "speaker": "Ali Abdaal",
+      "text": "Because intensity feels heroic, while consistency feels boring and unrewarding in the short term."
+    },
+    {
+      "idx": 7,
+      "start_ms": 127200,
+      "end_ms": 137000,
+      "speaker": "Ali Abdaal",
+      "text": "The people who win aren't the ones who work 14 hours once a month."
+    },
+    {
+      "idx": 8,
+      "start_ms": 137200,
+      "end_ms": 147000,
+      "speaker": "Ali Abdaal",
+      "text": "They are the ones who show up for 90 minutes every single morning without fail."
+    },
+    {
+      "idx": 9,
+      "start_ms": 147200,
+      "end_ms": 153000,
+      "speaker": "Ali Abdaal",
+      "text": "Compounding does the rest of the heavy lifting."
+    }
+  ],
+  "words": [
+    {
+      "idx": 0,
+      "word": "Stop",
+      "start_ms": 6000,
+      "end_ms": 6626,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 1,
+      "word": "trying",
+      "start_ms": 6636,
+      "end_ms": 7262,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 2,
+      "word": "to",
+      "start_ms": 7272,
+      "end_ms": 7898,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 3,
+      "word": "manage",
+      "start_ms": 7908,
+      "end_ms": 8534,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 4,
+      "word": "your",
+      "start_ms": 8544,
+      "end_ms": 9170,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 5,
+      "word": "time",
+      "start_ms": 9180,
+      "end_ms": 9806,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 6,
+      "word": "and",
+      "start_ms": 9816,
+      "end_ms": 10442,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 7,
+      "word": "start",
+      "start_ms": 10452,
+      "end_ms": 11078,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 8,
+      "word": "managing",
+      "start_ms": 11088,
+      "end_ms": 11714,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 9,
+      "word": "your",
+      "start_ms": 11724,
+      "end_ms": 12350,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 10,
+      "word": "energy.",
+      "start_ms": 12360,
+      "end_ms": 12986,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 11,
+      "word": "Most",
+      "start_ms": 13200,
+      "end_ms": 13890,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 12,
+      "word": "people",
+      "start_ms": 13900,
+      "end_ms": 14590,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 13,
+      "word": "have",
+      "start_ms": 14600,
+      "end_ms": 15290,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 14,
+      "word": "four",
+      "start_ms": 15300,
+      "end_ms": 15990,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 15,
+      "word": "hours",
+      "start_ms": 16000,
+      "end_ms": 16690,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 16,
+      "word": "of",
+      "start_ms": 16700,
+      "end_ms": 17390,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 17,
+      "word": "high-cognitive",
+      "start_ms": 17400,
+      "end_ms": 18090,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 18,
+      "word": "output",
+      "start_ms": 18100,
+      "end_ms": 18790,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 19,
+      "word": "every",
+      "start_ms": 18800,
+      "end_ms": 19490,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 20,
+      "word": "day,",
+      "start_ms": 19500,
+      "end_ms": 20190,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 21,
+      "word": "not",
+      "start_ms": 20200,
+      "end_ms": 20890,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 22,
+      "word": "eight",
+      "start_ms": 20900,
+      "end_ms": 21590,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 23,
+      "word": "or",
+      "start_ms": 21600,
+      "end_ms": 22290,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 24,
+      "word": "ten.",
+      "start_ms": 22300,
+      "end_ms": 22990,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 25,
+      "word": "If",
+      "start_ms": 23200,
+      "end_ms": 23780,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 26,
+      "word": "you",
+      "start_ms": 23790,
+      "end_ms": 24370,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 27,
+      "word": "protect",
+      "start_ms": 24380,
+      "end_ms": 24960,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 28,
+      "word": "your",
+      "start_ms": 24970,
+      "end_ms": 25550,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 29,
+      "word": "top",
+      "start_ms": 25560,
+      "end_ms": 26140,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 30,
+      "word": "two",
+      "start_ms": 26150,
+      "end_ms": 26730,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 31,
+      "word": "hours",
+      "start_ms": 26740,
+      "end_ms": 27320,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 32,
+      "word": "in",
+      "start_ms": 27330,
+      "end_ms": 27910,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 33,
+      "word": "the",
+      "start_ms": 27920,
+      "end_ms": 28500,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 34,
+      "word": "morning",
+      "start_ms": 28510,
+      "end_ms": 29090,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 35,
+      "word": "for",
+      "start_ms": 29100,
+      "end_ms": 29680,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 36,
+      "word": "your",
+      "start_ms": 29690,
+      "end_ms": 30270,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 37,
+      "word": "highest-leverage",
+      "start_ms": 30280,
+      "end_ms": 30860,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 38,
+      "word": "project,",
+      "start_ms": 30870,
+      "end_ms": 31450,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 39,
+      "word": "you",
+      "start_ms": 31460,
+      "end_ms": 32040,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 40,
+      "word": "outperform",
+      "start_ms": 32050,
+      "end_ms": 32630,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 41,
+      "word": "99%",
+      "start_ms": 32640,
+      "end_ms": 33220,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 42,
+      "word": "of",
+      "start_ms": 33230,
+      "end_ms": 33810,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 43,
+      "word": "your",
+      "start_ms": 33820,
+      "end_ms": 34400,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 44,
+      "word": "peers.",
+      "start_ms": 34410,
+      "end_ms": 34990,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 45,
+      "word": "That",
+      "start_ms": 35200,
+      "end_ms": 36040,
+      "speaker": "Ali Ali",
+      "confidence": 0.95
+    },
+    {
+      "idx": 46,
+      "word": "is",
+      "start_ms": 36050,
+      "end_ms": 36890,
+      "speaker": "Ali Ali",
+      "confidence": 0.95
+    },
+    {
+      "idx": 47,
+      "word": "the",
+      "start_ms": 36900,
+      "end_ms": 37740,
+      "speaker": "Ali Ali",
+      "confidence": 0.95
+    },
+    {
+      "idx": 48,
+      "word": "entire",
+      "start_ms": 37750,
+      "end_ms": 38590,
+      "speaker": "Ali Ali",
+      "confidence": 0.95
+    },
+    {
+      "idx": 49,
+      "word": "secret",
+      "start_ms": 38600,
+      "end_ms": 39440,
+      "speaker": "Ali Ali",
+      "confidence": 0.95
+    },
+    {
+      "idx": 50,
+      "word": "to",
+      "start_ms": 39450,
+      "end_ms": 40290,
+      "speaker": "Ali Ali",
+      "confidence": 0.95
+    },
+    {
+      "idx": 51,
+      "word": "exponential",
+      "start_ms": 40300,
+      "end_ms": 41140,
+      "speaker": "Ali Ali",
+      "confidence": 0.95
+    },
+    {
+      "idx": 52,
+      "word": "productivity.",
+      "start_ms": 41150,
+      "end_ms": 41990,
+      "speaker": "Ali Ali",
+      "confidence": 0.95
+    },
+    {
+      "idx": 53,
+      "word": "Anyway,",
+      "start_ms": 50000,
+      "end_ms": 50690,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 54,
+      "word": "let",
+      "start_ms": 50700,
+      "end_ms": 51390,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 55,
+      "word": "me",
+      "start_ms": 51400,
+      "end_ms": 52090,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 56,
+      "word": "check",
+      "start_ms": 52100,
+      "end_ms": 52790,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 57,
+      "word": "my",
+      "start_ms": 52800,
+      "end_ms": 53490,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 58,
+      "word": "calendar",
+      "start_ms": 53500,
+      "end_ms": 54190,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 59,
+      "word": "for",
+      "start_ms": 54200,
+      "end_ms": 54890,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 60,
+      "word": "next",
+      "start_ms": 54900,
+      "end_ms": 55590,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 61,
+      "word": "Tuesday",
+      "start_ms": 55600,
+      "end_ms": 56290,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 62,
+      "word": "afternoon.",
+      "start_ms": 56300,
+      "end_ms": 56990,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 63,
+      "word": "Why",
+      "start_ms": 110000,
+      "end_ms": 110740,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 64,
+      "word": "is",
+      "start_ms": 110750,
+      "end_ms": 111490,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 65,
+      "word": "consistency",
+      "start_ms": 111500,
+      "end_ms": 112240,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 66,
+      "word": "so",
+      "start_ms": 112250,
+      "end_ms": 112990,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 67,
+      "word": "much",
+      "start_ms": 113000,
+      "end_ms": 113740,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 68,
+      "word": "harder",
+      "start_ms": 113750,
+      "end_ms": 114490,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 69,
+      "word": "than",
+      "start_ms": 114500,
+      "end_ms": 115240,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 70,
+      "word": "intensity?",
+      "start_ms": 115250,
+      "end_ms": 115990,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 71,
+      "word": "Because",
+      "start_ms": 116200,
+      "end_ms": 116961,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 72,
+      "word": "intensity",
+      "start_ms": 116971,
+      "end_ms": 117732,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 73,
+      "word": "feels",
+      "start_ms": 117742,
+      "end_ms": 118503,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 74,
+      "word": "heroic,",
+      "start_ms": 118513,
+      "end_ms": 119274,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 75,
+      "word": "while",
+      "start_ms": 119284,
+      "end_ms": 120045,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 76,
+      "word": "consistency",
+      "start_ms": 120055,
+      "end_ms": 120816,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 77,
+      "word": "feels",
+      "start_ms": 120826,
+      "end_ms": 121587,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 78,
+      "word": "boring",
+      "start_ms": 121597,
+      "end_ms": 122358,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 79,
+      "word": "and",
+      "start_ms": 122368,
+      "end_ms": 123129,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 80,
+      "word": "unrewarding",
+      "start_ms": 123139,
+      "end_ms": 123900,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 81,
+      "word": "in",
+      "start_ms": 123910,
+      "end_ms": 124671,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 82,
+      "word": "the",
+      "start_ms": 124681,
+      "end_ms": 125442,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 83,
+      "word": "short",
+      "start_ms": 125452,
+      "end_ms": 126213,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 84,
+      "word": "term.",
+      "start_ms": 126223,
+      "end_ms": 126984,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 85,
+      "word": "The",
+      "start_ms": 127200,
+      "end_ms": 127890,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 86,
+      "word": "people",
+      "start_ms": 127900,
+      "end_ms": 128590,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 87,
+      "word": "who",
+      "start_ms": 128600,
+      "end_ms": 129290,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 88,
+      "word": "win",
+      "start_ms": 129300,
+      "end_ms": 129990,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 89,
+      "word": "aren't",
+      "start_ms": 130000,
+      "end_ms": 130690,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 90,
+      "word": "the",
+      "start_ms": 130700,
+      "end_ms": 131390,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 91,
+      "word": "ones",
+      "start_ms": 131400,
+      "end_ms": 132090,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 92,
+      "word": "who",
+      "start_ms": 132100,
+      "end_ms": 132790,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 93,
+      "word": "work",
+      "start_ms": 132800,
+      "end_ms": 133490,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 94,
+      "word": "14",
+      "start_ms": 133500,
+      "end_ms": 134190,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 95,
+      "word": "hours",
+      "start_ms": 134200,
+      "end_ms": 134890,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 96,
+      "word": "once",
+      "start_ms": 134900,
+      "end_ms": 135590,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 97,
+      "word": "a",
+      "start_ms": 135600,
+      "end_ms": 136290,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 98,
+      "word": "month.",
+      "start_ms": 136300,
+      "end_ms": 136990,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 99,
+      "word": "They",
+      "start_ms": 137200,
+      "end_ms": 137843,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 100,
+      "word": "are",
+      "start_ms": 137853,
+      "end_ms": 138496,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 101,
+      "word": "the",
+      "start_ms": 138506,
+      "end_ms": 139149,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 102,
+      "word": "ones",
+      "start_ms": 139159,
+      "end_ms": 139802,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 103,
+      "word": "who",
+      "start_ms": 139812,
+      "end_ms": 140455,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 104,
+      "word": "show",
+      "start_ms": 140465,
+      "end_ms": 141108,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 105,
+      "word": "up",
+      "start_ms": 141118,
+      "end_ms": 141761,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 106,
+      "word": "for",
+      "start_ms": 141771,
+      "end_ms": 142414,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 107,
+      "word": "90",
+      "start_ms": 142424,
+      "end_ms": 143067,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 108,
+      "word": "minutes",
+      "start_ms": 143077,
+      "end_ms": 143720,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 109,
+      "word": "every",
+      "start_ms": 143730,
+      "end_ms": 144373,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 110,
+      "word": "single",
+      "start_ms": 144383,
+      "end_ms": 145026,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 111,
+      "word": "morning",
+      "start_ms": 145036,
+      "end_ms": 145679,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 112,
+      "word": "without",
+      "start_ms": 145689,
+      "end_ms": 146332,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 113,
+      "word": "fail.",
+      "start_ms": 146342,
+      "end_ms": 146985,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 114,
+      "word": "Compounding",
+      "start_ms": 147200,
+      "end_ms": 147915,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 115,
+      "word": "does",
+      "start_ms": 147925,
+      "end_ms": 148640,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 116,
+      "word": "the",
+      "start_ms": 148650,
+      "end_ms": 149365,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 117,
+      "word": "rest",
+      "start_ms": 149375,
+      "end_ms": 150090,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 118,
+      "word": "of",
+      "start_ms": 150100,
+      "end_ms": 150815,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 119,
+      "word": "the",
+      "start_ms": 150825,
+      "end_ms": 151540,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 120,
+      "word": "heavy",
+      "start_ms": 151550,
+      "end_ms": 152265,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    },
+    {
+      "idx": 121,
+      "word": "lifting.",
+      "start_ms": 152275,
+      "end_ms": 152990,
+      "speaker": "Ali Abdaal",
+      "confidence": 0.95
+    }
+  ],
+  "speakers": [
+    {
+      "label": "Ali Abdaal",
+      "display_name": "Ali Abdaal"
+    }
+  ]
+}

@@ -1,0 +1,493 @@
+{
+  "language": "en",
+  "status": "ready",
+  "model": "large-v3",
+  "backend": "whisperx",
+  "word_count": 56,
+  "segments": [
+    {
+      "idx": 0,
+      "start_ms": 8000,
+      "end_ms": 15000,
+      "speaker": "Grant Sanderson",
+      "text": "What does an eigenvalue actually represent in physical space?"
+    },
+    {
+      "idx": 1,
+      "start_ms": 15200,
+      "end_ms": 27000,
+      "speaker": "Grant Sanderson",
+      "text": "When a linear transformation stretches and morphs space, most vectors get knocked off the line they spanned."
+    },
+    {
+      "idx": 2,
+      "start_ms": 27200,
+      "end_ms": 39000,
+      "speaker": "Grant Sanderson",
+      "text": "Eigenvectors are the special axes that remain strictly on their original line, only scaled by the eigenvalue factor."
+    },
+    {
+      "idx": 3,
+      "start_ms": 39200,
+      "end_ms": 52000,
+      "speaker": "Grant Sanderson",
+      "text": "Understanding this geometric invariant turns impenetrable matrix formulas into intuitive physical insights."
+    }
+  ],
+  "words": [
+    {
+      "idx": 0,
+      "word": "What",
+      "start_ms": 8000,
+      "end_ms": 8767,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 1,
+      "word": "does",
+      "start_ms": 8777,
+      "end_ms": 9544,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 2,
+      "word": "an",
+      "start_ms": 9554,
+      "end_ms": 10321,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 3,
+      "word": "eigenvalue",
+      "start_ms": 10331,
+      "end_ms": 11098,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 4,
+      "word": "actually",
+      "start_ms": 11108,
+      "end_ms": 11875,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 5,
+      "word": "represent",
+      "start_ms": 11885,
+      "end_ms": 12652,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 6,
+      "word": "in",
+      "start_ms": 12662,
+      "end_ms": 13429,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 7,
+      "word": "physical",
+      "start_ms": 13439,
+      "end_ms": 14206,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 8,
+      "word": "space?",
+      "start_ms": 14216,
+      "end_ms": 14983,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 9,
+      "word": "When",
+      "start_ms": 15200,
+      "end_ms": 15884,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 10,
+      "word": "a",
+      "start_ms": 15894,
+      "end_ms": 16578,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 11,
+      "word": "linear",
+      "start_ms": 16588,
+      "end_ms": 17272,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 12,
+      "word": "transformation",
+      "start_ms": 17282,
+      "end_ms": 17966,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 13,
+      "word": "stretches",
+      "start_ms": 17976,
+      "end_ms": 18660,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 14,
+      "word": "and",
+      "start_ms": 18670,
+      "end_ms": 19354,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 15,
+      "word": "morphs",
+      "start_ms": 19364,
+      "end_ms": 20048,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 16,
+      "word": "space,",
+      "start_ms": 20058,
+      "end_ms": 20742,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 17,
+      "word": "most",
+      "start_ms": 20752,
+      "end_ms": 21436,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 18,
+      "word": "vectors",
+      "start_ms": 21446,
+      "end_ms": 22130,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 19,
+      "word": "get",
+      "start_ms": 22140,
+      "end_ms": 22824,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 20,
+      "word": "knocked",
+      "start_ms": 22834,
+      "end_ms": 23518,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 21,
+      "word": "off",
+      "start_ms": 23528,
+      "end_ms": 24212,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 22,
+      "word": "the",
+      "start_ms": 24222,
+      "end_ms": 24906,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 23,
+      "word": "line",
+      "start_ms": 24916,
+      "end_ms": 25600,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 24,
+      "word": "they",
+      "start_ms": 25610,
+      "end_ms": 26294,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 25,
+      "word": "spanned.",
+      "start_ms": 26304,
+      "end_ms": 26988,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 26,
+      "word": "Eigenvectors",
+      "start_ms": 27200,
+      "end_ms": 27845,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 27,
+      "word": "are",
+      "start_ms": 27855,
+      "end_ms": 28500,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 28,
+      "word": "the",
+      "start_ms": 28510,
+      "end_ms": 29155,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 29,
+      "word": "special",
+      "start_ms": 29165,
+      "end_ms": 29810,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 30,
+      "word": "axes",
+      "start_ms": 29820,
+      "end_ms": 30465,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 31,
+      "word": "that",
+      "start_ms": 30475,
+      "end_ms": 31120,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 32,
+      "word": "remain",
+      "start_ms": 31130,
+      "end_ms": 31775,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 33,
+      "word": "strictly",
+      "start_ms": 31785,
+      "end_ms": 32430,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 34,
+      "word": "on",
+      "start_ms": 32440,
+      "end_ms": 33085,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 35,
+      "word": "their",
+      "start_ms": 33095,
+      "end_ms": 33740,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 36,
+      "word": "original",
+      "start_ms": 33750,
+      "end_ms": 34395,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 37,
+      "word": "line,",
+      "start_ms": 34405,
+      "end_ms": 35050,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 38,
+      "word": "only",
+      "start_ms": 35060,
+      "end_ms": 35705,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 39,
+      "word": "scaled",
+      "start_ms": 35715,
+      "end_ms": 36360,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 40,
+      "word": "by",
+      "start_ms": 36370,
+      "end_ms": 37015,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 41,
+      "word": "the",
+      "start_ms": 37025,
+      "end_ms": 37670,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 42,
+      "word": "eigenvalue",
+      "start_ms": 37680,
+      "end_ms": 38325,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 43,
+      "word": "factor.",
+      "start_ms": 38335,
+      "end_ms": 38980,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 44,
+      "word": "Understanding",
+      "start_ms": 39200,
+      "end_ms": 40256,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 45,
+      "word": "this",
+      "start_ms": 40266,
+      "end_ms": 41322,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 46,
+      "word": "geometric",
+      "start_ms": 41332,
+      "end_ms": 42388,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 47,
+      "word": "invariant",
+      "start_ms": 42398,
+      "end_ms": 43454,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 48,
+      "word": "turns",
+      "start_ms": 43464,
+      "end_ms": 44520,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 49,
+      "word": "impenetrable",
+      "start_ms": 44530,
+      "end_ms": 45586,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 50,
+      "word": "matrix",
+      "start_ms": 45596,
+      "end_ms": 46652,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 51,
+      "word": "formulas",
+      "start_ms": 46662,
+      "end_ms": 47718,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 52,
+      "word": "into",
+      "start_ms": 47728,
+      "end_ms": 48784,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 53,
+      "word": "intuitive",
+      "start_ms": 48794,
+      "end_ms": 49850,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 54,
+      "word": "physical",
+      "start_ms": 49860,
+      "end_ms": 50916,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    },
+    {
+      "idx": 55,
+      "word": "insights.",
+      "start_ms": 50926,
+      "end_ms": 51982,
+      "speaker": "Grant Sanderson",
+      "confidence": 0.95
+    }
+  ],
+  "speakers": [
+    {
+      "label": "Grant Sanderson",
+      "display_name": "Grant Sanderson"
+    }
+  ]
+}

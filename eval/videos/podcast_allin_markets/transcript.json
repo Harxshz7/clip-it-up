@@ -1,0 +1,1091 @@
+{
+  "language": "en",
+  "status": "ready",
+  "model": "large-v3",
+  "backend": "whisperx",
+  "word_count": 125,
+  "segments": [
+    {
+      "idx": 0,
+      "start_ms": 10000,
+      "end_ms": 17000,
+      "speaker": "Jason Calacanis",
+      "text": "What is the actual defensible moat in the artificial intelligence stack?"
+    },
+    {
+      "idx": 1,
+      "start_ms": 17200,
+      "end_ms": 25000,
+      "speaker": "Chamath Palihapitiya",
+      "text": "It is not the base model and it is not the raw compute."
+    },
+    {
+      "idx": 2,
+      "start_ms": 25200,
+      "end_ms": 38000,
+      "speaker": "Chamath Palihapitiya",
+      "text": "The only sustainable moat is proprietary distribution and unique workflow integration where you own the end-user loop."
+    },
+    {
+      "idx": 3,
+      "start_ms": 38200,
+      "end_ms": 50000,
+      "speaker": "Chamath Palihapitiya",
+      "text": "Commoditized intelligence means value flows directly to the application layer with sticky domain data."
+    },
+    {
+      "idx": 4,
+      "start_ms": 50200,
+      "end_ms": 59000,
+      "speaker": "Chamath Palihapitiya",
+      "text": "And that is where the next hundred-billion-dollar companies will be created."
+    },
+    {
+      "idx": 5,
+      "start_ms": 65000,
+      "end_ms": 72000,
+      "speaker": "Jason Calacanis",
+      "text": "Yeah, let me check our flight schedule for Miami conference next month."
+    },
+    {
+      "idx": 6,
+      "start_ms": 160000,
+      "end_ms": 167000,
+      "speaker": "Chamath Palihapitiya",
+      "text": "Why did zero interest rates destroy venture capital discipline?"
+    },
+    {
+      "idx": 7,
+      "start_ms": 167200,
+      "end_ms": 178000,
+      "speaker": "Chamath Palihapitiya",
+      "text": "When capital has zero cost, founders stop prioritizing unit economics and cash flow sustainability."
+    },
+    {
+      "idx": 8,
+      "start_ms": 178200,
+      "end_ms": 189000,
+      "speaker": "Chamath Palihapitiya",
+      "text": "You end up subsidizing unprofitable customer acquisition instead of building genuine product differentiation."
+    },
+    {
+      "idx": 9,
+      "start_ms": 189200,
+      "end_ms": 199000,
+      "speaker": "Chamath Palihapitiya",
+      "text": "When rates normalize, the businesses without real gross margins evaporate overnight."
+    }
+  ],
+  "words": [
+    {
+      "idx": 0,
+      "word": "What",
+      "start_ms": 10000,
+      "end_ms": 10626,
+      "speaker": "Jason Calacanis",
+      "confidence": 0.95
+    },
+    {
+      "idx": 1,
+      "word": "is",
+      "start_ms": 10636,
+      "end_ms": 11262,
+      "speaker": "Jason Calacanis",
+      "confidence": 0.95
+    },
+    {
+      "idx": 2,
+      "word": "the",
+      "start_ms": 11272,
+      "end_ms": 11898,
+      "speaker": "Jason Calacanis",
+      "confidence": 0.95
+    },
+    {
+      "idx": 3,
+      "word": "actual",
+      "start_ms": 11908,
+      "end_ms": 12534,
+      "speaker": "Jason Calacanis",
+      "confidence": 0.95
+    },
+    {
+      "idx": 4,
+      "word": "defensible",
+      "start_ms": 12544,
+      "end_ms": 13170,
+      "speaker": "Jason Calacanis",
+      "confidence": 0.95
+    },
+    {
+      "idx": 5,
+      "word": "moat",
+      "start_ms": 13180,
+      "end_ms": 13806,
+      "speaker": "Jason Calacanis",
+      "confidence": 0.95
+    },
+    {
+      "idx": 6,
+      "word": "in",
+      "start_ms": 13816,
+      "end_ms": 14442,
+      "speaker": "Jason Calacanis",
+      "confidence": 0.95
+    },
+    {
+      "idx": 7,
+      "word": "the",
+      "start_ms": 14452,
+      "end_ms": 15078,
+      "speaker": "Jason Calacanis",
+      "confidence": 0.95
+    },
+    {
+      "idx": 8,
+      "word": "artificial",
+      "start_ms": 15088,
+      "end_ms": 15714,
+      "speaker": "Jason Calacanis",
+      "confidence": 0.95
+    },
+    {
+      "idx": 9,
+      "word": "intelligence",
+      "start_ms": 15724,
+      "end_ms": 16350,
+      "speaker": "Jason Calacanis",
+      "confidence": 0.95
+    },
+    {
+      "idx": 10,
+      "word": "stack?",
+      "start_ms": 16360,
+      "end_ms": 16986,
+      "speaker": "Jason Calacanis",
+      "confidence": 0.95
+    },
+    {
+      "idx": 11,
+      "word": "It",
+      "start_ms": 17200,
+      "end_ms": 17790,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 12,
+      "word": "is",
+      "start_ms": 17800,
+      "end_ms": 18390,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 13,
+      "word": "not",
+      "start_ms": 18400,
+      "end_ms": 18990,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 14,
+      "word": "the",
+      "start_ms": 19000,
+      "end_ms": 19590,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 15,
+      "word": "base",
+      "start_ms": 19600,
+      "end_ms": 20190,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 16,
+      "word": "model",
+      "start_ms": 20200,
+      "end_ms": 20790,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 17,
+      "word": "and",
+      "start_ms": 20800,
+      "end_ms": 21390,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 18,
+      "word": "it",
+      "start_ms": 21400,
+      "end_ms": 21990,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 19,
+      "word": "is",
+      "start_ms": 22000,
+      "end_ms": 22590,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 20,
+      "word": "not",
+      "start_ms": 22600,
+      "end_ms": 23190,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 21,
+      "word": "the",
+      "start_ms": 23200,
+      "end_ms": 23790,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 22,
+      "word": "raw",
+      "start_ms": 23800,
+      "end_ms": 24390,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 23,
+      "word": "compute.",
+      "start_ms": 24400,
+      "end_ms": 24990,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 24,
+      "word": "The",
+      "start_ms": 25200,
+      "end_ms": 25942,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 25,
+      "word": "only",
+      "start_ms": 25952,
+      "end_ms": 26694,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 26,
+      "word": "sustainable",
+      "start_ms": 26704,
+      "end_ms": 27446,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 27,
+      "word": "moat",
+      "start_ms": 27456,
+      "end_ms": 28198,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 28,
+      "word": "is",
+      "start_ms": 28208,
+      "end_ms": 28950,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 29,
+      "word": "proprietary",
+      "start_ms": 28960,
+      "end_ms": 29702,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 30,
+      "word": "distribution",
+      "start_ms": 29712,
+      "end_ms": 30454,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 31,
+      "word": "and",
+      "start_ms": 30464,
+      "end_ms": 31206,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 32,
+      "word": "unique",
+      "start_ms": 31216,
+      "end_ms": 31958,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 33,
+      "word": "workflow",
+      "start_ms": 31968,
+      "end_ms": 32710,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 34,
+      "word": "integration",
+      "start_ms": 32720,
+      "end_ms": 33462,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 35,
+      "word": "where",
+      "start_ms": 33472,
+      "end_ms": 34214,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 36,
+      "word": "you",
+      "start_ms": 34224,
+      "end_ms": 34966,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 37,
+      "word": "own",
+      "start_ms": 34976,
+      "end_ms": 35718,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 38,
+      "word": "the",
+      "start_ms": 35728,
+      "end_ms": 36470,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 39,
+      "word": "end-user",
+      "start_ms": 36480,
+      "end_ms": 37222,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 40,
+      "word": "loop.",
+      "start_ms": 37232,
+      "end_ms": 37974,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 41,
+      "word": "Commoditized",
+      "start_ms": 38200,
+      "end_ms": 39032,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 42,
+      "word": "intelligence",
+      "start_ms": 39042,
+      "end_ms": 39874,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 43,
+      "word": "means",
+      "start_ms": 39884,
+      "end_ms": 40716,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 44,
+      "word": "value",
+      "start_ms": 40726,
+      "end_ms": 41558,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 45,
+      "word": "flows",
+      "start_ms": 41568,
+      "end_ms": 42400,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 46,
+      "word": "directly",
+      "start_ms": 42410,
+      "end_ms": 43242,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 47,
+      "word": "to",
+      "start_ms": 43252,
+      "end_ms": 44084,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 48,
+      "word": "the",
+      "start_ms": 44094,
+      "end_ms": 44926,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 49,
+      "word": "application",
+      "start_ms": 44936,
+      "end_ms": 45768,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 50,
+      "word": "layer",
+      "start_ms": 45778,
+      "end_ms": 46610,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 51,
+      "word": "with",
+      "start_ms": 46620,
+      "end_ms": 47452,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 52,
+      "word": "sticky",
+      "start_ms": 47462,
+      "end_ms": 48294,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 53,
+      "word": "domain",
+      "start_ms": 48304,
+      "end_ms": 49136,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 54,
+      "word": "data.",
+      "start_ms": 49146,
+      "end_ms": 49978,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 55,
+      "word": "And",
+      "start_ms": 50200,
+      "end_ms": 50990,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 56,
+      "word": "that",
+      "start_ms": 51000,
+      "end_ms": 51790,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 57,
+      "word": "is",
+      "start_ms": 51800,
+      "end_ms": 52590,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 58,
+      "word": "where",
+      "start_ms": 52600,
+      "end_ms": 53390,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 59,
+      "word": "the",
+      "start_ms": 53400,
+      "end_ms": 54190,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 60,
+      "word": "next",
+      "start_ms": 54200,
+      "end_ms": 54990,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 61,
+      "word": "hundred-billion-dollar",
+      "start_ms": 55000,
+      "end_ms": 55790,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 62,
+      "word": "companies",
+      "start_ms": 55800,
+      "end_ms": 56590,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 63,
+      "word": "will",
+      "start_ms": 56600,
+      "end_ms": 57390,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 64,
+      "word": "be",
+      "start_ms": 57400,
+      "end_ms": 58190,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 65,
+      "word": "created.",
+      "start_ms": 58200,
+      "end_ms": 58990,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 66,
+      "word": "Yeah,",
+      "start_ms": 65000,
+      "end_ms": 65573,
+      "speaker": "Jason Calacanis",
+      "confidence": 0.95
+    },
+    {
+      "idx": 67,
+      "word": "let",
+      "start_ms": 65583,
+      "end_ms": 66156,
+      "speaker": "Jason Calacanis",
+      "confidence": 0.95
+    },
+    {
+      "idx": 68,
+      "word": "me",
+      "start_ms": 66166,
+      "end_ms": 66739,
+      "speaker": "Jason Calacanis",
+      "confidence": 0.95
+    },
+    {
+      "idx": 69,
+      "word": "check",
+      "start_ms": 66749,
+      "end_ms": 67322,
+      "speaker": "Jason Calacanis",
+      "confidence": 0.95
+    },
+    {
+      "idx": 70,
+      "word": "our",
+      "start_ms": 67332,
+      "end_ms": 67905,
+      "speaker": "Jason Calacanis",
+      "confidence": 0.95
+    },
+    {
+      "idx": 71,
+      "word": "flight",
+      "start_ms": 67915,
+      "end_ms": 68488,
+      "speaker": "Jason Calacanis",
+      "confidence": 0.95
+    },
+    {
+      "idx": 72,
+      "word": "schedule",
+      "start_ms": 68498,
+      "end_ms": 69071,
+      "speaker": "Jason Calacanis",
+      "confidence": 0.95
+    },
+    {
+      "idx": 73,
+      "word": "for",
+      "start_ms": 69081,
+      "end_ms": 69654,
+      "speaker": "Jason Calacanis",
+      "confidence": 0.95
+    },
+    {
+      "idx": 74,
+      "word": "Miami",
+      "start_ms": 69664,
+      "end_ms": 70237,
+      "speaker": "Jason Calacanis",
+      "confidence": 0.95
+    },
+    {
+      "idx": 75,
+      "word": "conference",
+      "start_ms": 70247,
+      "end_ms": 70820,
+      "speaker": "Jason Calacanis",
+      "confidence": 0.95
+    },
+    {
+      "idx": 76,
+      "word": "next",
+      "start_ms": 70830,
+      "end_ms": 71403,
+      "speaker": "Jason Calacanis",
+      "confidence": 0.95
+    },
+    {
+      "idx": 77,
+      "word": "month.",
+      "start_ms": 71413,
+      "end_ms": 71986,
+      "speaker": "Jason Calacanis",
+      "confidence": 0.95
+    },
+    {
+      "idx": 78,
+      "word": "Why",
+      "start_ms": 160000,
+      "end_ms": 160767,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 79,
+      "word": "did",
+      "start_ms": 160777,
+      "end_ms": 161544,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 80,
+      "word": "zero",
+      "start_ms": 161554,
+      "end_ms": 162321,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 81,
+      "word": "interest",
+      "start_ms": 162331,
+      "end_ms": 163098,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 82,
+      "word": "rates",
+      "start_ms": 163108,
+      "end_ms": 163875,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 83,
+      "word": "destroy",
+      "start_ms": 163885,
+      "end_ms": 164652,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 84,
+      "word": "venture",
+      "start_ms": 164662,
+      "end_ms": 165429,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 85,
+      "word": "capital",
+      "start_ms": 165439,
+      "end_ms": 166206,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 86,
+      "word": "discipline?",
+      "start_ms": 166216,
+      "end_ms": 166983,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 87,
+      "word": "When",
+      "start_ms": 167200,
+      "end_ms": 167961,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 88,
+      "word": "capital",
+      "start_ms": 167971,
+      "end_ms": 168732,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 89,
+      "word": "has",
+      "start_ms": 168742,
+      "end_ms": 169503,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 90,
+      "word": "zero",
+      "start_ms": 169513,
+      "end_ms": 170274,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 91,
+      "word": "cost,",
+      "start_ms": 170284,
+      "end_ms": 171045,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 92,
+      "word": "founders",
+      "start_ms": 171055,
+      "end_ms": 171816,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 93,
+      "word": "stop",
+      "start_ms": 171826,
+      "end_ms": 172587,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 94,
+      "word": "prioritizing",
+      "start_ms": 172597,
+      "end_ms": 173358,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 95,
+      "word": "unit",
+      "start_ms": 173368,
+      "end_ms": 174129,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 96,
+      "word": "economics",
+      "start_ms": 174139,
+      "end_ms": 174900,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 97,
+      "word": "and",
+      "start_ms": 174910,
+      "end_ms": 175671,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 98,
+      "word": "cash",
+      "start_ms": 175681,
+      "end_ms": 176442,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 99,
+      "word": "flow",
+      "start_ms": 176452,
+      "end_ms": 177213,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 100,
+      "word": "sustainability.",
+      "start_ms": 177223,
+      "end_ms": 177984,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 101,
+      "word": "You",
+      "start_ms": 178200,
+      "end_ms": 179020,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 102,
+      "word": "end",
+      "start_ms": 179030,
+      "end_ms": 179850,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 103,
+      "word": "up",
+      "start_ms": 179860,
+      "end_ms": 180680,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 104,
+      "word": "subsidizing",
+      "start_ms": 180690,
+      "end_ms": 181510,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 105,
+      "word": "unprofitable",
+      "start_ms": 181520,
+      "end_ms": 182340,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 106,
+      "word": "customer",
+      "start_ms": 182350,
+      "end_ms": 183170,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 107,
+      "word": "acquisition",
+      "start_ms": 183180,
+      "end_ms": 184000,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 108,
+      "word": "instead",
+      "start_ms": 184010,
+      "end_ms": 184830,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 109,
+      "word": "of",
+      "start_ms": 184840,
+      "end_ms": 185660,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 110,
+      "word": "building",
+      "start_ms": 185670,
+      "end_ms": 186490,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 111,
+      "word": "genuine",
+      "start_ms": 186500,
+      "end_ms": 187320,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 112,
+      "word": "product",
+      "start_ms": 187330,
+      "end_ms": 188150,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 113,
+      "word": "differentiation.",
+      "start_ms": 188160,
+      "end_ms": 188980,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 114,
+      "word": "When",
+      "start_ms": 189200,
+      "end_ms": 190080,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 115,
+      "word": "rates",
+      "start_ms": 190090,
+      "end_ms": 190970,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 116,
+      "word": "normalize,",
+      "start_ms": 190980,
+      "end_ms": 191860,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 117,
+      "word": "the",
+      "start_ms": 191870,
+      "end_ms": 192750,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 118,
+      "word": "businesses",
+      "start_ms": 192760,
+      "end_ms": 193640,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 119,
+      "word": "without",
+      "start_ms": 193650,
+      "end_ms": 194530,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 120,
+      "word": "real",
+      "start_ms": 194540,
+      "end_ms": 195420,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 121,
+      "word": "gross",
+      "start_ms": 195430,
+      "end_ms": 196310,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 122,
+      "word": "margins",
+      "start_ms": 196320,
+      "end_ms": 197200,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 123,
+      "word": "evaporate",
+      "start_ms": 197210,
+      "end_ms": 198090,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    },
+    {
+      "idx": 124,
+      "word": "overnight.",
+      "start_ms": 198100,
+      "end_ms": 198980,
+      "speaker": "Chamath Palihapitiya",
+      "confidence": 0.95
+    }
+  ],
+  "speakers": [
+    {
+      "label": "Chamath Palihapitiya",
+      "display_name": "Chamath Palihapitiya"
+    },
+    {
+      "label": "Jason Calacanis",
+      "display_name": "Jason Calacanis"
+    }
+  ]
+}

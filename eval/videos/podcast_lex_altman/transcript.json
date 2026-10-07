@@ -1,0 +1,1401 @@
+{
+  "language": "en",
+  "status": "ready",
+  "model": "large-v3",
+  "backend": "whisperx",
+  "word_count": 162,
+  "segments": [
+    {
+      "idx": 0,
+      "start_ms": 5000,
+      "end_ms": 11000,
+      "speaker": "Sam Altman",
+      "text": "Why do people underestimate exponential technology curves?"
+    },
+    {
+      "idx": 1,
+      "start_ms": 11200,
+      "end_ms": 22000,
+      "speaker": "Sam Altman",
+      "text": "The human brain is fundamentally wired for linear progress because in the ancestral environment nothing doubled every year."
+    },
+    {
+      "idx": 2,
+      "start_ms": 22200,
+      "end_ms": 31000,
+      "speaker": "Sam Altman",
+      "text": "When you look at compute clusters growing by orders of magnitude, people think it must hit a wall tomorrow."
+    },
+    {
+      "idx": 3,
+      "start_ms": 31200,
+      "end_ms": 42000,
+      "speaker": "Sam Altman",
+      "text": "In reality, the scaling laws have held steady for six consecutive years with no plateau in sight."
+    },
+    {
+      "idx": 4,
+      "start_ms": 42200,
+      "end_ms": 50000,
+      "speaker": "Sam Altman",
+      "text": "And that is why the next five years will look unrecognizable compared to the last fifty."
+    },
+    {
+      "idx": 5,
+      "start_ms": 55000,
+      "end_ms": 62000,
+      "speaker": "Lex Fridman",
+      "text": "Yeah, let's talk about the database architecture we had in 2015."
+    },
+    {
+      "idx": 6,
+      "start_ms": 62200,
+      "end_ms": 70000,
+      "speaker": "Lex Fridman",
+      "text": "We had some Redis servers and standard PostgreSQL instances."
+    },
+    {
+      "idx": 7,
+      "start_ms": 120000,
+      "end_ms": 126000,
+      "speaker": "Lex Fridman",
+      "text": "What is the single most important skill for a young engineer today?"
+    },
+    {
+      "idx": 8,
+      "start_ms": 126200,
+      "end_ms": 133000,
+      "speaker": "Sam Altman",
+      "text": "It is not memorizing syntax or algorithms anymore."
+    },
+    {
+      "idx": 9,
+      "start_ms": 133200,
+      "end_ms": 144000,
+      "speaker": "Sam Altman",
+      "text": "The superpower now is deep problem decomposition and taste in deciding what is worth building."
+    },
+    {
+      "idx": 10,
+      "start_ms": 144200,
+      "end_ms": 155000,
+      "speaker": "Sam Altman",
+      "text": "If you can articulate clear intent to AI agents, you have the leverage of an entire engineering organization."
+    },
+    {
+      "idx": 11,
+      "start_ms": 155200,
+      "end_ms": 163000,
+      "speaker": "Sam Altman",
+      "text": "That is the biggest leverage shift in the history of human work."
+    }
+  ],
+  "words": [
+    {
+      "idx": 0,
+      "word": "Why",
+      "start_ms": 5000,
+      "end_ms": 5847,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 1,
+      "word": "do",
+      "start_ms": 5857,
+      "end_ms": 6704,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 2,
+      "word": "people",
+      "start_ms": 6714,
+      "end_ms": 7561,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 3,
+      "word": "underestimate",
+      "start_ms": 7571,
+      "end_ms": 8418,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 4,
+      "word": "exponential",
+      "start_ms": 8428,
+      "end_ms": 9275,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 5,
+      "word": "technology",
+      "start_ms": 9285,
+      "end_ms": 10132,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 6,
+      "word": "curves?",
+      "start_ms": 10142,
+      "end_ms": 10989,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 7,
+      "word": "The",
+      "start_ms": 11200,
+      "end_ms": 11790,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 8,
+      "word": "human",
+      "start_ms": 11800,
+      "end_ms": 12390,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 9,
+      "word": "brain",
+      "start_ms": 12400,
+      "end_ms": 12990,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 10,
+      "word": "is",
+      "start_ms": 13000,
+      "end_ms": 13590,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 11,
+      "word": "fundamentally",
+      "start_ms": 13600,
+      "end_ms": 14190,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 12,
+      "word": "wired",
+      "start_ms": 14200,
+      "end_ms": 14790,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 13,
+      "word": "for",
+      "start_ms": 14800,
+      "end_ms": 15390,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 14,
+      "word": "linear",
+      "start_ms": 15400,
+      "end_ms": 15990,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 15,
+      "word": "progress",
+      "start_ms": 16000,
+      "end_ms": 16590,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 16,
+      "word": "because",
+      "start_ms": 16600,
+      "end_ms": 17190,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 17,
+      "word": "in",
+      "start_ms": 17200,
+      "end_ms": 17790,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 18,
+      "word": "the",
+      "start_ms": 17800,
+      "end_ms": 18390,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 19,
+      "word": "ancestral",
+      "start_ms": 18400,
+      "end_ms": 18990,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 20,
+      "word": "environment",
+      "start_ms": 19000,
+      "end_ms": 19590,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 21,
+      "word": "nothing",
+      "start_ms": 19600,
+      "end_ms": 20190,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 22,
+      "word": "doubled",
+      "start_ms": 20200,
+      "end_ms": 20790,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 23,
+      "word": "every",
+      "start_ms": 20800,
+      "end_ms": 21390,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 24,
+      "word": "year.",
+      "start_ms": 21400,
+      "end_ms": 21990,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 25,
+      "word": "When",
+      "start_ms": 22200,
+      "end_ms": 22653,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 26,
+      "word": "you",
+      "start_ms": 22663,
+      "end_ms": 23116,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 27,
+      "word": "look",
+      "start_ms": 23126,
+      "end_ms": 23579,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 28,
+      "word": "at",
+      "start_ms": 23589,
+      "end_ms": 24042,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 29,
+      "word": "compute",
+      "start_ms": 24052,
+      "end_ms": 24505,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 30,
+      "word": "clusters",
+      "start_ms": 24515,
+      "end_ms": 24968,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 31,
+      "word": "growing",
+      "start_ms": 24978,
+      "end_ms": 25431,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 32,
+      "word": "by",
+      "start_ms": 25441,
+      "end_ms": 25894,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 33,
+      "word": "orders",
+      "start_ms": 25904,
+      "end_ms": 26357,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 34,
+      "word": "of",
+      "start_ms": 26367,
+      "end_ms": 26820,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 35,
+      "word": "magnitude,",
+      "start_ms": 26830,
+      "end_ms": 27283,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 36,
+      "word": "people",
+      "start_ms": 27293,
+      "end_ms": 27746,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 37,
+      "word": "think",
+      "start_ms": 27756,
+      "end_ms": 28209,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 38,
+      "word": "it",
+      "start_ms": 28219,
+      "end_ms": 28672,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 39,
+      "word": "must",
+      "start_ms": 28682,
+      "end_ms": 29135,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 40,
+      "word": "hit",
+      "start_ms": 29145,
+      "end_ms": 29598,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 41,
+      "word": "a",
+      "start_ms": 29608,
+      "end_ms": 30061,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 42,
+      "word": "wall",
+      "start_ms": 30071,
+      "end_ms": 30524,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 43,
+      "word": "tomorrow.",
+      "start_ms": 30534,
+      "end_ms": 30987,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 44,
+      "word": "In",
+      "start_ms": 31200,
+      "end_ms": 31825,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 45,
+      "word": "reality,",
+      "start_ms": 31835,
+      "end_ms": 32460,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 46,
+      "word": "the",
+      "start_ms": 32470,
+      "end_ms": 33095,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 47,
+      "word": "scaling",
+      "start_ms": 33105,
+      "end_ms": 33730,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 48,
+      "word": "laws",
+      "start_ms": 33740,
+      "end_ms": 34365,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 49,
+      "word": "have",
+      "start_ms": 34375,
+      "end_ms": 35000,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 50,
+      "word": "held",
+      "start_ms": 35010,
+      "end_ms": 35635,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 51,
+      "word": "steady",
+      "start_ms": 35645,
+      "end_ms": 36270,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 52,
+      "word": "for",
+      "start_ms": 36280,
+      "end_ms": 36905,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 53,
+      "word": "six",
+      "start_ms": 36915,
+      "end_ms": 37540,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 54,
+      "word": "consecutive",
+      "start_ms": 37550,
+      "end_ms": 38175,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 55,
+      "word": "years",
+      "start_ms": 38185,
+      "end_ms": 38810,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 56,
+      "word": "with",
+      "start_ms": 38820,
+      "end_ms": 39445,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 57,
+      "word": "no",
+      "start_ms": 39455,
+      "end_ms": 40080,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 58,
+      "word": "plateau",
+      "start_ms": 40090,
+      "end_ms": 40715,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 59,
+      "word": "in",
+      "start_ms": 40725,
+      "end_ms": 41350,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 60,
+      "word": "sight.",
+      "start_ms": 41360,
+      "end_ms": 41985,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 61,
+      "word": "And",
+      "start_ms": 42200,
+      "end_ms": 42677,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 62,
+      "word": "that",
+      "start_ms": 42687,
+      "end_ms": 43164,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 63,
+      "word": "is",
+      "start_ms": 43174,
+      "end_ms": 43651,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 64,
+      "word": "why",
+      "start_ms": 43661,
+      "end_ms": 44138,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 65,
+      "word": "the",
+      "start_ms": 44148,
+      "end_ms": 44625,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 66,
+      "word": "next",
+      "start_ms": 44635,
+      "end_ms": 45112,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 67,
+      "word": "five",
+      "start_ms": 45122,
+      "end_ms": 45599,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 68,
+      "word": "years",
+      "start_ms": 45609,
+      "end_ms": 46086,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 69,
+      "word": "will",
+      "start_ms": 46096,
+      "end_ms": 46573,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 70,
+      "word": "look",
+      "start_ms": 46583,
+      "end_ms": 47060,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 71,
+      "word": "unrecognizable",
+      "start_ms": 47070,
+      "end_ms": 47547,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 72,
+      "word": "compared",
+      "start_ms": 47557,
+      "end_ms": 48034,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 73,
+      "word": "to",
+      "start_ms": 48044,
+      "end_ms": 48521,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 74,
+      "word": "the",
+      "start_ms": 48531,
+      "end_ms": 49008,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 75,
+      "word": "last",
+      "start_ms": 49018,
+      "end_ms": 49495,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 76,
+      "word": "fifty.",
+      "start_ms": 49505,
+      "end_ms": 49982,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 77,
+      "word": "Yeah,",
+      "start_ms": 55000,
+      "end_ms": 55626,
+      "speaker": "Lex Fridman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 78,
+      "word": "let's",
+      "start_ms": 55636,
+      "end_ms": 56262,
+      "speaker": "Lex Fridman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 79,
+      "word": "talk",
+      "start_ms": 56272,
+      "end_ms": 56898,
+      "speaker": "Lex Fridman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 80,
+      "word": "about",
+      "start_ms": 56908,
+      "end_ms": 57534,
+      "speaker": "Lex Fridman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 81,
+      "word": "the",
+      "start_ms": 57544,
+      "end_ms": 58170,
+      "speaker": "Lex Fridman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 82,
+      "word": "database",
+      "start_ms": 58180,
+      "end_ms": 58806,
+      "speaker": "Lex Fridman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 83,
+      "word": "architecture",
+      "start_ms": 58816,
+      "end_ms": 59442,
+      "speaker": "Lex Fridman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 84,
+      "word": "we",
+      "start_ms": 59452,
+      "end_ms": 60078,
+      "speaker": "Lex Fridman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 85,
+      "word": "had",
+      "start_ms": 60088,
+      "end_ms": 60714,
+      "speaker": "Lex Fridman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 86,
+      "word": "in",
+      "start_ms": 60724,
+      "end_ms": 61350,
+      "speaker": "Lex Fridman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 87,
+      "word": "2015.",
+      "start_ms": 61360,
+      "end_ms": 61986,
+      "speaker": "Lex Fridman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 88,
+      "word": "We",
+      "start_ms": 62200,
+      "end_ms": 63056,
+      "speaker": "Lex Fridman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 89,
+      "word": "had",
+      "start_ms": 63066,
+      "end_ms": 63922,
+      "speaker": "Lex Fridman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 90,
+      "word": "some",
+      "start_ms": 63932,
+      "end_ms": 64788,
+      "speaker": "Lex Fridman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 91,
+      "word": "Redis",
+      "start_ms": 64798,
+      "end_ms": 65654,
+      "speaker": "Lex Fridman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 92,
+      "word": "servers",
+      "start_ms": 65664,
+      "end_ms": 66520,
+      "speaker": "Lex Fridman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 93,
+      "word": "and",
+      "start_ms": 66530,
+      "end_ms": 67386,
+      "speaker": "Lex Fridman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 94,
+      "word": "standard",
+      "start_ms": 67396,
+      "end_ms": 68252,
+      "speaker": "Lex Fridman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 95,
+      "word": "PostgreSQL",
+      "start_ms": 68262,
+      "end_ms": 69118,
+      "speaker": "Lex Fridman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 96,
+      "word": "instances.",
+      "start_ms": 69128,
+      "end_ms": 69984,
+      "speaker": "Lex Fridman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 97,
+      "word": "What",
+      "start_ms": 120000,
+      "end_ms": 120490,
+      "speaker": "Lex Fridman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 98,
+      "word": "is",
+      "start_ms": 120500,
+      "end_ms": 120990,
+      "speaker": "Lex Fridman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 99,
+      "word": "the",
+      "start_ms": 121000,
+      "end_ms": 121490,
+      "speaker": "Lex Fridman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 100,
+      "word": "single",
+      "start_ms": 121500,
+      "end_ms": 121990,
+      "speaker": "Lex Fridman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 101,
+      "word": "most",
+      "start_ms": 122000,
+      "end_ms": 122490,
+      "speaker": "Lex Fridman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 102,
+      "word": "important",
+      "start_ms": 122500,
+      "end_ms": 122990,
+      "speaker": "Lex Fridman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 103,
+      "word": "skill",
+      "start_ms": 123000,
+      "end_ms": 123490,
+      "speaker": "Lex Fridman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 104,
+      "word": "for",
+      "start_ms": 123500,
+      "end_ms": 123990,
+      "speaker": "Lex Fridman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 105,
+      "word": "a",
+      "start_ms": 124000,
+      "end_ms": 124490,
+      "speaker": "Lex Fridman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 106,
+      "word": "young",
+      "start_ms": 124500,
+      "end_ms": 124990,
+      "speaker": "Lex Fridman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 107,
+      "word": "engineer",
+      "start_ms": 125000,
+      "end_ms": 125490,
+      "speaker": "Lex Fridman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 108,
+      "word": "today?",
+      "start_ms": 125500,
+      "end_ms": 125990,
+      "speaker": "Lex Fridman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 109,
+      "word": "It",
+      "start_ms": 126200,
+      "end_ms": 127040,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 110,
+      "word": "is",
+      "start_ms": 127050,
+      "end_ms": 127890,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 111,
+      "word": "not",
+      "start_ms": 127900,
+      "end_ms": 128740,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 112,
+      "word": "memorizing",
+      "start_ms": 128750,
+      "end_ms": 129590,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 113,
+      "word": "syntax",
+      "start_ms": 129600,
+      "end_ms": 130440,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 114,
+      "word": "or",
+      "start_ms": 130450,
+      "end_ms": 131290,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 115,
+      "word": "algorithms",
+      "start_ms": 131300,
+      "end_ms": 132140,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 116,
+      "word": "anymore.",
+      "start_ms": 132150,
+      "end_ms": 132990,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 117,
+      "word": "The",
+      "start_ms": 133200,
+      "end_ms": 133910,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 118,
+      "word": "superpower",
+      "start_ms": 133920,
+      "end_ms": 134630,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 119,
+      "word": "now",
+      "start_ms": 134640,
+      "end_ms": 135350,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 120,
+      "word": "is",
+      "start_ms": 135360,
+      "end_ms": 136070,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 121,
+      "word": "deep",
+      "start_ms": 136080,
+      "end_ms": 136790,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 122,
+      "word": "problem",
+      "start_ms": 136800,
+      "end_ms": 137510,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 123,
+      "word": "decomposition",
+      "start_ms": 137520,
+      "end_ms": 138230,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 124,
+      "word": "and",
+      "start_ms": 138240,
+      "end_ms": 138950,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 125,
+      "word": "taste",
+      "start_ms": 138960,
+      "end_ms": 139670,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 126,
+      "word": "in",
+      "start_ms": 139680,
+      "end_ms": 140390,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 127,
+      "word": "deciding",
+      "start_ms": 140400,
+      "end_ms": 141110,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 128,
+      "word": "what",
+      "start_ms": 141120,
+      "end_ms": 141830,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 129,
+      "word": "is",
+      "start_ms": 141840,
+      "end_ms": 142550,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 130,
+      "word": "worth",
+      "start_ms": 142560,
+      "end_ms": 143270,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 131,
+      "word": "building.",
+      "start_ms": 143280,
+      "end_ms": 143990,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 132,
+      "word": "If",
+      "start_ms": 144200,
+      "end_ms": 144790,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 133,
+      "word": "you",
+      "start_ms": 144800,
+      "end_ms": 145390,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 134,
+      "word": "can",
+      "start_ms": 145400,
+      "end_ms": 145990,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 135,
+      "word": "articulate",
+      "start_ms": 146000,
+      "end_ms": 146590,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 136,
+      "word": "clear",
+      "start_ms": 146600,
+      "end_ms": 147190,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 137,
+      "word": "intent",
+      "start_ms": 147200,
+      "end_ms": 147790,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 138,
+      "word": "to",
+      "start_ms": 147800,
+      "end_ms": 148390,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 139,
+      "word": "AI",
+      "start_ms": 148400,
+      "end_ms": 148990,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 140,
+      "word": "agents,",
+      "start_ms": 149000,
+      "end_ms": 149590,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 141,
+      "word": "you",
+      "start_ms": 149600,
+      "end_ms": 150190,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 142,
+      "word": "have",
+      "start_ms": 150200,
+      "end_ms": 150790,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 143,
+      "word": "the",
+      "start_ms": 150800,
+      "end_ms": 151390,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 144,
+      "word": "leverage",
+      "start_ms": 151400,
+      "end_ms": 151990,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 145,
+      "word": "of",
+      "start_ms": 152000,
+      "end_ms": 152590,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 146,
+      "word": "an",
+      "start_ms": 152600,
+      "end_ms": 153190,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 147,
+      "word": "entire",
+      "start_ms": 153200,
+      "end_ms": 153790,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 148,
+      "word": "engineering",
+      "start_ms": 153800,
+      "end_ms": 154390,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 149,
+      "word": "organization.",
+      "start_ms": 154400,
+      "end_ms": 154990,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 150,
+      "word": "That",
+      "start_ms": 155200,
+      "end_ms": 155840,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 151,
+      "word": "is",
+      "start_ms": 155850,
+      "end_ms": 156490,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 152,
+      "word": "the",
+      "start_ms": 156500,
+      "end_ms": 157140,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 153,
+      "word": "biggest",
+      "start_ms": 157150,
+      "end_ms": 157790,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 154,
+      "word": "leverage",
+      "start_ms": 157800,
+      "end_ms": 158440,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 155,
+      "word": "shift",
+      "start_ms": 158450,
+      "end_ms": 159090,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 156,
+      "word": "in",
+      "start_ms": 159100,
+      "end_ms": 159740,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 157,
+      "word": "the",
+      "start_ms": 159750,
+      "end_ms": 160390,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 158,
+      "word": "history",
+      "start_ms": 160400,
+      "end_ms": 161040,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 159,
+      "word": "of",
+      "start_ms": 161050,
+      "end_ms": 161690,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 160,
+      "word": "human",
+      "start_ms": 161700,
+      "end_ms": 162340,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    },
+    {
+      "idx": 161,
+      "word": "work.",
+      "start_ms": 162350,
+      "end_ms": 162990,
+      "speaker": "Sam Altman",
+      "confidence": 0.95
+    }
+  ],
+  "speakers": [
+    {
+      "label": "Lex Fridman",
+      "display_name": "Lex Fridman"
+    },
+    {
+      "label": "Sam Altman",
+      "display_name": "Sam Altman"
+    }
+  ]
+}
