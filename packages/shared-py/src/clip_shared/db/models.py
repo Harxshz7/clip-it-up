@@ -334,8 +334,6 @@ class ClipFeedback(Base):
 
     __table_args__ = (
         UniqueConstraint("clip_id", "user_id", name="uq_clip_feedback_clip_user"),
-        Index("ix_clip_feedback_clip_id", "clip_id"),
-        Index("ix_clip_feedback_user_id", "user_id"),
     )
 
 
