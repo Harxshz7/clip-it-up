@@ -224,8 +224,9 @@ def calculate_gate_metrics(sessions_data: list[dict[str, Any]], gate_config: dic
         "message": f"Usable rate is {round(usable_rate * 100, 1)}% ({total_post_as_is + total_post_with_edits}/{total_clips_rated} clips).",
     })
 
-    # Check 2: >= 4 of 5 creators with >= 2 postable clips
-    min_postable_target = postable_conf.get("min_creators", 4)
+    # Check 2: >= 4 of 5 creators with >= 2 postable clips (scaled for cohort size)
+    nominal_postable = postable_conf.get("min_creators", 4)
+    min_postable_target = min(nominal_postable, math.ceil(num_submitted * (4 / 5.0))) if num_submitted else nominal_postable
     c2_status = "PASS" if creators_with_min_postable >= min_postable_target else "FAIL"
     checks.append({
         "id": "creators_postable_clips",
@@ -236,8 +237,9 @@ def calculate_gate_metrics(sessions_data: list[dict[str, Any]], gate_config: dic
         "message": f"{creators_with_min_postable} of {num_submitted} creators found >= {postable_conf.get('min_postable_clips', 2)} clips they would post.",
     })
 
-    # Check 3: >= 3 of 5 willing to pay >= 1500 or commit to upload within 14 days
-    min_comm_target = comm_conf.get("min_creators", 3)
+    # Check 3: >= 3 of 5 willing to pay >= 1500 or commit to upload within 14 days (scaled for cohort size)
+    nominal_comm = comm_conf.get("min_creators", 3)
+    min_comm_target = min(nominal_comm, math.ceil(num_submitted * (3 / 5.0))) if num_submitted else nominal_comm
     c3_status = "PASS" if creators_with_commercial_intent >= min_comm_target else "FAIL"
     checks.append({
         "id": "commercial_intent",

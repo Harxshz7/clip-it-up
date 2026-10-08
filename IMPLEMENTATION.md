@@ -23,7 +23,7 @@
 | **0. Foundation** | W1–2 | Presigned S3 upload, dummy 6-stage worker, live SSE progress, ₹ INR cost recording | **Complete** | `<DEV_A>` / `<DEV_B>` |
 | **1. Transcript** | W3–4 | Real WhisperX audio extraction, word-level timestamps, speaker diarization, interactive viewer | **Complete** | `<DEV_A>` / `<DEV_B>` |
 | **2. Clip Selection**| W5–8 | LLM virality scoring (Claude API), candidate hook extraction, ranking, streaming SSE, eval harness | **Complete** | `<DEV_A>` / `<DEV_B>` |
-| **2.5 Reality Check**| W9 | Creators test raw AI clip cuts; validate hook retention against baseline | Planned | `<DEV_A>` / `<DEV_B>` |
+| **2.5 Reality Check**| W9 | Tooling for 5 creators to review raw AI cuts, download crude clips, exit survey & gate report | **Complete** | `<DEV_A>` / `<DEV_B>` |
 
 ---
 
@@ -57,6 +57,15 @@
 - [x] `[web]` Interactive ClipsDeck and ClipCard with score breakdown tooltips, variant selector, proxy video preview seek, and thumbs feedback.
 - [x] `[web]` Blind human rater interface at `/eval/rate` for 3 independent raters with CSV export.
 - [x] `[eval]` Eval harness with 10 benchmark videos, ground truth ratings, `make eval` (Precision@5, AUC, correlations, cost diffs), `make tune` (coordinate search), and `docs/eval.md`.
+
+### Phase 2.5: Creator Reality Check (Week 9) — COMPLETE
+- [x] `[db]` Alembic migration `0004_phase2_5_creator_review` (`review_sessions`, `review_ratings`, `review_survey`, `clip_review_exports`).
+- [x] `[worker]` Lazy FFmpeg crude clip export task (horizontal + 9:16 center-crop + watermark overlay, safe argument lists, idempotent rerun).
+- [x] `[api]` Added `POST /videos/{id}/review-sessions`, `GET /review/{token}` (unanchored score hiding, rate limited, constant-time compare), `PUT /review/{token}/ratings/{clip_id}`, `PUT /review/{token}/survey`, `POST /review/{token}/submit`, `DELETE /review-sessions/{id}`.
+- [x] `[web]` Public mobile-first review flow at `/review/[token]` (crude disclaimers, video player with 9:16 / 16:9 toggle, 3 verdict buttons, reason chips, comment auto-save, exit survey, download crude clips).
+- [x] `[web]` Owner review management at `/videos/[id]/reviews` (create session, list, copy link, detailed rating & survey inspect) and Gate Report viewer at `/reviews/gate`.
+- [x] `[eval]` Gate decision report generator (`make gate`, `eval/gate.py`, `eval/run_gate.py`, `config/gate.yaml`, fixtures test suite, markdown + JSON output).
+- [x] `[docs]` Created `docs/creator-check.md` with outreach templates, call scripts, question checklist, operational protocol, and results log.
 
 ### Phase 3 & 4: Reframe, Captions & Render (Weeks 10–14)
 - [ ] `[worker]` Implement MediaPipe/YOLO face tracking for 1–2 speaker 9:16 auto-framing.

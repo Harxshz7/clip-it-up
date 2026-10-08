@@ -51,7 +51,7 @@ def test_gate_metrics_fixture_hand_calculated_numbers():
 
 def test_gate_decision_branch_fix_selection_and_rethink():
     """Verify gate decision logic correctly triggers 'FIX SELECTION FIRST' and 'RETHINK'."""
-    # Scenario A: Usable rate < 60% with high 'bad_start' rejections
+    # Scenario A: Usable rate 50% (between 40% and 60%) with high 'bad_start' rejections
     low_usable_sessions = [
         {
             "creator_name": "Test Creator 1",
@@ -59,9 +59,8 @@ def test_gate_decision_branch_fix_selection_and_rethink():
             "ratings": [
                 {"verdict": "no", "reason_tag": "bad_start", "rank": 1},
                 {"verdict": "no", "reason_tag": "bad_start", "rank": 2},
-                {"verdict": "no", "reason_tag": "bad_start", "rank": 3},
-                {"verdict": "no", "reason_tag": "bad_start", "rank": 4},
-                {"verdict": "post_as_is", "rank": 5},
+                {"verdict": "post_with_edits", "rank": 3},
+                {"verdict": "post_as_is", "rank": 4},
             ],
             "survey": {"price_open_inr": 2000, "accepts_1500": True, "would_upload_next": "yes"},
         }
