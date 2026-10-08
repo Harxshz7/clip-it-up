@@ -1,0 +1,19 @@
+# Gate Decision Criteria and Thresholds for Phase 2.5 Creator Reality Check
+gate_criteria:
+  usable_rate_min: 0.60
+  min_creators_with_postable_clips:
+    min_creators: 4
+    out_of: 5
+    min_postable_clips: 2
+  commercial_intent:
+    min_creators: 3
+    out_of: 5
+    min_price_inr: 1500
+    max_upload_days: 14
+  max_single_no_reason_pct: 0.30
+
+# Evaluation weights and settings
+settings:
+  strict_verdicts: ["post_as_is"]
+  postable_verdicts: ["post_as_is", "post_with_edits"]
+  negative_verdicts: ["no"]

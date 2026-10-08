@@ -14,6 +14,7 @@ from api.routes.clips import router as clips_router
 from api.routes.eval import router as eval_router
 from api.routes.health import router as health_router
 from api.routes.jobs import router as jobs_router
+from api.routes.reviews import router as reviews_router
 from api.routes.usage import router as usage_router
 from api.routes.videos import router as videos_router
 from clip_shared.config import get_settings
@@ -148,4 +149,5 @@ app.include_router(videos_router)
 app.include_router(jobs_router)
 app.include_router(usage_router)
 app.include_router(clips_router)
+app.include_router(reviews_router)
 app.include_router(eval_router)

@@ -308,3 +308,119 @@ def run_parallel_audio_and_proxy(
 
     if progress_cb:
         progress_cb(100.0)
+
+
+def build_crude_clip_ffmpeg_cmd(
+    input_video: str,
+    output_mp4: str,
+    start_ms: int,
+    end_ms: int,
+    kind: str = "horizontal",
+    watermark_text: str = "Preview",
+) -> list[str]:
+    """
+    Construct safe FFmpeg argument list for crude clip export with accurate seek and re-encoding.
+    Argument lists only (no shell=True).
+    """
+    start_s = max(0.0, start_ms / 1000.0)
+    duration_s = max(0.1, (end_ms - start_ms) / 1000.0)
+
+    # Watermark filter
+    watermark_filter = (
+        f"drawtext=text='{watermark_text}':fontsize=24:fontcolor=white@0.8:"
+        "x=w-tw-20:y=20:box=1:boxcolor=black@0.5:boxborderw=4"
+    )
+
+    if kind == "vertical_center":
+        # 9:16 naive center crop + watermark
+        vf_filter = f"crop=min(iw\\,ih*9/16):min(ih\\,iw*16/9):(iw-min(iw\\,ih*9/16))/2:(ih-min(ih\\,iw*16/9))/2,{watermark_filter}"
+    else:
+        # Horizontal with watermark
+        vf_filter = watermark_filter
+
+    cmd = [
+        "ffmpeg",
+        "-y",
+        "-ss", f"{start_s:.3f}",
+        "-i", input_video,
+        "-t", f"{duration_s:.3f}",
+        "-vf", vf_filter,
+        "-c:v", "libx264",
+        "-crf", "23",
+        "-preset", "veryfast",
+        "-c:a", "aac",
+        "-b:a", "128k",
+        "-movflags", "+faststart",
+        "-avoid_negative_ts", "make_zero",
+        "-progress", "pipe:1",
+        "-nostats",
+        output_mp4,
+    ]
+    return cmd
+
+
+def export_crude_clip(
+    input_video: str,
+    output_mp4: str,
+    start_ms: int,
+    end_ms: int,
+    kind: str = "horizontal",
+    watermark_text: str = "Preview",
+    progress_cb: Callable[[float], None] | None = None,
+) -> None:
+    """
+    Export crude cut clip (horizontal or naive 9:16 vertical crop) from original video.
+    Re-encodes H.264/AAC with watermark and cleans up properly. Idempotent rerun overwrites.
+    """
+    os.makedirs(os.path.dirname(os.path.abspath(output_mp4)), exist_ok=True)
+    cmd = build_crude_clip_ffmpeg_cmd(
+        input_video=input_video,
+        output_mp4=output_mp4,
+        start_ms=start_ms,
+        end_ms=end_ms,
+        kind=kind,
+        watermark_text=watermark_text,
+    )
+
+    duration_s = max(0.1, (end_ms - start_ms) / 1000.0)
+
+    try:
+        proc = subprocess.Popen(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+        _monitor_ffmpeg_progress(proc, duration_s, progress_cb)
+        _, stderr_text = proc.communicate()
+
+        if proc.returncode != 0:
+            logger.error("ffmpeg_crude_export_failed", stderr=stderr_text, kind=kind)
+            # Fallback if drawtext is missing or filter fails: try without drawtext
+            if "drawtext" in stderr_text:
+                logger.warn("retrying_export_without_drawtext", kind=kind)
+                fallback_cmd = [
+                    "ffmpeg", "-y",
+                    "-ss", f"{(start_ms/1000.0):.3f}",
+                    "-i", input_video,
+                    "-t", f"{duration_s:.3f}",
+                ]
+                if kind == "vertical_center":
+                    fallback_cmd.extend(["-vf", "crop=min(iw\\,ih*9/16):min(ih\\,iw*16/9):(iw-min(iw\\,ih*9/16))/2:(ih-min(ih\\,iw*16/9))/2"])
+                fallback_cmd.extend([
+                    "-c:v", "libx264", "-crf", "23", "-preset", "veryfast",
+                    "-c:a", "aac", "-b:a", "128k", "-movflags", "+faststart",
+                    "-avoid_negative_ts", "make_zero",
+                    output_mp4,
+                ])
+                fb_proc = subprocess.run(fallback_cmd, capture_output=True, text=True, check=False)
+                if fb_proc.returncode != 0:
+                    raise RuntimeError(f"FFmpeg crude export fallback failed: {fb_proc.stderr}")
+            else:
+                raise RuntimeError(f"FFmpeg crude export failed: {stderr_text}")
+
+        if progress_cb:
+            progress_cb(100.0)
+    except FileNotFoundError:
+        raise FileNotFoundError("ffmpeg binary not found in worker environment.")
+

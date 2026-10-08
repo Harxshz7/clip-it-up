@@ -1,0 +1,443 @@
+[
+  {
+    "session_id": "11111111-1111-1111-1111-111111111111",
+    "creator_name": "Aarav Tech Shorts",
+    "creator_email": "aarav@creator.test",
+    "status": "submitted",
+    "ratings": [
+      {
+        "clip_id": "c1111111-0001-0000-0000-000000000001",
+        "rank": 1,
+        "verdict": "post_as_is",
+        "final_score": 0.92,
+        "watch_ms": 28000,
+        "comment": "Awesome hook! Catches attention right away."
+      },
+      {
+        "clip_id": "c1111111-0001-0000-0000-000000000002",
+        "rank": 2,
+        "verdict": "post_with_edits",
+        "reason_tag": "bad_end",
+        "final_score": 0.88,
+        "watch_ms": 32000,
+        "comment": "Good point but cut off the last word."
+      },
+      {
+        "clip_id": "c1111111-0001-0000-0000-000000000003",
+        "rank": 3,
+        "verdict": "post_as_is",
+        "final_score": 0.85,
+        "watch_ms": 24000,
+        "comment": "Very strong take on AI agents."
+      },
+      {
+        "clip_id": "c1111111-0001-0000-0000-000000000004",
+        "rank": 4,
+        "verdict": "post_with_edits",
+        "reason_tag": "bad_start",
+        "final_score": 0.78,
+        "watch_ms": 40000,
+        "comment": "Trim first 2 seconds of umm."
+      },
+      {
+        "clip_id": "c1111111-0001-0000-0000-000000000005",
+        "rank": 5,
+        "verdict": "no",
+        "reason_tag": "boring",
+        "final_score": 0.65,
+        "watch_ms": 15000,
+        "comment": "Too slow and monotone."
+      },
+      {
+        "clip_id": "c1111111-0001-0000-0000-000000000006",
+        "rank": 6,
+        "verdict": "no",
+        "reason_tag": "no_context",
+        "final_score": 0.60,
+        "watch_ms": 18000,
+        "comment": "Viewer wouldn't understand without context."
+      },
+      {
+        "clip_id": "c1111111-0001-0000-0000-000000000007",
+        "rank": 7,
+        "verdict": "post_with_edits",
+        "reason_tag": "bad_start",
+        "final_score": 0.58,
+        "watch_ms": 35000,
+        "comment": "Needs quicker intro."
+      },
+      {
+        "clip_id": "c1111111-0001-0000-0000-000000000008",
+        "rank": 8,
+        "verdict": "no",
+        "reason_tag": "bad_start",
+        "final_score": 0.52,
+        "watch_ms": 12000,
+        "comment": "Started mid-sentence."
+      }
+    ],
+    "survey": {
+      "missing_text": "Need auto-captions and animated zoom-in effects.",
+      "current_workflow_text": "Manual Premiere Pro trimming and CapCut subtitles.",
+      "current_cost_text": "Pay editor ₹12,000/mo and spend 6 hrs/week.",
+      "price_open_inr": 2500,
+      "accepts_1500": true,
+      "accepts_4000": false,
+      "would_upload_next": "yes",
+      "upload_timeframe": "Within 3 days",
+      "email_optin": true
+    }
+  },
+  {
+    "session_id": "22222222-2222-2222-2222-222222222222",
+    "creator_name": "Priya Finance Daily",
+    "creator_email": "priya@finance.test",
+    "status": "submitted",
+    "ratings": [
+      {
+        "clip_id": "c2222222-0001-0000-0000-000000000001",
+        "rank": 1,
+        "verdict": "post_as_is",
+        "final_score": 0.94,
+        "watch_ms": 35000,
+        "comment": "Clear value proposition and punchy numbers."
+      },
+      {
+        "clip_id": "c2222222-0001-0000-0000-000000000002",
+        "rank": 2,
+        "verdict": "post_as_is",
+        "final_score": 0.91,
+        "watch_ms": 29000,
+        "comment": "Ready for Instagram Reels right now."
+      },
+      {
+        "clip_id": "c2222222-0001-0000-0000-000000000003",
+        "rank": 3,
+        "verdict": "post_with_edits",
+        "reason_tag": "bad_start",
+        "final_score": 0.84,
+        "watch_ms": 27000,
+        "comment": "Cut the intro throat clearing."
+      },
+      {
+        "clip_id": "c2222222-0001-0000-0000-000000000004",
+        "rank": 4,
+        "verdict": "post_with_edits",
+        "reason_tag": "bad_end",
+        "final_score": 0.77,
+        "watch_ms": 33000,
+        "comment": "Ended slightly abruptly."
+      },
+      {
+        "clip_id": "c2222222-0001-0000-0000-000000000005",
+        "rank": 5,
+        "verdict": "post_as_is",
+        "final_score": 0.73,
+        "watch_ms": 31000,
+        "comment": "Good insight on tax saving."
+      },
+      {
+        "clip_id": "c2222222-0001-0000-0000-000000000006",
+        "rank": 6,
+        "verdict": "no",
+        "reason_tag": "no_context",
+        "final_score": 0.62,
+        "watch_ms": 14000,
+        "comment": "Refers to a chart not visible on screen."
+      },
+      {
+        "clip_id": "c2222222-0001-0000-0000-000000000007",
+        "rank": 7,
+        "verdict": "no",
+        "reason_tag": "too_long",
+        "final_score": 0.55,
+        "watch_ms": 48000,
+        "comment": "Too long for shorts."
+      },
+      {
+        "clip_id": "c2222222-0001-0000-0000-000000000008",
+        "rank": 8,
+        "verdict": "post_with_edits",
+        "reason_tag": "bad_start",
+        "final_score": 0.51,
+        "watch_ms": 25000,
+        "comment": "Trim 1 second."
+      }
+    ],
+    "survey": {
+      "missing_text": "B-roll insertion and bold text overlay presets.",
+      "current_workflow_text": "Descript + Canva templates.",
+      "current_cost_text": "₹3,500 on tools and 4 hours every weekend.",
+      "price_open_inr": 3000,
+      "accepts_1500": true,
+      "accepts_4000": true,
+      "would_upload_next": "yes",
+      "upload_timeframe": "Next Monday (5 days)",
+      "email_optin": true
+    }
+  },
+  {
+    "session_id": "33333333-3333-3333-3333-333333333333",
+    "creator_name": "Rohan Podcasts",
+    "creator_email": "rohan@podcasts.test",
+    "status": "submitted",
+    "ratings": [
+      {
+        "clip_id": "c3333333-0001-0000-0000-000000000001",
+        "rank": 1,
+        "verdict": "post_as_is",
+        "final_score": 0.95,
+        "watch_ms": 45000,
+        "comment": "Incredible soundbite on founder psychology."
+      },
+      {
+        "clip_id": "c3333333-0001-0000-0000-000000000002",
+        "rank": 2,
+        "verdict": "post_as_is",
+        "final_score": 0.89,
+        "watch_ms": 38000,
+        "comment": "Great debate moment."
+      },
+      {
+        "clip_id": "c3333333-0001-0000-0000-000000000003",
+        "rank": 3,
+        "verdict": "post_with_edits",
+        "reason_tag": "bad_start",
+        "final_score": 0.82,
+        "watch_ms": 30000,
+        "comment": "Speaker interrupted, need cleaner lead-in."
+      },
+      {
+        "clip_id": "c3333333-0001-0000-0000-000000000004",
+        "rank": 4,
+        "verdict": "post_as_is",
+        "final_score": 0.79,
+        "watch_ms": 32000,
+        "comment": "Very witty reply."
+      },
+      {
+        "clip_id": "c3333333-0001-0000-0000-000000000005",
+        "rank": 5,
+        "verdict": "post_with_edits",
+        "reason_tag": "off_topic",
+        "final_score": 0.71,
+        "watch_ms": 28000,
+        "comment": "Good energy but diverges into an internal joke."
+      },
+      {
+        "clip_id": "c3333333-0001-0000-0000-000000000006",
+        "rank": 6,
+        "verdict": "no",
+        "reason_tag": "bad_start",
+        "final_score": 0.63,
+        "watch_ms": 11000,
+        "comment": "Started while other guest was laughing."
+      },
+      {
+        "clip_id": "c3333333-0001-0000-0000-000000000007",
+        "rank": 7,
+        "verdict": "no",
+        "reason_tag": "bad_end",
+        "final_score": 0.57,
+        "watch_ms": 19000,
+        "comment": "Unfinished anecdote."
+      },
+      {
+        "clip_id": "c3333333-0001-0000-0000-000000000008",
+        "rank": 8,
+        "verdict": "no",
+        "reason_tag": "boring",
+        "final_score": 0.49,
+        "watch_ms": 13000,
+        "comment": "Not viral material."
+      }
+    ],
+    "survey": {
+      "missing_text": "Speaker tracking crop when 2 people speak and auto subtitles.",
+      "current_workflow_text": "Agency cuts 15 clips per episode for ₹25k/mo.",
+      "current_cost_text": "₹25,000 / month.",
+      "price_open_inr": 5000,
+      "accepts_1500": true,
+      "accepts_4000": true,
+      "would_upload_next": "yes",
+      "upload_timeframe": "Next week Thursday",
+      "email_optin": true
+    }
+  },
+  {
+    "session_id": "44444444-4444-4444-4444-444444444444",
+    "creator_name": "Kavita Mindset",
+    "creator_email": "kavita@mindset.test",
+    "status": "submitted",
+    "ratings": [
+      {
+        "clip_id": "c4444444-0001-0000-0000-000000000001",
+        "rank": 1,
+        "verdict": "post_as_is",
+        "final_score": 0.91,
+        "watch_ms": 30000,
+        "comment": "Hit right in the feels. Very shareable."
+      },
+      {
+        "clip_id": "c4444444-0001-0000-0000-000000000002",
+        "rank": 2,
+        "verdict": "post_with_edits",
+        "reason_tag": "bad_start",
+        "final_score": 0.86,
+        "watch_ms": 26000,
+        "comment": "Start right at the quote."
+      },
+      {
+        "clip_id": "c4444444-0001-0000-0000-000000000003",
+        "rank": 3,
+        "verdict": "post_as_is",
+        "final_score": 0.81,
+        "watch_ms": 28000,
+        "comment": "Inspiring conclusion."
+      },
+      {
+        "clip_id": "c4444444-0001-0000-0000-000000000004",
+        "rank": 4,
+        "verdict": "no",
+        "reason_tag": "no_context",
+        "final_score": 0.74,
+        "watch_ms": 16000,
+        "comment": "Needs back-story to make sense."
+      },
+      {
+        "clip_id": "c4444444-0001-0000-0000-000000000005",
+        "rank": 5,
+        "verdict": "post_with_edits",
+        "reason_tag": "too_long",
+        "final_score": 0.69,
+        "watch_ms": 42000,
+        "comment": "Could be shortened by 10s."
+      },
+      {
+        "clip_id": "c4444444-0001-0000-0000-000000000006",
+        "rank": 6,
+        "verdict": "no",
+        "reason_tag": "bad_end",
+        "final_score": 0.61,
+        "watch_ms": 20000,
+        "comment": "Cut off before payoff."
+      },
+      {
+        "clip_id": "c4444444-0001-0000-0000-000000000007",
+        "rank": 7,
+        "verdict": "post_as_is",
+        "final_score": 0.56,
+        "watch_ms": 22000,
+        "comment": "Solid one-liner."
+      },
+      {
+        "clip_id": "c4444444-0001-0000-0000-000000000008",
+        "rank": 8,
+        "verdict": "no",
+        "reason_tag": "boring",
+        "final_score": 0.48,
+        "watch_ms": 14000,
+        "comment": "Too generic."
+      }
+    ],
+    "survey": {
+      "missing_text": "Background music generator / selector and lyric style captions.",
+      "current_workflow_text": "InShot on phone.",
+      "current_cost_text": "₹0 but 8 hours a week.",
+      "price_open_inr": 1500,
+      "accepts_1500": true,
+      "accepts_4000": false,
+      "would_upload_next": "yes",
+      "upload_timeframe": "In 7 days",
+      "email_optin": true
+    }
+  },
+  {
+    "session_id": "55555555-5555-5555-5555-555555555555",
+    "creator_name": "Dev & Code India",
+    "creator_email": "dev@codeindia.test",
+    "status": "submitted",
+    "ratings": [
+      {
+        "clip_id": "c5555555-0001-0000-0000-000000000001",
+        "rank": 1,
+        "verdict": "post_as_is",
+        "final_score": 0.93,
+        "watch_ms": 27000,
+        "comment": "Top tier programming tip."
+      },
+      {
+        "clip_id": "c5555555-0001-0000-0000-000000000002",
+        "rank": 2,
+        "verdict": "post_with_edits",
+        "reason_tag": "bad_start",
+        "final_score": 0.87,
+        "watch_ms": 25000,
+        "comment": "Trim 1 sec before code explanation."
+      },
+      {
+        "clip_id": "c5555555-0001-0000-0000-000000000003",
+        "rank": 3,
+        "verdict": "post_as_is",
+        "final_score": 0.83,
+        "watch_ms": 31000,
+        "comment": "Great explanation."
+      },
+      {
+        "clip_id": "c5555555-0001-0000-0000-000000000004",
+        "rank": 4,
+        "verdict": "post_with_edits",
+        "reason_tag": "too_short",
+        "final_score": 0.76,
+        "watch_ms": 15000,
+        "comment": "Could include the terminal command."
+      },
+      {
+        "clip_id": "c5555555-0001-0000-0000-000000000005",
+        "rank": 5,
+        "verdict": "no",
+        "reason_tag": "no_context",
+        "final_score": 0.68,
+        "watch_ms": 18000,
+        "comment": "Requires knowing earlier repo state."
+      },
+      {
+        "clip_id": "c5555555-0001-0000-0000-000000000006",
+        "rank": 6,
+        "verdict": "no",
+        "reason_tag": "bad_end",
+        "final_score": 0.59,
+        "watch_ms": 22000,
+        "comment": "Cut off mid error explanation."
+      },
+      {
+        "clip_id": "c5555555-0001-0000-0000-000000000007",
+        "rank": 7,
+        "verdict": "post_as_is",
+        "final_score": 0.54,
+        "watch_ms": 24000,
+        "comment": "Good standalone snippet."
+      },
+      {
+        "clip_id": "c5555555-0001-0000-0000-000000000008",
+        "rank": 8,
+        "verdict": "no",
+        "reason_tag": "boring",
+        "final_score": 0.47,
+        "watch_ms": 12000,
+        "comment": "Too dry."
+      }
+    ],
+    "survey": {
+      "missing_text": "Code snippet syntax highlight overlays and zoom into code editor.",
+      "current_workflow_text": "OBS recordings cut in DaVinci Resolve.",
+      "current_cost_text": "₹0 but takes 10+ hrs/week.",
+      "price_open_inr": 2000,
+      "accepts_1500": true,
+      "accepts_4000": false,
+      "would_upload_next": "yes",
+      "upload_timeframe": "Next video this Saturday (2 days)",
+      "email_optin": true
+    }
+  }
+]

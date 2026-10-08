@@ -1,0 +1,152 @@
+{
+  "report_id": "gate_20261008_135141",
+  "timestamp": "2026-10-08 13:51:41 UTC",
+  "generated_at": "2026-10-08T13:51:41.603086+00:00",
+  "overall_verdict": "GO",
+  "checks": [
+    {
+      "id": "usable_rate",
+      "name": "Overall Usable Rate >= 60%",
+      "status": "PASS",
+      "actual": "65.0%",
+      "target": ">=60%",
+      "message": "Usable rate is 65.0% (26/40 clips)."
+    },
+    {
+      "id": "creators_postable_clips",
+      "name": ">=4 Creators with >=2 Postable Clips",
+      "status": "PASS",
+      "actual": "5/5 creators",
+      "target": ">=4 creators",
+      "message": "5 of 5 creators found >= 2 clips they would post."
+    },
+    {
+      "id": "commercial_intent",
+      "name": ">=3 Creators with Commercial Intent (Pay >= \u20b91500 or Upload <= 14d)",
+      "status": "PASS",
+      "actual": "5/5 creators",
+      "target": ">=3 creators",
+      "message": "5 of 5 creators expressed willingness to pay or commit to upload."
+    },
+    {
+      "id": "no_reason_concentration",
+      "name": "No Single Negative Reason > 30%",
+      "status": "PASS",
+      "actual": "28.6% (boring)",
+      "target": "<=30%",
+      "message": "Dominant rejection reason 'boring' accounts for 28.6% of all negative ratings."
+    }
+  ],
+  "metrics": {
+    "total_creators": 5,
+    "submitted_creators": 5,
+    "total_clips_rated": 40,
+    "usable_rate": 0.65,
+    "strict_usable_rate": 0.35,
+    "top3_usable_rate": 1.0,
+    "top8_usable_rate": 0.65,
+    "score_verdict_correlation": 0.6754,
+    "median_open_price_inr": 2500.0,
+    "accepts_1500_pct": 100.0,
+    "accepts_4000_pct": 40.0,
+    "commit_upload_pct": 100.0,
+    "reason_distribution": {
+      "boring": 28.6,
+      "no_context": 28.6,
+      "bad_start": 14.3,
+      "too_long": 7.1,
+      "bad_end": 21.4
+    },
+    "no_reasons_count": {
+      "boring": 4,
+      "no_context": 4,
+      "bad_start": 2,
+      "too_long": 1,
+      "bad_end": 3
+    },
+    "edits_reasons_count": {
+      "bad_end": 2,
+      "bad_start": 7,
+      "off_topic": 1,
+      "too_long": 1,
+      "too_short": 1
+    }
+  },
+  "creator_summaries": [
+    {
+      "creator_name": "Aarav Tech Shorts",
+      "status": "submitted",
+      "clips_rated": 8,
+      "post_as_is_pct": 25.0,
+      "post_with_edits_pct": 37.5,
+      "no_pct": 37.5,
+      "postable_clips_count": 5,
+      "price_open_inr": 2500.0,
+      "accepts_1500": true,
+      "accepts_4000": false,
+      "would_upload_next": "yes",
+      "upload_timeframe": "Within 3 days"
+    },
+    {
+      "creator_name": "Priya Finance Daily",
+      "status": "submitted",
+      "clips_rated": 8,
+      "post_as_is_pct": 37.5,
+      "post_with_edits_pct": 37.5,
+      "no_pct": 25.0,
+      "postable_clips_count": 6,
+      "price_open_inr": 3000.0,
+      "accepts_1500": true,
+      "accepts_4000": true,
+      "would_upload_next": "yes",
+      "upload_timeframe": "Next Monday (5 days)"
+    },
+    {
+      "creator_name": "Rohan Podcasts",
+      "status": "submitted",
+      "clips_rated": 8,
+      "post_as_is_pct": 37.5,
+      "post_with_edits_pct": 25.0,
+      "no_pct": 37.5,
+      "postable_clips_count": 5,
+      "price_open_inr": 5000.0,
+      "accepts_1500": true,
+      "accepts_4000": true,
+      "would_upload_next": "yes",
+      "upload_timeframe": "Next week Thursday"
+    },
+    {
+      "creator_name": "Kavita Mindset",
+      "status": "submitted",
+      "clips_rated": 8,
+      "post_as_is_pct": 37.5,
+      "post_with_edits_pct": 25.0,
+      "no_pct": 37.5,
+      "postable_clips_count": 5,
+      "price_open_inr": 1500.0,
+      "accepts_1500": true,
+      "accepts_4000": false,
+      "would_upload_next": "yes",
+      "upload_timeframe": "In 7 days"
+    },
+    {
+      "creator_name": "Dev & Code India",
+      "status": "submitted",
+      "clips_rated": 8,
+      "post_as_is_pct": 37.5,
+      "post_with_edits_pct": 25.0,
+      "no_pct": 37.5,
+      "postable_clips_count": 5,
+      "price_open_inr": 2000.0,
+      "accepts_1500": true,
+      "accepts_4000": false,
+      "would_upload_next": "yes",
+      "upload_timeframe": "Next video this Saturday (2 days)"
+    }
+  ],
+  "recommendations": [
+    "Increase audio energy and punchline weights: 'boring' caused 28.6% of rejections.",
+    "Ranking works well (Top-3 usable rate 100.0% vs Top-8 65.0%). Consider defaulting to top 4 recommendations.",
+    "Pricing validation: median willingness to pay is \u20b92,500/month (100.0% accepting \u20b91,500/mo tier)."
+  ]
+}

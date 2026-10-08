@@ -381,3 +381,181 @@ export interface EvalClipRating {
   created_at: string;
 }
 
+// Phase 2.5 Creator Review Types
+
+export type ReviewVerdict = 'post_as_is' | 'post_with_edits' | 'no';
+export type ReviewReasonTag =
+  | 'bad_start'
+  | 'bad_end'
+  | 'no_context'
+  | 'boring'
+  | 'off_topic'
+  | 'too_long'
+  | 'too_short'
+  | 'other';
+export type ReviewSessionStatus = 'open' | 'submitted' | 'closed';
+export type UploadIntent = 'yes' | 'maybe' | 'no';
+export type ExportKind = 'horizontal' | 'vertical_center';
+
+export interface ReviewRating {
+  id: string;
+  session_id: string;
+  clip_id: string;
+  verdict: ReviewVerdict;
+  reason_tag?: ReviewReasonTag | null;
+  comment?: string | null;
+  watch_ms: number;
+  created_at: string;
+}
+
+export interface ReviewRatingUpsertRequest {
+  verdict: ReviewVerdict;
+  reason_tag?: ReviewReasonTag | null;
+  comment?: string | null;
+  watch_ms?: number;
+}
+
+export interface ReviewSurvey {
+  id: string;
+  session_id: string;
+  missing_text?: string | null;
+  current_workflow_text?: string | null;
+  current_cost_text?: string | null;
+  price_open_inr?: number | null;
+  accepts_1500?: boolean | null;
+  accepts_4000?: boolean | null;
+  would_upload_next?: UploadIntent | null;
+  upload_timeframe?: string | null;
+  email_optin: boolean;
+  created_at: string;
+}
+
+export interface ReviewSurveyUpsertRequest {
+  missing_text?: string | null;
+  current_workflow_text?: string | null;
+  current_cost_text?: string | null;
+  price_open_inr?: number | null;
+  accepts_1500?: boolean | null;
+  accepts_4000?: boolean | null;
+  would_upload_next?: UploadIntent | null;
+  upload_timeframe?: string | null;
+  email_optin?: boolean;
+}
+
+export interface ReviewClipPublic {
+  clip_id: string;
+  moment_id: string;
+  rank?: number | null;
+  title: string;
+  hook_text: string;
+  start_ms: number;
+  end_ms: number;
+  duration_seconds: number;
+  variant_length_s: string;
+  video_urls: Record<string, string>;
+  rating?: ReviewRating | null;
+  why_chosen?: string | null;
+}
+
+export interface ReviewSessionPublic {
+  id: string;
+  video_id: string;
+  token: string;
+  creator_name: string;
+  status: ReviewSessionStatus;
+  expires_at: string;
+  created_at: string;
+  submitted_at?: string | null;
+  video_title: string;
+  consent_notice: string;
+  clips: ReviewClipPublic[];
+  survey?: ReviewSurvey | null;
+}
+
+export interface ReviewSessionCreateRequest {
+  creator_name: string;
+  creator_email?: string | null;
+  expires_in_days?: number;
+  top_n?: number;
+}
+
+export interface ReviewSessionCreatedResponse {
+  id: string;
+  video_id: string;
+  token: string;
+  shareable_url: string;
+  creator_name: string;
+  creator_email?: string | null;
+  status: ReviewSessionStatus;
+  expires_at: string;
+  created_at: string;
+  message: string;
+}
+
+export interface ReviewSessionOwnerItem {
+  id: string;
+  video_id: string;
+  token: string;
+  creator_name: string;
+  creator_email?: string | null;
+  status: ReviewSessionStatus;
+  shareable_url: string;
+  expires_at: string;
+  created_at: string;
+  submitted_at?: string | null;
+  ratings: ReviewRating[];
+  survey?: ReviewSurvey | null;
+  total_clips: number;
+  rated_clips_count: number;
+}
+
+export interface GateReportCheck {
+  id: string;
+  name: string;
+  status: 'PASS' | 'FAIL';
+  actual: any;
+  target: any;
+  message: string;
+}
+
+export interface GateReport {
+  report_id: string;
+  timestamp: string;
+  generated_at: string;
+  overall_verdict: 'GO' | 'FIX SELECTION FIRST' | 'RETHINK';
+  checks: GateReportCheck[];
+  metrics: {
+    total_creators: number;
+    submitted_creators: number;
+    total_clips_rated: number;
+    usable_rate: number;
+    strict_usable_rate: number;
+    top3_usable_rate: number;
+    top8_usable_rate: number;
+    score_verdict_correlation: number;
+    median_open_price_inr: number;
+    accepts_1500_pct: number;
+    accepts_4000_pct: number;
+    commit_upload_pct: number;
+    reason_distribution: Record<string, number>;
+    [key: string]: any;
+  };
+  creator_summaries: {
+    creator_name: string;
+    status: string;
+    clips_rated: number;
+    post_as_is_pct: number;
+    post_with_edits_pct: number;
+    no_pct: number;
+    postable_clips_count: number;
+    price_open_inr?: number | null;
+    accepts_1500?: boolean | null;
+    accepts_4000?: boolean | null;
+    would_upload_next?: string | null;
+  }[];
+  recommendations: string[];
+  markdown_path?: string | null;
+  json_path?: string | null;
+}
+
+

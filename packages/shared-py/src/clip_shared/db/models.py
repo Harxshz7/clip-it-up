@@ -40,6 +40,7 @@ class User(Base):
     videos: Mapped[list["Video"]] = relationship("Video", back_populates="user", cascade="all, delete-orphan")
     jobs: Mapped[list["Job"]] = relationship("Job", back_populates="user", cascade="all, delete-orphan")
     usage_records: Mapped[list["Usage"]] = relationship("Usage", back_populates="user", cascade="all, delete-orphan")
+    review_sessions: Mapped[list["ReviewSession"]] = relationship("ReviewSession", back_populates="creator", cascade="all, delete-orphan")
 
     __table_args__ = (
         Index("ix_users_created_at", "created_at"),
@@ -93,6 +94,7 @@ class Video(Base):
     clips: Mapped[list["Clip"]] = relationship("Clip", back_populates="video", cascade="all, delete-orphan")
     scoring_runs: Mapped[list["ScoringRun"]] = relationship("ScoringRun", back_populates="video", cascade="all, delete-orphan")
     audio_features_records: Mapped[list["AudioFeatures"]] = relationship("AudioFeatures", back_populates="video", cascade="all, delete-orphan")
+    review_sessions: Mapped[list["ReviewSession"]] = relationship("ReviewSession", back_populates="video", cascade="all, delete-orphan")
 
     __table_args__ = (
         Index("ix_videos_user_created_at", "user_id", "created_at"),
@@ -309,6 +311,8 @@ class Clip(Base):
     video: Mapped["Video"] = relationship("Video", back_populates="clips")
     scoring_run: Mapped[Optional["ScoringRun"]] = relationship("ScoringRun", back_populates="clips")
     feedback: Mapped[list["ClipFeedback"]] = relationship("ClipFeedback", back_populates="clip", cascade="all, delete-orphan")
+    review_ratings: Mapped[list["ReviewRating"]] = relationship("ReviewRating", back_populates="clip", cascade="all, delete-orphan")
+    review_exports: Mapped[list["ClipReviewExport"]] = relationship("ClipReviewExport", back_populates="clip", cascade="all, delete-orphan")
 
     __table_args__ = (
         Index("ix_clips_video_score", "video_id", "final_score"),
@@ -413,5 +417,99 @@ class Usage(Base):
         Index("ix_usage_user_created_at", "user_id", "created_at"),
         Index("ix_usage_metric", "metric"),
     )
+
+
+class ReviewSession(Base):
+    """External creator review session accessible via private token without authentication."""
+    __tablename__ = "review_sessions"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    video_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("videos.id", ondelete="CASCADE"), nullable=False, index=True)
+    created_by: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    token: Mapped[str] = mapped_column(String(128), unique=True, nullable=False, index=True)
+    creator_name: Mapped[str] = mapped_column(String(255), nullable=False)
+    creator_email: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    status: Mapped[str] = mapped_column(String(32), default="open", nullable=False)  # open | submitted | closed
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+    submitted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+    # Relationships
+    video: Mapped["Video"] = relationship("Video", back_populates="review_sessions")
+    creator: Mapped["User"] = relationship("User", back_populates="review_sessions")
+    ratings: Mapped[list["ReviewRating"]] = relationship("ReviewRating", back_populates="session", cascade="all, delete-orphan")
+    survey: Mapped[Optional["ReviewSurvey"]] = relationship("ReviewSurvey", back_populates="session", uselist=False, cascade="all, delete-orphan")
+
+    __table_args__ = (
+        UniqueConstraint("token", name="uq_review_session_token"),
+        Index("ix_review_sessions_video_status", "video_id", "status"),
+        Index("ix_review_sessions_expires_at", "expires_at"),
+    )
+
+
+class ReviewRating(Base):
+    """Per-clip rating submitted by creator in a review session."""
+    __tablename__ = "review_ratings"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    session_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("review_sessions.id", ondelete="CASCADE"), nullable=False, index=True)
+    clip_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("clips.id", ondelete="CASCADE"), nullable=False, index=True)
+    verdict: Mapped[str] = mapped_column(String(32), nullable=False)  # post_as_is | post_with_edits | no
+    reason_tag: Mapped[str | None] = mapped_column(String(64), nullable=True)  # bad_start | bad_end | no_context | boring | off_topic | too_long | too_short | other
+    comment: Mapped[str | None] = mapped_column(Text, nullable=True)
+    watch_ms: Mapped[int] = mapped_column(BigInteger, default=0, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+
+    # Relationships
+    session: Mapped["ReviewSession"] = relationship("ReviewSession", back_populates="ratings")
+    clip: Mapped["Clip"] = relationship("Clip", back_populates="review_ratings")
+
+    __table_args__ = (
+        UniqueConstraint("session_id", "clip_id", name="uq_review_rating_session_clip"),
+    )
+
+
+class ReviewSurvey(Base):
+    """Exit survey submitted by creator after rating clips."""
+    __tablename__ = "review_survey"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    session_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("review_sessions.id", ondelete="CASCADE"), unique=True, nullable=False)
+    missing_text: Mapped[str | None] = mapped_column(Text, nullable=True)
+    current_workflow_text: Mapped[str | None] = mapped_column(Text, nullable=True)
+    current_cost_text: Mapped[str | None] = mapped_column(Text, nullable=True)
+    price_open_inr: Mapped[Decimal | None] = mapped_column(Numeric(12, 2), nullable=True)
+    accepts_1500: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
+    accepts_4000: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
+    would_upload_next: Mapped[str | None] = mapped_column(String(16), nullable=True)  # yes | maybe | no
+    upload_timeframe: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    email_optin: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+
+    # Relationships
+    session: Mapped["ReviewSession"] = relationship("ReviewSession", back_populates="survey")
+
+    __table_args__ = (
+        Index("ix_review_survey_session_id", "session_id", unique=True),
+    )
+
+
+class ClipReviewExport(Base):
+    """Rendered crude video exports for creator preview and download."""
+    __tablename__ = "clip_review_exports"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    clip_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("clips.id", ondelete="CASCADE"), nullable=False, index=True)
+    storage_key: Mapped[str] = mapped_column(String(1024), nullable=False)
+    kind: Mapped[str] = mapped_column(String(32), nullable=False)  # horizontal | vertical_center
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+
+    # Relationships
+    clip: Mapped["Clip"] = relationship("Clip", back_populates="review_exports")
+
+    __table_args__ = (
+        UniqueConstraint("clip_id", "kind", name="uq_clip_review_export_clip_kind"),
+    )
+
 
 
