@@ -11,6 +11,15 @@ import {
   Speaker,
   ProxyUrlResponse,
   ExportFormat,
+  ReviewSessionCreateRequest,
+  ReviewSessionCreatedResponse,
+  ReviewSessionOwnerItem,
+  ReviewSessionPublic,
+  ReviewRating,
+  ReviewRatingUpsertRequest,
+  ReviewSurvey,
+  ReviewSurveyUpsertRequest,
+  GateReport,
 } from "@clip-it-up/shared";
 
 
@@ -313,5 +322,103 @@ export const api = {
     if (!res.ok) throw new ApiError(`Failed to export transcript (${res.status})`, `HTTP_${res.status}`);
     return res.text();
   },
+
+  // 9. Phase 2.5 Creator Review Endpoints
+  async createReviewSession(
+    videoId: string,
+    payload: ReviewSessionCreateRequest,
+    token?: string | null
+  ): Promise<ReviewSessionCreatedResponse> {
+    return request<ReviewSessionCreatedResponse>(
+      `/videos/${videoId}/review-sessions`,
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+      },
+      token
+    );
+  },
+
+  async getReviewSessions(
+    videoId: string,
+    token?: string | null
+  ): Promise<ReviewSessionOwnerItem[]> {
+    return request<ReviewSessionOwnerItem[]>(
+      `/review-sessions?video_id=${videoId}`,
+      {},
+      token
+    );
+  },
+
+  async getReviewSessionDetail(
+    sessionId: string,
+    token?: string | null
+  ): Promise<ReviewSessionOwnerItem> {
+    return request<ReviewSessionOwnerItem>(
+      `/review-sessions/${sessionId}`,
+      {},
+      token
+    );
+  },
+
+  async deleteReviewSession(
+    sessionId: string,
+    token?: string | null
+  ): Promise<void> {
+    return request<void>(
+      `/review-sessions/${sessionId}`,
+      {
+        method: "DELETE",
+      },
+      token
+    );
+  },
+
+  // Public Review Endpoints (No login)
+  async getPublicReviewSession(
+    reviewToken: string,
+    showReasons: boolean = false
+  ): Promise<ReviewSessionPublic> {
+    const query = showReasons ? "?show_reasons=true" : "";
+    return request<ReviewSessionPublic>(`/review/${reviewToken}${query}`, {});
+  },
+
+  async upsertReviewRating(
+    reviewToken: string,
+    clipId: string,
+    payload: ReviewRatingUpsertRequest
+  ): Promise<ReviewRating> {
+    return request<ReviewRating>(`/review/${reviewToken}/ratings/${clipId}`, {
+      method: "PUT",
+      body: JSON.stringify(payload),
+    });
+  },
+
+  async upsertReviewSurvey(
+    reviewToken: string,
+    payload: ReviewSurveyUpsertRequest
+  ): Promise<ReviewSurvey> {
+    return request<ReviewSurvey>(`/review/${reviewToken}/survey`, {
+      method: "PUT",
+      body: JSON.stringify(payload),
+    });
+  },
+
+  async submitReviewSession(
+    reviewToken: string
+  ): Promise<{ status: string; session_id: string; submitted_at: string; message: string }> {
+    return request<{ status: string; session_id: string; submitted_at: string; message: string }>(
+      `/review/${reviewToken}/submit`,
+      {
+        method: "POST",
+      }
+    );
+  },
+
+  // Gate Report
+  async getGateReport(token?: string | null): Promise<GateReport> {
+    return request<GateReport>("/reviews/gate", {}, token);
+  },
 };
+
 

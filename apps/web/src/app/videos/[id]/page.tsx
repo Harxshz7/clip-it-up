@@ -243,6 +243,19 @@ export default function VideoDetailPage() {
             </div>
           </div>
         </div>
+
+        <div className="flex items-center gap-2.5">
+          <Link
+            href={`/videos/${videoId}/reviews`}
+            className="px-4 py-2 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/40 text-xs font-bold text-purple-200 hover:text-white flex items-center gap-1.5 transition-colors shadow-sm"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+            <span>Creator Reality Check</span>
+            <span className="text-[10px] px-1.5 py-0.5 rounded bg-purple-500/40 text-purple-200 font-mono">
+              Phase 2.5
+            </span>
+          </Link>
+        </div>
       </div>
 
       {/* Main Content Area: Side-by-Side Video Player & Clips / Transcript Viewers */}

@@ -40,6 +40,10 @@ eval:
 tune:
 	python -m eval.tune
 
+gate:
+	python -m eval.run_gate
+
+
 
 
 # Linting & Formatting

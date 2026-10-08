@@ -37,6 +37,18 @@ export function Navbar() {
               <LayoutDashboard className="h-4 w-4" />
               Dashboard
             </Link>
+
+            <Link
+              href="/reviews/gate"
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-lg transition-colors ${
+                pathname.startsWith("/reviews/gate")
+                  ? "bg-white/10 text-white"
+                  : "text-zinc-400 hover:text-white hover:bg-white/5"
+              }`}
+            >
+              <BarChart3 className="h-4 w-4 text-purple-400" />
+              Gate Report
+            </Link>
           </div>
         </div>
 
