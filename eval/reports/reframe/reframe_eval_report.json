@@ -1,0 +1,70 @@
+{
+  "timestamp": "2026-10-09T11:21:45.515641+00:00",
+  "summary": {
+    "total_eval_clips": 3,
+    "face_inside_crop_rate": 1.0,
+    "target_face_inside_rate": 0.99,
+    "mean_jitter_score": 0.0,
+    "target_jitter_score": 0.005,
+    "mean_pan_speed_p95": 0.0,
+    "human_ok_rate": 1.0,
+    "target_human_ok_rate": 0.9,
+    "fallback_rate": 0.3333,
+    "low_confidence_rate": 0.0,
+    "mode_distribution": {
+      "speaker_track": 1,
+      "balanced": 1,
+      "fit_blur": 1
+    }
+  },
+  "clip_results": [
+    {
+      "id": "talking_head_single_speaker",
+      "video_slug": "huberman_lab_solo",
+      "mode": "speaker_track",
+      "confidence": 0.98,
+      "jitter_score": 0.0,
+      "pan_speed_p95": 0.0,
+      "face_inside_rate": 1.0,
+      "flags": {
+        "face_cut_risk": false,
+        "low_confidence": false,
+        "multi_person": false,
+        "fallback_reason": null,
+        "suggested_fix": null
+      }
+    },
+    {
+      "id": "two_person_balanced",
+      "video_slug": "lex_altman_cozy",
+      "mode": "balanced",
+      "confidence": 0.94,
+      "jitter_score": 0.0,
+      "pan_speed_p95": 0.0,
+      "face_inside_rate": 1.0,
+      "flags": {
+        "face_cut_risk": false,
+        "low_confidence": false,
+        "multi_person": true,
+        "fallback_reason": null,
+        "suggested_fix": null
+      }
+    },
+    {
+      "id": "presentation_slides_fallback",
+      "video_slug": "mit_open_courseware_slides",
+      "mode": "fit_blur",
+      "confidence": 0.9,
+      "jitter_score": 0.0,
+      "pan_speed_p95": 0.0,
+      "face_inside_rate": 1.0,
+      "flags": {
+        "face_cut_risk": false,
+        "low_confidence": false,
+        "multi_person": false,
+        "fallback_reason": "screen_share_detected",
+        "suggested_fix": null
+      }
+    }
+  ]
+}

@@ -58,17 +58,20 @@ class RuleBasedSceneClassifier(BaseSceneClassifier):
             )
 
         # 2. Count concurrent faces sampled at regular timestamps inside the shot
-        sample_times = range(shot_start, shot_end, max(200, shot_duration // 10))
+        sample_times = list(range(shot_start, shot_end, max(200, shot_duration // 10))) or [shot_start]
         concurrent_counts = []
         for t_ms in sample_times:
-            count = sum(1 for trk in overlapping_tracks if trk.get_bbox_at(t_ms) is not None)
+            count = sum(
+                1 for trk in overlapping_tracks
+                if (trk.get_bbox_at(t_ms) is not None or (trk.start_ms <= t_ms <= trk.end_ms))
+            )
             concurrent_counts.append(count)
 
         max_concurrent = max(concurrent_counts) if concurrent_counts else len(overlapping_tracks)
         avg_concurrent = sum(concurrent_counts) / len(concurrent_counts) if concurrent_counts else 0.0
 
         # 3. Classify based on face counts and sizes
-        if max_concurrent >= 3 or len(overlapping_tracks) >= 4:
+        if max_concurrent >= 3 or len(overlapping_tracks) >= 3:
             return SceneItem(
                 start_ms=shot_start,
                 end_ms=shot_end,
@@ -76,7 +79,7 @@ class RuleBasedSceneClassifier(BaseSceneClassifier):
                 confidence=0.85,
                 num_faces=max_concurrent,
             )
-        elif max_concurrent == 2 or (len(overlapping_tracks) == 2 and avg_concurrent >= 0.8):
+        elif max_concurrent == 2 or len(overlapping_tracks) == 2:
             return SceneItem(
                 start_ms=shot_start,
                 end_ms=shot_end,

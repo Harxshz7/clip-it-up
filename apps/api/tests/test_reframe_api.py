@@ -126,9 +126,8 @@ async def test_reframe_api_endpoints_and_ownership(
     db_session.add(reframe)
     await db_session.commit()
 
-    # 6. Test GET /videos/{video_id}/analysis (Authenticated as sample_user)
-    headers = {"Authorization": f"Bearer {sample_user.id}"}
-    res = await client.get(f"/videos/{vid}/analysis", headers=headers)
+    # 6. Test GET /videos/{video_id}/analysis (Authenticated as sample_user via dev bypass)
+    res = await client.get(f"/videos/{vid}/analysis")
     assert res.status_code == 200
     data = res.json()
     assert data["video_id"] == str(vid)
@@ -137,7 +136,7 @@ async def test_reframe_api_endpoints_and_ownership(
     assert len(data["face_tracks"]) == 1
 
     # 7. Test GET /clips/{clip_id}/reframe
-    res = await client.get(f"/clips/{cid}/reframe", headers=headers)
+    res = await client.get(f"/clips/{cid}/reframe")
     assert res.status_code == 200
     r_data = res.json()
     assert r_data["clip_id"] == str(cid)
@@ -153,23 +152,37 @@ async def test_reframe_api_endpoints_and_ownership(
         ],
         "mode": "speaker_track",
     }
-    put_res = await client.put(f"/clips/{cid}/reframe", json=nudge_payload, headers=headers)
+    put_res = await client.put(f"/clips/{cid}/reframe", json=nudge_payload)
     assert put_res.status_code == 200
     put_data = put_res.json()
     assert put_data["has_edits"] is True
     assert put_data["active_keyframes"][0]["cx"] == 0.58
 
     # 9. Test DELETE /clips/{clip_id}/reframe/edits (Revert back to auto)
-    del_res = await client.delete(f"/clips/{cid}/reframe/edits", headers=headers)
+    del_res = await client.delete(f"/clips/{cid}/reframe/edits")
     assert del_res.status_code == 200
     del_data = del_res.json()
     assert del_data["has_edits"] is False
     assert del_data["active_keyframes"][0]["cx"] == 0.52
 
     # 10. Test Ownership Isolation (other_user gets 404)
-    other_headers = {"Authorization": f"Bearer {other_user.id}"}
-    unauth_get = await client.get(f"/clips/{cid}/reframe", headers=other_headers)
-    assert unauth_get.status_code == 404
+    from api.dependencies import get_current_user
+    from api.main import app
+    from clip_shared.schemas.auth import AuthenticatedUser
 
-    unauth_put = await client.put(f"/clips/{cid}/reframe", json=nudge_payload, headers=other_headers)
-    assert unauth_put.status_code == 404
+    async def override_other_user():
+        return AuthenticatedUser(
+            id=other_user.id,
+            clerk_user_id=other_user.clerk_user_id,
+            email=other_user.email,
+        )
+
+    app.dependency_overrides[get_current_user] = override_other_user
+    try:
+        unauth_get = await client.get(f"/clips/{cid}/reframe")
+        assert unauth_get.status_code == 404
+
+        unauth_put = await client.put(f"/clips/{cid}/reframe", json=nudge_payload)
+        assert unauth_put.status_code == 404
+    finally:
+        app.dependency_overrides.pop(get_current_user, None)

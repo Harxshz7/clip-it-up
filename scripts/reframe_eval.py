@@ -246,7 +246,7 @@ def evaluate_synthetic_benchmarks() -> dict[str, Any]:
             f.write(f"- **{r['id']}** (`{r['mode']}`): Conf `{r['confidence']}`, Face Inside `{r['face_inside_rate'] * 100:.1f}%`, Jitter `{r['jitter_score']}`\n")
 
     print("\n========================================================")
-    print("🎬 PHASE 3 REFRAME EVALUATION REPORT")
+    print("PHASE 3 REFRAME EVALUATION REPORT")
     print("========================================================")
     print(f"Face Inside Crop Rate: {face_inside_rate * 100:.1f}% (Target: >= 99.0%)")
     print(f"Mean Jitter Score:     {mean_jitter:.5f} (Target: < 0.005)")

@@ -44,8 +44,16 @@ export const ReframeViewer: React.FC<ReframeViewerProps> = ({
   const [dragStartPos, setDragStartPos] = useState<{ x: number; y: number } | null>(null);
 
   const videoRef = useRef<HTMLVideoElement>(null);
+  const previewVideoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Sync preview video time with main video
+  useEffect(() => {
+    if (previewVideoRef.current && Math.abs(previewVideoRef.current.currentTime - currentTimeMs / 1000.0) > 0.1) {
+      previewVideoRef.current.currentTime = currentTimeMs / 1000.0;
+    }
+  }, [currentTimeMs]);
 
   // 1. Fetch Reframe Data
   const loadReframe = useCallback(async () => {
@@ -414,7 +422,6 @@ export const ReframeViewer: React.FC<ReframeViewerProps> = ({
                       {proxyUrl && (
                         <video
                           src={proxyUrl}
-                          currentTime={currentTimeMs / 1000.0}
                           className="absolute inset-0 w-full h-full object-cover blur-md opacity-60 scale-125 pointer-events-none"
                           muted
                         />
@@ -422,8 +429,8 @@ export const ReframeViewer: React.FC<ReframeViewerProps> = ({
                       {/* Crisp centered 16:9 foreground */}
                       {proxyUrl && (
                         <video
+                          ref={previewVideoRef}
                           src={proxyUrl}
-                          currentTime={currentTimeMs / 1000.0}
                           className="absolute inset-0 m-auto w-full object-contain pointer-events-none"
                           muted
                         />
@@ -442,8 +449,8 @@ export const ReframeViewer: React.FC<ReframeViewerProps> = ({
                           }}
                         >
                           <video
+                            ref={previewVideoRef}
                             src={proxyUrl}
-                            currentTime={currentTimeMs / 1000.0}
                             className="w-full h-full object-cover"
                             muted
                           />

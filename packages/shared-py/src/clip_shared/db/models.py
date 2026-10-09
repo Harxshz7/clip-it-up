@@ -520,7 +520,7 @@ class VideoAnalysis(Base):
     __tablename__ = "video_analysis"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    video_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("videos.id", ondelete="CASCADE"), nullable=False, index=True)
+    video_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("videos.id", ondelete="CASCADE"), nullable=False)
     version: Mapped[str] = mapped_column(String(32), default="v1", nullable=False)
     fps_sampled: Mapped[float] = mapped_column(Float, default=6.0, nullable=False)
     scenes: Mapped[list[dict[str, Any]]] = mapped_column(JSON_TYPE, default=list, nullable=False)  # [{start_ms, end_ms, type, confidence}]
@@ -545,7 +545,7 @@ class FaceTrack(Base):
     __tablename__ = "face_tracks"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    analysis_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("video_analysis.id", ondelete="CASCADE"), nullable=False, index=True)
+    analysis_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("video_analysis.id", ondelete="CASCADE"), nullable=False)
     track_id: Mapped[int] = mapped_column(Integer, nullable=False)
     start_ms: Mapped[int] = mapped_column(BigInteger, nullable=False)
     end_ms: Mapped[int] = mapped_column(BigInteger, nullable=False)
@@ -569,7 +569,7 @@ class ClipReframe(Base):
     __tablename__ = "clip_reframes"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    clip_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("clips.id", ondelete="CASCADE"), nullable=False, index=True)
+    clip_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("clips.id", ondelete="CASCADE"), nullable=False)
     analysis_version: Mapped[str] = mapped_column(String(32), default="v1", nullable=False)
     mode: Mapped[str] = mapped_column(String(32), nullable=False)  # speaker_track | balanced | center | fit_blur
     crop_path: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, nullable=False)  # keyframes [{t_ms, cx, cy, w, h}], segments, easing
@@ -594,8 +594,8 @@ class ClipReframeEdit(Base):
     __tablename__ = "clip_reframe_edits"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    clip_reframe_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("clip_reframes.id", ondelete="CASCADE"), nullable=False, index=True)
-    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    clip_reframe_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("clip_reframes.id", ondelete="CASCADE"), nullable=False)
+    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     keyframes: Mapped[list[dict[str, Any]]] = mapped_column(JSON_TYPE, nullable=False)
     mode: Mapped[str | None] = mapped_column(String(32), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)

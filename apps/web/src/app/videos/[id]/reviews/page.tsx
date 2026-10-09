@@ -358,7 +358,7 @@ export default function VideoReviewsPage() {
                               </span>
                             )}
                           </div>
-                          {r.comment && <p className="text-zinc-300 italic">"{r.comment}"</p>}
+                          {r.comment && <p className="text-zinc-300 italic">&ldquo;{r.comment}&rdquo;</p>}
                         </div>
 
                         {r.watch_ms > 0 && (

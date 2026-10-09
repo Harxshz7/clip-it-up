@@ -358,7 +358,7 @@ export default function PublicReviewPage() {
                 </h1>
                 <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed">
                   Hi {session.creator_name}, our AI extracted the top <strong>{clips.length} moments</strong> from your video.
-                  You will review each clip one by one, tell us if you'd post it, and share a 2-minute feedback survey at the end.
+                  You will review each clip one by one, tell us if you&apos;d post it, and share a 2-minute feedback survey at the end.
                 </p>
               </div>
 
@@ -534,7 +534,7 @@ export default function PublicReviewPage() {
                   </div>
 
                   <div className="p-3 rounded-xl bg-white/5 border border-white/5 text-xs text-zinc-300">
-                    <span className="font-semibold text-purple-300">AI Hook:</span> "{currentClip.hook_text}"
+                    <span className="font-semibold text-purple-300">AI Hook:</span> &ldquo;{currentClip.hook_text}&rdquo;
                   </div>
 
                   {currentClip.why_chosen && (
@@ -599,7 +599,7 @@ export default function PublicReviewPage() {
                 {currentRating && (currentRating.verdict === "post_with_edits" || currentRating.verdict === "no") && (
                   <div className="glass-panel p-4 rounded-2xl border border-white/10 space-y-2.5 animate-in fade-in">
                     <label className="text-xs font-semibold text-zinc-300 flex items-center justify-between">
-                      <span>What's the main issue? (Select reason)</span>
+                      <span>What&apos;s the main issue? (Select reason)</span>
                     </label>
 
                     <div className="flex flex-wrap gap-1.5">
