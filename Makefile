@@ -43,6 +43,9 @@ tune:
 gate:
 	python -m eval.run_gate
 
+reframe-eval:
+	python scripts/reframe_eval.py
+
 
 
 

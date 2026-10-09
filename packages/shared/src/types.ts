@@ -558,4 +558,99 @@ export interface GateReport {
   json_path?: string | null;
 }
 
+// Phase 3 Reframe Types
+
+export type ReframeMode = 'speaker_track' | 'balanced' | 'center' | 'fit_blur';
+export type ReframeSource = 'auto' | 'manual';
+export type SceneType = 'talking_head' | 'two_shot' | 'wide_multi' | 'screen_share_or_slides' | 'other';
+
+export interface ReframeKeyframe {
+  t_ms: number;
+  cx: number;
+  cy: number;
+  w: number;
+  h: number;
+}
+
+export interface ReframeSegment {
+  start_ms: number;
+  end_ms: number;
+  mode: ReframeMode;
+  confidence: number;
+  target_track_id?: number | null;
+  fallback_reason?: string | null;
+}
+
+export interface ReframeFlags {
+  face_cut_risk: boolean;
+  low_confidence: boolean;
+  multi_person: boolean;
+  fallback_reason?: string | null;
+  suggested_fix?: string | null;
+}
+
+export interface ReframeCropPath {
+  keyframes: ReframeKeyframe[];
+  segments?: ReframeSegment[];
+  easing?: string;
+  source_width?: number | null;
+  source_height?: number | null;
+  target_aspect?: string;
+}
+
+export interface ReframeResponse {
+  id: string;
+  clip_id: string;
+  analysis_version: string;
+  mode: ReframeMode;
+  crop_path: ReframeCropPath;
+  confidence: number;
+  flags: ReframeFlags;
+  source: ReframeSource;
+  has_edits: boolean;
+  created_at: string;
+  active_keyframes: ReframeKeyframe[];
+}
+
+export interface ReframeUpdateRequest {
+  keyframes: ReframeKeyframe[];
+  mode?: ReframeMode | null;
+}
+
+export interface ReframeRegenerateRequest {
+  mode_override?: ReframeMode | null;
+  analysis_version?: string | null;
+}
+
+export interface SceneItem {
+  start_ms: number;
+  end_ms: number;
+  type: SceneType;
+  confidence: number;
+  num_faces?: number;
+}
+
+export interface FaceTrack {
+  id: string;
+  track_id: number;
+  start_ms: number;
+  end_ms: number;
+  avg_conf: number;
+  speaker_label?: string | null;
+  summary: Record<string, any>;
+}
+
+export interface VideoAnalysisResponse {
+  id: string;
+  video_id: string;
+  version: string;
+  fps_sampled: number;
+  scenes: SceneItem[];
+  status: 'queued' | 'running' | 'ready' | 'failed';
+  summary: Record<string, any>;
+  created_at: string;
+  face_tracks: FaceTrack[];
+}
+
+
 

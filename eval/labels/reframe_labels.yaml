@@ -1,0 +1,25 @@
+# Human QA Ground Truth Labels for Reframe Evaluation
+# schema:
+#   clip_id: string
+#   video_slug: string
+#   verdict: ok | bad
+#   reason: face_cut | wrong_speaker | jitter | bad_zoom | wrong_mode | none
+#   notes: string
+
+- clip_id: "synthetic_talking_head_01"
+  video_slug: "alex_huberman_clip1"
+  verdict: "ok"
+  reason: "none"
+  notes: "Centered with proper upper-third eyeline and headroom."
+
+- clip_id: "synthetic_two_shot_01"
+  video_slug: "lex_sam_clip1"
+  verdict: "ok"
+  reason: "none"
+  notes: "Switches smoothly on speaker turn, holds > 1.5s."
+
+- clip_id: "synthetic_slides_01"
+  video_slug: "stanford_cs229_clip1"
+  verdict: "ok"
+  reason: "none"
+  notes: "Triggers fit_blur fallback without cropping code/slides."

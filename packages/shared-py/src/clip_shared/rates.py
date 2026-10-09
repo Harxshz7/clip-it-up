@@ -14,6 +14,7 @@ class StageRateConfig:
         "transcribe": Decimal("12.00"),   # ₹12.00 / hr (Whisper ASR inference)
         "candidates": Decimal("8.50"),   # ₹8.50 / hr (LLM context analysis & clip proposal)
         "score": Decimal("4.00"),        # ₹4.00 / hr (Virality / hook scoring model)
+        "analysis": Decimal("3.50"),     # ₹3.50 / hr (Video analysis, face tracking & scene detection)
         "render": Decimal("15.00"),      # ₹15.00 / hr (GPU video encoding, cropping, burning subtitles)
     }
 
@@ -24,6 +25,7 @@ class StageRateConfig:
         "transcribe": "audio_minutes",
         "candidates": "llm_tokens",
         "score": "llm_tokens",
+        "analysis": "cpu_seconds",
         "render": "gpu_seconds",
     }
 

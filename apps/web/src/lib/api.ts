@@ -20,6 +20,10 @@ import {
   ReviewSurvey,
   ReviewSurveyUpsertRequest,
   GateReport,
+  VideoAnalysisResponse,
+  ReframeResponse,
+  ReframeUpdateRequest,
+  ReframeRegenerateRequest,
 } from "@clip-it-up/shared";
 
 
@@ -418,6 +422,86 @@ export const api = {
   // Gate Report
   async getGateReport(token?: string | null): Promise<GateReport> {
     return request<GateReport>("/reviews/gate", {}, token);
+  },
+
+  // Phase 3 Video Analysis & Reframe
+  async triggerVideoAnalysis(
+    videoId: string,
+    version: string = "v1",
+    token?: string | null
+  ): Promise<VideoAnalysisResponse> {
+    return request<VideoAnalysisResponse>(
+      `/videos/${videoId}/analysis?version=${version}`,
+      { method: "POST" },
+      token
+    );
+  },
+
+  async getVideoAnalysis(
+    videoId: string,
+    version: string = "v1",
+    token?: string | null
+  ): Promise<VideoAnalysisResponse> {
+    return request<VideoAnalysisResponse>(
+      `/videos/${videoId}/analysis?version=${version}`,
+      {},
+      token
+    );
+  },
+
+  async getClipReframe(
+    clipId: string,
+    version: string = "v1",
+    token?: string | null
+  ): Promise<ReframeResponse> {
+    return request<ReframeResponse>(
+      `/clips/${clipId}/reframe?analysis_version=${version}`,
+      {},
+      token
+    );
+  },
+
+  async regenerateClipReframe(
+    clipId: string,
+    payload: ReframeRegenerateRequest,
+    token?: string | null
+  ): Promise<ReframeResponse> {
+    return request<ReframeResponse>(
+      `/clips/${clipId}/reframe/regenerate`,
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+      },
+      token
+    );
+  },
+
+  async updateClipReframe(
+    clipId: string,
+    payload: ReframeUpdateRequest,
+    token?: string | null
+  ): Promise<ReframeResponse> {
+    return request<ReframeResponse>(
+      `/clips/${clipId}/reframe`,
+      {
+        method: "PUT",
+        body: JSON.stringify(payload),
+      },
+      token
+    );
+  },
+
+  async revertClipReframeEdits(
+    clipId: string,
+    token?: string | null
+  ): Promise<ReframeResponse> {
+    return request<ReframeResponse>(
+      `/clips/${clipId}/reframe/edits`,
+      {
+        method: "DELETE",
+      },
+      token
+    );
   },
 };
 

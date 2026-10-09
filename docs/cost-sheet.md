@@ -31,6 +31,8 @@ This document defines the unit rates and cost measurement model across the 6 vid
 | **`candidates`** | Sentence Sliding + Audio Features (CPU) | CPU (2 vCPU) | ~2.5s | ~0.001x | N/A | ₹0.00 (CPU only) | Real pipeline active |
 | **`score`** | Claude 3.5 Sonnet + Haiku 2-Pass | Claude API | ~8.0s | ~0.004x | N/A | ₹1.28 ($0.015) | Real LLM 2-pass active |
 | **`score` (rerun)** | In-memory / Redis Hash Cache | Local CPU | 0.02s | < 0.0001x | N/A | ₹0.00 (cached) | Cache verified |
+| **`analysis`** | PySceneDetect + MediaPipe Face Tracking | CPU (2 vCPU) | ~45s (30m @ 6fps) | ~0.025x | N/A | ₹3.50 / hr | Real pipeline active |
+| **`reframe`** | Crop Path Planner + Trajectory Smoother | Local CPU | < 0.2s | < 0.0001x | N/A | ₹0.00 (lazy CPU) | Instant client preview |
 
 *Note: Measured values marked TODO are populated via `make bench` / `scripts/bench_transcribe.py` when executed on live production GPU instances.*
 

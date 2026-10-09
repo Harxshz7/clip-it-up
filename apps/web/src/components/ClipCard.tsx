@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { ClipMoment, Clip, VariantLength, FeedbackReasonTag } from '@clip-it-up/shared';
+import { ReframeViewer } from './ReframeViewer';
 
 interface ClipCardProps {
   moment: ClipMoment;
@@ -24,6 +25,7 @@ export const ClipCard: React.FC<ClipCardProps> = ({
   const [showTooltip, setShowTooltip] = useState(false);
   const [showReasonMenu, setShowReasonMenu] = useState<'up' | 'down' | null>(null);
   const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
+  const [showReframeModal, setShowReframeModal] = useState(false);
 
   // Find active variant or fallback to first
   const activeClip: Clip | undefined =
@@ -247,6 +249,16 @@ export const ClipCard: React.FC<ClipCardProps> = ({
           <span>Preview Range</span>
         </button>
 
+        {/* Reframe 9:16 Studio Button */}
+        <button
+          type="button"
+          onClick={() => setShowReframeModal(true)}
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-200 border border-indigo-500/30 rounded-lg text-xs font-medium transition-all hover:scale-102"
+        >
+          <span className="text-[10px] font-bold border border-indigo-400/50 px-1 rounded">9:16</span>
+          <span>Reframe</span>
+        </button>
+
         {/* Thumbs Feedback */}
         <div className="relative flex items-center gap-1">
           <button
@@ -313,6 +325,15 @@ export const ClipCard: React.FC<ClipCardProps> = ({
           )}
         </div>
       </div>
+
+      {/* Reframe Studio Modal */}
+      {showReframeModal && (
+        <ReframeViewer
+          clip={activeClip}
+          proxyUrl={proxyUrl}
+          onClose={() => setShowReframeModal(false)}
+        />
+      )}
     </div>
   );
 };

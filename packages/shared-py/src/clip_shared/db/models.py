@@ -41,6 +41,7 @@ class User(Base):
     jobs: Mapped[list["Job"]] = relationship("Job", back_populates="user", cascade="all, delete-orphan")
     usage_records: Mapped[list["Usage"]] = relationship("Usage", back_populates="user", cascade="all, delete-orphan")
     review_sessions: Mapped[list["ReviewSession"]] = relationship("ReviewSession", back_populates="creator", cascade="all, delete-orphan")
+    reframe_edits: Mapped[list["ClipReframeEdit"]] = relationship("ClipReframeEdit", back_populates="user", cascade="all, delete-orphan")
 
     __table_args__ = (
         Index("ix_users_created_at", "created_at"),
@@ -95,6 +96,7 @@ class Video(Base):
     scoring_runs: Mapped[list["ScoringRun"]] = relationship("ScoringRun", back_populates="video", cascade="all, delete-orphan")
     audio_features_records: Mapped[list["AudioFeatures"]] = relationship("AudioFeatures", back_populates="video", cascade="all, delete-orphan")
     review_sessions: Mapped[list["ReviewSession"]] = relationship("ReviewSession", back_populates="video", cascade="all, delete-orphan")
+    analysis_records: Mapped[list["VideoAnalysis"]] = relationship("VideoAnalysis", back_populates="video", cascade="all, delete-orphan")
 
     __table_args__ = (
         Index("ix_videos_user_created_at", "user_id", "created_at"),
@@ -313,6 +315,7 @@ class Clip(Base):
     feedback: Mapped[list["ClipFeedback"]] = relationship("ClipFeedback", back_populates="clip", cascade="all, delete-orphan")
     review_ratings: Mapped[list["ReviewRating"]] = relationship("ReviewRating", back_populates="clip", cascade="all, delete-orphan")
     review_exports: Mapped[list["ClipReviewExport"]] = relationship("ClipReviewExport", back_populates="clip", cascade="all, delete-orphan")
+    reframe_records: Mapped[list["ClipReframe"]] = relationship("ClipReframe", back_populates="clip", cascade="all, delete-orphan")
 
     __table_args__ = (
         Index("ix_clips_video_score", "video_id", "final_score"),
@@ -510,6 +513,102 @@ class ClipReviewExport(Base):
     __table_args__ = (
         UniqueConstraint("clip_id", "kind", name="uq_clip_review_export_clip_kind"),
     )
+
+
+class VideoAnalysis(Base):
+    """Video visual scene and face analysis summary stored per video version."""
+    __tablename__ = "video_analysis"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    video_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("videos.id", ondelete="CASCADE"), nullable=False, index=True)
+    version: Mapped[str] = mapped_column(String(32), default="v1", nullable=False)
+    fps_sampled: Mapped[float] = mapped_column(Float, default=6.0, nullable=False)
+    scenes: Mapped[list[dict[str, Any]]] = mapped_column(JSON_TYPE, default=list, nullable=False)  # [{start_ms, end_ms, type, confidence}]
+    status: Mapped[str] = mapped_column(String(32), default="ready", nullable=False)  # queued | running | ready | failed
+    frames_key: Mapped[str | None] = mapped_column(String(1024), nullable=True)  # S3 npz key
+    summary: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, default=dict, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+
+    # Relationships
+    video: Mapped["Video"] = relationship("Video", back_populates="analysis_records")
+    face_tracks: Mapped[list["FaceTrack"]] = relationship("FaceTrack", back_populates="analysis", cascade="all, delete-orphan", order_by="FaceTrack.track_id")
+
+    __table_args__ = (
+        UniqueConstraint("video_id", "version", name="uq_video_analysis_video_version"),
+        Index("ix_video_analysis_video_id", "video_id"),
+        Index("ix_video_analysis_status", "status"),
+    )
+
+
+class FaceTrack(Base):
+    """Tracked face trajectory summary and speaker association."""
+    __tablename__ = "face_tracks"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    analysis_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("video_analysis.id", ondelete="CASCADE"), nullable=False, index=True)
+    track_id: Mapped[int] = mapped_column(Integer, nullable=False)
+    start_ms: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    end_ms: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    avg_conf: Mapped[float] = mapped_column(Float, default=0.0, nullable=False)
+    speaker_label: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    summary: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, default=dict, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+
+    # Relationships
+    analysis: Mapped["VideoAnalysis"] = relationship("VideoAnalysis", back_populates="face_tracks")
+
+    __table_args__ = (
+        UniqueConstraint("analysis_id", "track_id", name="uq_face_track_analysis_track_id"),
+        Index("ix_face_tracks_analysis_id", "analysis_id"),
+        Index("ix_face_tracks_speaker_label", "speaker_label"),
+    )
+
+
+class ClipReframe(Base):
+    """Auto-generated or active reframed 9:16 crop path for a clip."""
+    __tablename__ = "clip_reframes"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    clip_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("clips.id", ondelete="CASCADE"), nullable=False, index=True)
+    analysis_version: Mapped[str] = mapped_column(String(32), default="v1", nullable=False)
+    mode: Mapped[str] = mapped_column(String(32), nullable=False)  # speaker_track | balanced | center | fit_blur
+    crop_path: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, nullable=False)  # keyframes [{t_ms, cx, cy, w, h}], segments, easing
+    confidence: Mapped[float] = mapped_column(Float, default=1.0, nullable=False)
+    flags: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, default=dict, nullable=False)  # face_cut_risk, low_confidence, multi_person, fallback_reason
+    source: Mapped[str] = mapped_column(String(32), default="auto", nullable=False)  # auto | manual
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+
+    # Relationships
+    clip: Mapped["Clip"] = relationship("Clip", back_populates="reframe_records")
+    edits: Mapped[list["ClipReframeEdit"]] = relationship("ClipReframeEdit", back_populates="reframe", cascade="all, delete-orphan", order_by="ClipReframeEdit.created_at.desc()")
+
+    __table_args__ = (
+        UniqueConstraint("clip_id", "analysis_version", "source", name="uq_clip_reframe_clip_version_source"),
+        Index("ix_clip_reframes_clip_id", "clip_id"),
+        Index("ix_clip_reframes_mode", "mode"),
+    )
+
+
+class ClipReframeEdit(Base):
+    """Manual nudge/edit override layer on top of auto reframing."""
+    __tablename__ = "clip_reframe_edits"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    clip_reframe_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("clip_reframes.id", ondelete="CASCADE"), nullable=False, index=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    keyframes: Mapped[list[dict[str, Any]]] = mapped_column(JSON_TYPE, nullable=False)
+    mode: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+
+    # Relationships
+    reframe: Mapped["ClipReframe"] = relationship("ClipReframe", back_populates="edits")
+    user: Mapped["User"] = relationship("User", back_populates="reframe_edits")
+
+    __table_args__ = (
+        Index("ix_clip_reframe_edits_reframe_id", "clip_reframe_id"),
+        Index("ix_clip_reframe_edits_user_id", "user_id"),
+    )
+
 
 
 
