@@ -42,6 +42,8 @@ class User(Base):
     usage_records: Mapped[list["Usage"]] = relationship("Usage", back_populates="user", cascade="all, delete-orphan")
     review_sessions: Mapped[list["ReviewSession"]] = relationship("ReviewSession", back_populates="creator", cascade="all, delete-orphan")
     reframe_edits: Mapped[list["ClipReframeEdit"]] = relationship("ClipReframeEdit", back_populates="user", cascade="all, delete-orphan")
+    exports: Mapped[list["Export"]] = relationship("Export", back_populates="user", cascade="all, delete-orphan")
+    plan: Mapped[Optional["UserPlan"]] = relationship("UserPlan", back_populates="user", uselist=False, cascade="all, delete-orphan")
 
     __table_args__ = (
         Index("ix_users_created_at", "created_at"),
@@ -316,6 +318,9 @@ class Clip(Base):
     review_ratings: Mapped[list["ReviewRating"]] = relationship("ReviewRating", back_populates="clip", cascade="all, delete-orphan")
     review_exports: Mapped[list["ClipReviewExport"]] = relationship("ClipReviewExport", back_populates="clip", cascade="all, delete-orphan")
     reframe_records: Mapped[list["ClipReframe"]] = relationship("ClipReframe", back_populates="clip", cascade="all, delete-orphan")
+    captions: Mapped[list["ClipCaption"]] = relationship("ClipCaption", back_populates="clip", cascade="all, delete-orphan")
+    cleanups: Mapped[list["ClipCleanup"]] = relationship("ClipCleanup", back_populates="clip", cascade="all, delete-orphan")
+    exports: Mapped[list["Export"]] = relationship("Export", back_populates="clip", cascade="all, delete-orphan")
 
     __table_args__ = (
         Index("ix_clips_video_score", "video_id", "final_score"),
@@ -608,6 +613,147 @@ class ClipReframeEdit(Base):
         Index("ix_clip_reframe_edits_reframe_id", "clip_reframe_id"),
         Index("ix_clip_reframe_edits_user_id", "user_id"),
     )
+
+
+class CaptionStyle(Base):
+    """Subtitle presentation style pack specification (ASS + preview)."""
+    __tablename__ = "caption_styles"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    key: Mapped[str] = mapped_column(String(64), unique=True, nullable=False, index=True)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    version: Mapped[str] = mapped_column(String(32), default="v1", nullable=False)
+    spec: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, nullable=False)
+    is_builtin: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+
+    __table_args__ = (
+        UniqueConstraint("key", name="uq_caption_styles_key"),
+    )
+
+
+class ExportPreset(Base):
+    """Platform-specific export configuration preset."""
+    __tablename__ = "export_presets"
+
+    key: Mapped[str] = mapped_column(String(64), primary_key=True)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    width: Mapped[int] = mapped_column(Integer, default=1080, nullable=False)
+    height: Mapped[int] = mapped_column(Integer, default=1920, nullable=False)
+    fps: Mapped[float] = mapped_column(Float, default=30.0, nullable=False)
+    max_duration_s: Mapped[int] = mapped_column(Integer, default=60, nullable=False)
+    video_bitrate: Mapped[str] = mapped_column(String(32), default="8000k", nullable=False)
+    crf: Mapped[int] = mapped_column(Integer, default=22, nullable=False)
+    audio_bitrate: Mapped[str] = mapped_column(String(32), default="192k", nullable=False)
+    loudness_lufs: Mapped[float] = mapped_column(Float, default=-14.0, nullable=False)
+    safe_zone: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, default=dict, nullable=False)
+    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+
+
+class Plan(Base):
+    """Subscription tiers and feature limits."""
+    __tablename__ = "plans"
+
+    key: Mapped[str] = mapped_column(String(64), primary_key=True)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    monthly_minutes: Mapped[int] = mapped_column(Integer, default=30, nullable=False)
+    export_watermark: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    max_export_height: Mapped[int] = mapped_column(Integer, default=1920, nullable=False)
+    max_exports_per_month: Mapped[int] = mapped_column(Integer, default=10, nullable=False)
+    features: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, default=dict, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+
+    # Relationships
+    user_plans: Mapped[list["UserPlan"]] = relationship("UserPlan", back_populates="plan")
+
+
+class UserPlan(Base):
+    """User assigned plan and active billing period."""
+    __tablename__ = "user_plans"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), unique=True, nullable=False, index=True)
+    plan_key: Mapped[str] = mapped_column(String(64), ForeignKey("plans.key", ondelete="CASCADE"), nullable=False)
+    period_start: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+
+    # Relationships
+    user: Mapped["User"] = relationship("User", back_populates="plan")
+    plan: Mapped["Plan"] = relationship("Plan", back_populates="user_plans")
+
+    __table_args__ = (
+        UniqueConstraint("user_id", name="uq_user_plans_user_id"),
+    )
+
+
+class ClipCaption(Base):
+    """Style-agnostic word captions stored in SOURCE time."""
+    __tablename__ = "clip_captions"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    clip_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("clips.id", ondelete="CASCADE"), nullable=False, index=True)
+    version: Mapped[str] = mapped_column(String(32), default="v1", nullable=False)
+    language: Mapped[str] = mapped_column(String(16), default="en", nullable=False)
+    words: Mapped[list[dict[str, Any]]] = mapped_column(JSON_TYPE, nullable=False)  # [{text, start_ms, end_ms, speaker, emphasis, deleted}]
+    style_key: Mapped[str] = mapped_column(String(64), default="bold_pop", nullable=False, index=True)
+    style_overrides: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, default=dict, nullable=False)
+    source: Mapped[str] = mapped_column(String(32), default="auto", nullable=False)  # auto | manual
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+
+    # Relationships
+    clip: Mapped["Clip"] = relationship("Clip", back_populates="captions")
+
+    __table_args__ = (
+        UniqueConstraint("clip_id", "version", "source", name="uq_clip_captions_clip_version_source"),
+    )
+
+
+class ClipCleanup(Base):
+    """Filler word and silence removal configuration and individual removal intervals."""
+    __tablename__ = "clip_cleanups"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    clip_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("clips.id", ondelete="CASCADE"), nullable=False, index=True)
+    version: Mapped[str] = mapped_column(String(32), default="v1", nullable=False)
+    options: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, nullable=False)  # remove_fillers, remove_silence, max_silence_ms, filler_list, crossfade_ms
+    removals: Mapped[list[dict[str, Any]]] = mapped_column(JSON_TYPE, default=list, nullable=False)  # [{start_ms, end_ms, kind, text}]
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+
+    # Relationships
+    clip: Mapped["Clip"] = relationship("Clip", back_populates="cleanups")
+
+    __table_args__ = (
+        UniqueConstraint("clip_id", "version", name="uq_clip_cleanups_clip_version"),
+    )
+
+
+class Export(Base):
+    """Final rendered clip export record."""
+    __tablename__ = "exports"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    clip_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("clips.id", ondelete="CASCADE"), nullable=False, index=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    status: Mapped[str] = mapped_column(String(32), default="queued", nullable=False, index=True)  # queued | rendering | succeeded | failed | cancelled
+    preset_key: Mapped[str] = mapped_column(String(64), nullable=False)
+    params_snapshot: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, nullable=False)
+    storage_key: Mapped[str | None] = mapped_column(String(1024), nullable=True)
+    duration_ms: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
+    size_bytes: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
+    render_ms: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
+    error: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+    finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+    # Relationships
+    clip: Mapped["Clip"] = relationship("Clip", back_populates="exports")
+    user: Mapped["User"] = relationship("User", back_populates="exports")
+
+    __table_args__ = (
+        Index("ix_exports_created_at", "created_at"),
+    )
+
 
 
 
