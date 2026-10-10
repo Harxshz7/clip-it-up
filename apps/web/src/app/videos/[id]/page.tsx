@@ -11,6 +11,7 @@ import { JobProgress } from "@/components/JobProgress";
 import { VideoPlayer, VideoPlayerRef } from "@/components/VideoPlayer";
 import { TranscriptViewer } from "@/components/TranscriptViewer";
 import { ClipsDeck } from "@/components/ClipsDeck";
+import { ExportsList } from "@/components/ExportsList";
 import {
   Film,
   ArrowLeft,
@@ -22,6 +23,7 @@ import {
   FileText,
   Sparkles,
   CheckCircle2,
+  Layers,
 } from "lucide-react";
 
 export default function VideoDetailPage() {
@@ -33,7 +35,7 @@ export default function VideoDetailPage() {
   const [proxyUrl, setProxyUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<"clips" | "transcript">("clips");
+  const [activeTab, setActiveTab] = useState<"clips" | "transcript" | "exports">("clips");
 
   // Playback sync state between VideoPlayer and TranscriptViewer
   const [currentPlaybackMs, setCurrentPlaybackMs] = useState(0);
@@ -290,6 +292,22 @@ export default function VideoDetailPage() {
             <FileText className="w-4 h-4" />
             <span>Transcript & Speakers</span>
           </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab("exports")}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
+              activeTab === "exports"
+                ? "bg-purple-600 text-white shadow-lg shadow-purple-600/20"
+                : "text-zinc-400 hover:text-zinc-200 hover:bg-white/5"
+            }`}
+          >
+            <Layers className="w-4 h-4 text-purple-300" />
+            <span>Exports & Renders</span>
+            <span className="text-[11px] px-2 py-0.5 rounded-full bg-white/20 text-white font-mono">
+              Phase 4
+            </span>
+          </button>
         </div>
 
         {/* Video Player & Active Tab Content */}
@@ -330,7 +348,7 @@ export default function VideoDetailPage() {
                 onSeek={handleSeek}
                 isJobRunning={job?.status === "running"}
               />
-            ) : (
+            ) : activeTab === "transcript" ? (
               <TranscriptViewer
                 videoId={videoId}
                 currentMs={currentPlaybackMs}
@@ -340,6 +358,8 @@ export default function VideoDetailPage() {
                 error={job?.error}
                 onRetry={fetchVideoAndJob}
               />
+            ) : (
+              <ExportsList videoId={videoId} />
             )}
           </div>
         </div>

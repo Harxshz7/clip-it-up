@@ -24,6 +24,15 @@ import {
   ReframeResponse,
   ReframeUpdateRequest,
   ReframeRegenerateRequest,
+  CaptionStyle,
+  ExportPreset,
+  UserPlanMe,
+  ClipCaptions,
+  ClipCleanup,
+  ClipCleanupAnalyzeResult,
+  ExportRecord,
+  CreateExportPayload,
+  VideoClipsResponse,
 } from "@clip-it-up/shared";
 
 
@@ -251,6 +260,19 @@ export const api = {
 
   async getVideo(videoId: string, token?: string | null): Promise<Video> {
     return request<Video>(`/videos/${videoId}`, {}, token);
+  },
+
+  async getVideoClips(
+    videoId: string,
+    params?: { status?: string; min_score?: number; sort?: string },
+    token?: string | null
+  ): Promise<VideoClipsResponse> {
+    const searchParams = new URLSearchParams();
+    if (params?.status) searchParams.set("status", params.status);
+    if (params?.min_score !== undefined) searchParams.set("min_score", params.min_score.toString());
+    if (params?.sort) searchParams.set("sort", params.sort);
+    const queryStr = searchParams.toString() ? `?${searchParams.toString()}` : "";
+    return request<VideoClipsResponse>(`/videos/${videoId}/clips${queryStr}`, {}, token);
   },
 
   // 6. Job queries & control
@@ -500,6 +522,124 @@ export const api = {
       {
         method: "DELETE",
       },
+      token
+    );
+  },
+
+  // -------------------------------------------------------------------------
+  // Phase 4: Exports, Captions, Cleanups, Presets & Plans
+  // -------------------------------------------------------------------------
+
+  async getCaptionStyles(token?: string | null): Promise<CaptionStyle[]> {
+    return request<CaptionStyle[]>("/caption-styles", {}, token);
+  },
+
+  async getExportPresets(token?: string | null): Promise<ExportPreset[]> {
+    return request<ExportPreset[]>("/export-presets", {}, token);
+  },
+
+  async getMyPlan(token?: string | null): Promise<UserPlanMe> {
+    return request<UserPlanMe>("/plans/me", {}, token);
+  },
+
+  async getClipCaptions(clipId: string, token?: string | null): Promise<ClipCaptions> {
+    return request<ClipCaptions>(`/clips/${clipId}/captions`, {}, token);
+  },
+
+  async updateClipCaptions(
+    clipId: string,
+    payload: { words: any[]; style_key?: string; style_overrides?: any },
+    token?: string | null
+  ): Promise<ClipCaptions> {
+    return request<ClipCaptions>(
+      `/clips/${clipId}/captions`,
+      {
+        method: "PUT",
+        body: JSON.stringify(payload),
+      },
+      token
+    );
+  },
+
+  async regenerateClipCaptions(
+    clipId: string,
+    payload: { style_key?: string; language?: string },
+    token?: string | null
+  ): Promise<ClipCaptions> {
+    return request<ClipCaptions>(
+      `/clips/${clipId}/captions/regenerate`,
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+      },
+      token
+    );
+  },
+
+  async getClipCleanup(clipId: string, token?: string | null): Promise<ClipCleanup> {
+    return request<ClipCleanup>(`/clips/${clipId}/cleanup`, {}, token);
+  },
+
+  async updateClipCleanup(
+    clipId: string,
+    payload: { options?: any; removals?: any[] },
+    token?: string | null
+  ): Promise<ClipCleanup> {
+    return request<ClipCleanup>(
+      `/clips/${clipId}/cleanup`,
+      {
+        method: "PUT",
+        body: JSON.stringify(payload),
+      },
+      token
+    );
+  },
+
+  async analyzeClipCleanup(
+    clipId: string,
+    options?: any,
+    token?: string | null
+  ): Promise<ClipCleanupAnalyzeResult> {
+    return request<ClipCleanupAnalyzeResult>(
+      `/clips/${clipId}/cleanup/analyze`,
+      {
+        method: "POST",
+        body: JSON.stringify(options || {}),
+      },
+      token
+    );
+  },
+
+  async createClipExports(
+    clipId: string,
+    payload: CreateExportPayload,
+    token?: string | null
+  ): Promise<ExportRecord[]> {
+    return request<ExportRecord[]>(
+      `/clips/${clipId}/exports`,
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+      },
+      token
+    );
+  },
+
+  async getExport(exportId: string, token?: string | null): Promise<ExportRecord> {
+    return request<ExportRecord>(`/exports/${exportId}`, {}, token);
+  },
+
+  async listClipExports(clipId: string, token?: string | null): Promise<ExportRecord[]> {
+    return request<ExportRecord[]>(`/clips/${clipId}/exports`, {}, token);
+  },
+
+  async getExportDownloadUrl(
+    exportId: string,
+    token?: string | null
+  ): Promise<{ export_id: string; download_url: string; expires_in_seconds: number }> {
+    return request<{ export_id: string; download_url: string; expires_in_seconds: number }>(
+      `/exports/${exportId}/download-url`,
+      {},
       token
     );
   },

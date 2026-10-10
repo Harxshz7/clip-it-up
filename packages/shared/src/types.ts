@@ -652,5 +652,170 @@ export interface VideoAnalysisResponse {
   face_tracks: FaceTrack[];
 }
 
+export interface CaptionStyle {
+  id: string;
+  key: string;
+  name: string;
+  version: string;
+  spec: {
+    font_family: string;
+    font_weight?: string;
+    font_size_pt: number;
+    uppercase: boolean;
+    primary_color: string;
+    highlight_color: string;
+    outline_color: string;
+    outline_width: number;
+    shadow_color?: string;
+    shadow_offset?: number;
+    alignment: number;
+    margin_v: number;
+    margin_h: number;
+    max_chars_per_line: number;
+    max_lines: number;
+    words_per_chunk: number;
+    animation: 'pop' | 'none' | 'karaoke';
+    highlight_style?: string;
+    safe_zone_anchor?: string;
+  };
+  is_builtin: boolean;
+  created_at: string;
+}
+
+export interface ExportPreset {
+  key: string;
+  name: string;
+  width: number;
+  height: number;
+  fps: number;
+  max_duration_s: number;
+  video_bitrate: string;
+  crf: number;
+  audio_bitrate: string;
+  loudness_lufs: number;
+  safe_zone: {
+    top: number;
+    bottom: number;
+    left: number;
+    right: number;
+  };
+  notes?: string | null;
+}
+
+export interface Plan {
+  key: string;
+  name: string;
+  monthly_minutes: number;
+  export_watermark: boolean;
+  max_export_height: number;
+  max_exports_per_month: number;
+  features: Record<string, any>;
+}
+
+export interface UserPlanMe {
+  plan: Plan;
+  period_start: string;
+  monthly_source_minutes_used: number;
+  monthly_exports_used: number;
+  monthly_source_minutes_limit: number;
+  monthly_exports_limit: number;
+  watermark_required: boolean;
+}
+
+export interface ClipCaptionWord {
+  text: string;
+  start_ms: number;
+  end_ms: number;
+  speaker?: string | null;
+  emphasis: boolean;
+  deleted: boolean;
+}
+
+export interface ClipCaptions {
+  id: string;
+  clip_id: string;
+  version: string;
+  language: string;
+  words: ClipCaptionWord[];
+  style_key: string;
+  style_overrides: Record<string, any>;
+  source: 'auto' | 'manual';
+  created_at: string;
+}
+
+export interface ClipCleanupRemoval {
+  start_ms: number;
+  end_ms: number;
+  kind: 'filler' | 'silence' | 'manual' | string;
+  text?: string | null;
+}
+
+export interface ClipCleanupOptions {
+  remove_fillers: boolean;
+  remove_silence: boolean;
+  max_silence_ms: number;
+  target_silence_ms: number;
+  crossfade_ms: number;
+  snap_cuts: boolean;
+  filler_list?: string[] | null;
+}
+
+export interface ClipCleanup {
+  id: string;
+  clip_id: string;
+  version: string;
+  options: ClipCleanupOptions;
+  removals: ClipCleanupRemoval[];
+  created_at: string;
+}
+
+export interface KeepSegment {
+  src_start_ms: number;
+  src_end_ms: number;
+  out_start_ms: number;
+  out_end_ms: number;
+}
+
+export interface ClipCleanupAnalyzeResult {
+  clip_start_ms: number;
+  clip_end_ms: number;
+  original_duration_ms: number;
+  clean_duration_ms: number;
+  saved_ms: number;
+  saved_seconds: number;
+  cut_count: number;
+  filler_count: number;
+  silence_count: number;
+  savings_ratio: number;
+  options: ClipCleanupOptions;
+  removals: ClipCleanupRemoval[];
+  keep_segments: KeepSegment[];
+}
+
+export interface ExportRecord {
+  id: string;
+  clip_id: string;
+  user_id: string;
+  status: 'queued' | 'rendering' | 'succeeded' | 'failed' | 'cancelled';
+  preset_key: string;
+  params_snapshot: Record<string, any>;
+  storage_key?: string | null;
+  duration_ms?: number | null;
+  size_bytes?: number | null;
+  render_ms?: number | null;
+  error?: string | null;
+  created_at: string;
+  finished_at?: string | null;
+  download_url?: string | null;
+}
+
+export interface CreateExportPayload {
+  preset_key?: string | null;
+  presets?: string[] | null;
+  style_key?: string | null;
+  force?: boolean;
+}
+
+
 
 

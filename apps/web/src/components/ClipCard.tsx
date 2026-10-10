@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 import { ClipMoment, Clip, VariantLength, FeedbackReasonTag } from '@clip-it-up/shared';
 import { ReframeViewer } from './ReframeViewer';
+import { ExportPanel } from './ExportPanel';
+import { Sparkles } from 'lucide-react';
 
 interface ClipCardProps {
   moment: ClipMoment;
@@ -26,6 +28,7 @@ export const ClipCard: React.FC<ClipCardProps> = ({
   const [showReasonMenu, setShowReasonMenu] = useState<'up' | 'down' | null>(null);
   const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
   const [showReframeModal, setShowReframeModal] = useState(false);
+  const [showExportModal, setShowExportModal] = useState(false);
 
   // Find active variant or fallback to first
   const activeClip: Clip | undefined =
@@ -259,6 +262,16 @@ export const ClipCard: React.FC<ClipCardProps> = ({
           <span>Reframe</span>
         </button>
 
+        {/* Export Studio Button */}
+        <button
+          type="button"
+          onClick={() => setShowExportModal(true)}
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-600/20 hover:bg-purple-600/40 text-purple-200 border border-purple-500/30 rounded-lg text-xs font-medium transition-all hover:scale-102"
+        >
+          <Sparkles className="w-3.5 h-3.5 text-purple-300" />
+          <span>Export</span>
+        </button>
+
         {/* Thumbs Feedback */}
         <div className="relative flex items-center gap-1">
           <button
@@ -333,6 +346,27 @@ export const ClipCard: React.FC<ClipCardProps> = ({
           proxyUrl={proxyUrl}
           onClose={() => setShowReframeModal(false)}
         />
+      )}
+
+      {/* Export Studio Modal */}
+      {showExportModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+          <div className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <button
+              onClick={() => setShowExportModal(false)}
+              className="absolute top-4 right-4 z-50 p-2 bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded-full border border-slate-700"
+            >
+              ✕
+            </button>
+            <ExportPanel
+              clipId={activeClip.id}
+              clipStartMs={activeClip.start_ms}
+              clipEndMs={activeClip.end_ms}
+              videoProxyUrl={proxyUrl}
+              onClose={() => setShowExportModal(false)}
+            />
+          </div>
+        </div>
       )}
     </div>
   );

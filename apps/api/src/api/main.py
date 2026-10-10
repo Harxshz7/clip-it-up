@@ -12,6 +12,7 @@ from fastapi.responses import JSONResponse
 
 from api.routes.clips import router as clips_router
 from api.routes.eval import router as eval_router
+from api.routes.exports import router as exports_router
 from api.routes.health import router as health_router
 from api.routes.jobs import router as jobs_router
 from api.routes.reframe import router as reframe_router
@@ -153,3 +154,4 @@ app.include_router(clips_router)
 app.include_router(reframe_router)
 app.include_router(reviews_router)
 app.include_router(eval_router)
+app.include_router(exports_router)
