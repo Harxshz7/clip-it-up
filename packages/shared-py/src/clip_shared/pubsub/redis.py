@@ -28,6 +28,14 @@ def publish_job_event_sync(job_id: str, event_data: dict[str, Any]) -> None:
     client.publish(channel, payload)
 
 
+def publish_export_event_sync(export_id: str, event_data: dict[str, Any]) -> None:
+    """Publish export progress/status event to Redis channel `export:{id}` from Celery worker."""
+    client = get_sync_redis()
+    channel = f"export:{export_id}"
+    payload = json.dumps(event_data, default=str)
+    client.publish(channel, payload)
+
+
 # Async Redis client for FastAPI SSE
 _async_redis_pool: aioredis.ConnectionPool | None = None
 
@@ -61,3 +69,24 @@ async def subscribe_job_events_async(job_id: str) -> AsyncGenerator[dict[str, An
     finally:
         await pubsub.unsubscribe(channel)
         await pubsub.close()
+
+
+async def subscribe_export_events_async(export_id: str) -> AsyncGenerator[dict[str, Any], None]:
+    """Async generator subscribing to Redis channel `export:{id}` for SSE export progress."""
+    client = get_async_redis_client()
+    pubsub = client.pubsub()
+    channel = f"export:{export_id}"
+    await pubsub.subscribe(channel)
+
+    try:
+        async for message in pubsub.listen():
+            if message["type"] == "message":
+                try:
+                    data = json.loads(message["data"])
+                    yield data
+                except (json.JSONDecodeError, TypeError):
+                    continue
+    finally:
+        await pubsub.unsubscribe(channel)
+        await pubsub.close()
+

@@ -8,7 +8,12 @@ celery_app = Celery(
     "clip_worker",
     broker=settings.REDIS_URL,
     backend=settings.REDIS_URL,
-    include=["worker.tasks.pipeline"],
+    include=[
+        "worker.tasks.pipeline",
+        "worker.tasks.render",
+        "worker.tasks.analysis",
+        "worker.tasks.review",
+    ],
 )
 
 celery_app.conf.update(
