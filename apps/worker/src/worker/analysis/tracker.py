@@ -1,7 +1,9 @@
 """Face tracking engine with IoU + Centroid matching, gap bridging, and trajectory statistics."""
 from dataclasses import dataclass, field
 from typing import Any
+
 import numpy as np
+
 from worker.analysis.detector import FaceDetection
 
 

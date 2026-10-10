@@ -1,8 +1,10 @@
 """Celery tasks for video visual analysis and clip reframing."""
-from datetime import UTC, datetime
 import uuid
-from celery import shared_task
+from datetime import UTC, datetime
+
 import structlog
+from celery import shared_task
+
 from clip_shared.db.session import get_sync_db
 from clip_shared.pubsub.redis import publish_job_event_sync
 from clip_shared.storage.s3 import get_s3_client

@@ -1,18 +1,16 @@
 """API routes for caption styles, export presets, clip captions, cleanups, exports, and plans."""
-import hashlib
 import json
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import StreamingResponse
 from sqlalchemy import desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.dependencies import get_current_user
 from clip_shared.config import get_settings
-from clip_shared.db.base import utc_now
 from clip_shared.db.models import (
     CaptionStyle,
     Clip,
@@ -25,19 +23,14 @@ from clip_shared.db.models import (
     Transcript,
     TranscriptWord,
     Usage,
-    User,
     UserPlan,
     Video,
 )
 from clip_shared.db.session import get_db
 from clip_shared.media.captions import build_clip_captions_data
 from clip_shared.media.cleanup import plan_clip_cleanup
-from clip_shared.media.edl import EditDecisionList
 from clip_shared.media.plan_limits import (
-    PlanLimitExceededError,
     compute_params_snapshot_hash,
-    enforce_export_plan_limits,
-    get_user_plan_and_usage,
 )
 from clip_shared.pubsub.redis import subscribe_export_events_async
 from clip_shared.schemas.auth import AuthenticatedUser
@@ -102,7 +95,7 @@ async def get_my_plan(
     u_plan = res.scalar_one_or_none()
 
     plan_key = u_plan.plan_key if u_plan else "free"
-    period_start = u_plan.period_start if u_plan else datetime.now(timezone.utc).replace(day=1, hour=0, minute=0, second=0)
+    period_start = u_plan.period_start if u_plan else datetime.now(UTC).replace(day=1, hour=0, minute=0, second=0)
 
     p_stmt = select(Plan).where(Plan.key == plan_key)
     p_res = await db.execute(p_stmt)
@@ -528,7 +521,7 @@ async def create_clip_export(
     up_res = await db.execute(up_stmt)
     user_plan = up_res.scalar_one_or_none()
     plan_key = user_plan.plan_key if user_plan else "free"
-    period_start = user_plan.period_start if user_plan else datetime.now(timezone.utc).replace(day=1, hour=0, minute=0, second=0)
+    period_start = user_plan.period_start if user_plan else datetime.now(UTC).replace(day=1, hour=0, minute=0, second=0)
 
     p_stmt = select(Plan).where(Plan.key == plan_key)
     p_res = await db.execute(p_stmt)

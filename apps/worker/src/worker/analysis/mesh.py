@@ -1,5 +1,6 @@
 """Face mesh and lip landmark extraction for mouth openness and active speaker detection."""
 from dataclasses import dataclass
+
 import numpy as np
 import structlog
 

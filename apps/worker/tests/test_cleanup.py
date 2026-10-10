@@ -1,5 +1,4 @@
 import numpy as np
-import pytest
 
 from clip_shared.media.cleanup import (
     detect_filler_removals,

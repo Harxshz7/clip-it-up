@@ -1,7 +1,8 @@
+import uuid
 from datetime import datetime
 from typing import Any
-import uuid
-from pydantic import BaseModel, ConfigDict, Field
+
+from pydantic import BaseModel, ConfigDict
 
 
 class CaptionStyleResponse(BaseModel):

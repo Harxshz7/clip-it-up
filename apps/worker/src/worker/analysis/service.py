@@ -1,17 +1,18 @@
 """End-to-end video analysis service orchestrating sampling, scene detection, tracking, and S3/DB persistence."""
-from collections.abc import Callable
-from typing import Any
 import io
 import os
 import tempfile
 import time
 import uuid
+from collections.abc import Callable
 from decimal import Decimal
+from typing import Any
+
 import cv2
 import numpy as np
+import structlog
 from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import insert as pg_insert
-import structlog
 
 from clip_shared.config import get_settings
 from clip_shared.db.base import utc_now

@@ -1,7 +1,6 @@
 """Subtitle chunking, keyword emphasis detection, ASS generation, and preview parity."""
-import math
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any
 
 from clip_shared.media.edl import EditDecisionList

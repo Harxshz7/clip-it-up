@@ -1,7 +1,6 @@
 """Filler word and silence detection, cut snapping, and cleanup planner."""
-import math
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any
 
 from clip_shared.media.edl import EditDecisionList, Removal

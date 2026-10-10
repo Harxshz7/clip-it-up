@@ -1,8 +1,6 @@
-import pytest
 
 from clip_shared.db.seed import DEFAULT_CAPTION_STYLES
 from clip_shared.media.captions import (
-    build_clip_captions_data,
     chunk_words_into_lines,
     detect_emphasis_words,
     generate_ass_subtitles,

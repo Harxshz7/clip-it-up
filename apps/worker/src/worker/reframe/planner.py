@@ -1,8 +1,10 @@
 """Per-clip 9:16 reframe planner with shot segmentation, speaker tracking, and fallback chain."""
 from dataclasses import dataclass
 from typing import Any
+
 import numpy as np
 import structlog
+
 from clip_shared.schemas.reframe import (
     ReframeCropPath,
     ReframeFlags,

@@ -1,6 +1,8 @@
 """Crop trajectory smoothing with deadzone, velocity clamping, hard cut snapping, and boundary constraints."""
 from dataclasses import dataclass
+
 import numpy as np
+
 from clip_shared.schemas.reframe import ReframeKeyframe
 
 

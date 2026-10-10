@@ -4,9 +4,7 @@ Combines EDL trimming, audio crossfade, vertical reframing, ASS subtitle burning
 EBU R128 loudness normalization, and server-enforced watermark overlay into a single
 efficient filtergraph.
 """
-import json
 import os
-import shutil
 import subprocess
 import time
 from collections.abc import Callable

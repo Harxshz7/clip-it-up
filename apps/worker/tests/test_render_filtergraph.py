@@ -1,11 +1,10 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 
 from clip_shared.media.edl import EditDecisionList
 from clip_shared.media.ffmpeg import MediaValidationError, VideoMetadata
 from clip_shared.media.render import (
-    RenderJobSnapshot,
     build_render_ffmpeg_cmd,
     build_render_filtergraph,
     validate_rendered_output,

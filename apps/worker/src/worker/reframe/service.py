@@ -1,8 +1,10 @@
 """Lazy reframe generation service linking VideoAnalysis, FaceTracks, and ClipReframe persistence."""
 import uuid
 from typing import Any
-from sqlalchemy import select
+
 import structlog
+from sqlalchemy import select
+
 from clip_shared.db.base import utc_now
 from clip_shared.db.models import Clip, ClipReframe, FaceTrack, Video, VideoAnalysis
 from clip_shared.schemas.reframe import SceneItem

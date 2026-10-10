@@ -33,6 +33,7 @@ This document defines the unit rates and cost measurement model across the 6 vid
 | **`score` (rerun)** | In-memory / Redis Hash Cache | Local CPU | 0.02s | < 0.0001x | N/A | ₹0.00 (cached) | Cache verified |
 | **`analysis`** | PySceneDetect + MediaPipe Face Tracking | CPU (2 vCPU) | ~45s (30m @ 6fps) | ~0.025x | N/A | ₹3.50 / hr | Real pipeline active |
 | **`reframe`** | Crop Path Planner + Trajectory Smoother | Local CPU | < 0.2s | < 0.0001x | N/A | ₹0.00 (lazy CPU) | Instant client preview |
+| **`render`** | FFmpeg Single-Pass (libass + loudnorm) | CPU (4 vCPU) | ~21s (60s clip) | ~0.35x | < 380 MB | ₹15.00 / hr (~₹0.25/clip) | Real pipeline active |
 
 *Note: Measured values marked TODO are populated via `make bench` / `scripts/bench_transcribe.py` when executed on live production GPU instances.*
 

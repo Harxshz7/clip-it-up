@@ -1,8 +1,10 @@
 """Audio-visual active speaker association using mouth variance and diarization overlap."""
-from dataclasses import dataclass, field
+from dataclasses import dataclass
+
 import numpy as np
 import scipy.optimize
 import structlog
+
 from worker.analysis.tracker import FaceTrackData
 
 logger = structlog.get_logger()

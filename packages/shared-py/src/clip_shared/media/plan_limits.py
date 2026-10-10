@@ -2,13 +2,13 @@
 import hashlib
 import json
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
-from sqlalchemy import func, select
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
-from clip_shared.db.models import Export, Plan, Usage, User, UserPlan, Video
+from clip_shared.db.models import Export, Plan, Usage, UserPlan
 
 
 class PlanLimitExceededError(Exception):
@@ -45,7 +45,7 @@ def get_user_plan_and_usage(user_id: uuid.UUID, db: Session) -> dict[str, Any]:
     """
     user_plan = db.query(UserPlan).filter(UserPlan.user_id == user_id).first()
     plan_key = user_plan.plan_key if user_plan else "free"
-    period_start = user_plan.period_start if user_plan else datetime.now(timezone.utc).replace(day=1, hour=0, minute=0, second=0)
+    period_start = user_plan.period_start if user_plan else datetime.now(UTC).replace(day=1, hour=0, minute=0, second=0)
 
     plan = db.query(Plan).filter(Plan.key == plan_key).first()
     if not plan:

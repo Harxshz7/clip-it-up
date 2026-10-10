@@ -1,8 +1,9 @@
 """Preview renderer generating quick low-res 360x640 vertical MP4 preview using FFmpeg."""
-import os
 import subprocess
 from typing import Any
+
 import structlog
+
 from clip_shared.schemas.reframe import ReframeCropPath
 from worker.reframe.ffmpeg_filter import crop_path_to_ffmpeg_filter
 

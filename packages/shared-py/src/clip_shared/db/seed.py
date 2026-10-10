@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from clip_shared.config import get_settings
 from clip_shared.db.models import CaptionStyle, ExportPreset, Plan, Project, User, UserPlan
@@ -253,7 +253,7 @@ def seed_database():
                 id=uuid.uuid4(),
                 user_id=user.id,
                 plan_key="free",
-                period_start=datetime.now(timezone.utc),
+                period_start=datetime.now(UTC),
             )
             db.add(user_plan)
             db.flush()

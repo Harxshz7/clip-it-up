@@ -9,9 +9,7 @@ from clip_shared.db.base import utc_now
 from clip_shared.db.models import (
     Clip,
     ClipMoment,
-    ReviewRating,
     ReviewSession,
-    ReviewSurvey,
     Transcript,
     User,
     Video,

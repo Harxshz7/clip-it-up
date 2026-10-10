@@ -1,6 +1,7 @@
 """Scene classifier assigning shot types: talking_head, two_shot, wide_multi, screen_share_or_slides, other."""
 from abc import ABC, abstractmethod
 from typing import Any
+
 from clip_shared.schemas.reframe import SceneItem
 from worker.analysis.scene import SceneCut
 from worker.analysis.tracker import FaceTrackData

@@ -1,5 +1,6 @@
 import uuid
 from unittest.mock import patch
+
 import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -8,10 +9,7 @@ from clip_shared.db.base import utc_now
 from clip_shared.db.models import (
     CaptionStyle,
     Clip,
-    ClipCaption,
-    ClipCleanup,
     ClipMoment,
-    Export,
     ExportPreset,
     Plan,
     Transcript,

@@ -1,14 +1,15 @@
 """Comprehensive tests for face tracking, scene classification, speaker association, smoothing, and ffmpeg filter generation."""
-import pytest
 import numpy as np
+import pytest
+
 from clip_shared.schemas.reframe import ReframeCropPath, ReframeKeyframe, SceneItem
 from worker.analysis.active_speaker import AudioVisualSpeakerAssociator, SpeakerTurn
 from worker.analysis.classifier import RuleBasedSceneClassifier
-from worker.analysis.detector import FaceDetection, MockFaceDetector
+from worker.analysis.detector import FaceDetection
 from worker.analysis.scene import SceneCut
 from worker.analysis.tracker import FaceTrackData, FaceTracker, compute_iou
 from worker.reframe.ffmpeg_filter import crop_path_to_ffmpeg_filter
-from worker.reframe.planner import calculate_normalized_9_16_crop_size, plan_clip_reframe
+from worker.reframe.planner import plan_clip_reframe
 from worker.reframe.smoother import CropSmoother, SmootherConfig
 
 

@@ -1,5 +1,6 @@
 """FFmpeg filtergraph generator for 9:16 vertical cropping and fit_blur rendering."""
 from typing import Any
+
 from clip_shared.schemas.reframe import ReframeCropPath, ReframeKeyframe
 
 

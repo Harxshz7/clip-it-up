@@ -4,7 +4,7 @@ import shutil
 import tempfile
 import time
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from decimal import Decimal
 from typing import Any
 
@@ -12,7 +12,6 @@ import structlog
 from celery import shared_task
 
 from clip_shared.config import get_settings
-from clip_shared.db.base import utc_now
 from clip_shared.db.models import (
     CaptionStyle,
     Clip,
@@ -212,7 +211,7 @@ def render_export_task(self, export_id: str) -> dict[str, Any]:
             export_rec.duration_ms = render_metrics["duration_ms"]
             export_rec.size_bytes = render_metrics["size_bytes"]
             export_rec.render_ms = render_metrics["render_ms"]
-            export_rec.finished_at = datetime.now(timezone.utc)
+            export_rec.finished_at = datetime.now(UTC)
 
             # Record usage
             exp_seconds = Decimal(str(render_metrics["duration_ms"] / 1000.0)).quantize(Decimal("0.01"))

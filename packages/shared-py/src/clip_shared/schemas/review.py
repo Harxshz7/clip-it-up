@@ -1,6 +1,5 @@
 import uuid
 from datetime import datetime
-from decimal import Decimal
 from typing import Any, Literal
 
 from pydantic import BaseModel, Field

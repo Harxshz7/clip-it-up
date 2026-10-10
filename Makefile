@@ -46,9 +46,8 @@ gate:
 reframe-eval:
 	python scripts/reframe_eval.py
 
-
-
-
+render-bench:
+	python scripts/render_bench.py
 # Linting & Formatting
 lint:
 	@echo "Linting Python with ruff & mypy..."

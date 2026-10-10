@@ -1,8 +1,9 @@
 """Scene boundary detection using PySceneDetect with OpenCV frame-diff fallback."""
-from dataclasses import dataclass
 import os
-import structlog
+from dataclasses import dataclass
+
 import cv2
+import structlog
 
 logger = structlog.get_logger()
 

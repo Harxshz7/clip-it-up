@@ -1,6 +1,5 @@
-import pytest
 
-from clip_shared.media.edl import EditDecisionList, KeepSegment, Removal
+from clip_shared.media.edl import EditDecisionList
 
 
 def test_edl_no_removals():
