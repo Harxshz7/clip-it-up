@@ -790,6 +790,48 @@ export const api = {
   async getEditorMetrics(token?: string | null): Promise<EditorMetricsResponse> {
     return request<EditorMetricsResponse>(`/admin/editor-metrics`, {}, token);
   },
+
+  async listExportPresets(token?: string | null): Promise<ExportPreset[]> {
+    return request<ExportPreset[]>("/export-presets", {}, token);
+  },
+
+  async createClipExport(
+    clipId: string,
+    payload: CreateExportPayload,
+    token?: string | null
+  ): Promise<ExportRecord[]> {
+    return request<ExportRecord[]>(
+      `/clips/${clipId}/exports`,
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+      },
+      token
+    );
+  },
+
+  async submitClipFeedback(
+    clipId: string,
+    payload: { value: "up" | "down"; reason_tag?: string },
+    token?: string | null
+  ): Promise<any> {
+    return request<any>(
+      `/clips/${clipId}/feedback`,
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+      },
+      token
+    );
+  },
+
+  async deleteClipFeedback(clipId: string, token?: string | null): Promise<any> {
+    return request<any>(`/clips/${clipId}/feedback`, { method: "DELETE" }, token);
+  },
+
+  async rescoreVideo(videoId: string, token?: string | null): Promise<any> {
+    return request<any>(`/videos/${videoId}/rescore`, { method: "POST" }, token);
+  },
 };
 
 

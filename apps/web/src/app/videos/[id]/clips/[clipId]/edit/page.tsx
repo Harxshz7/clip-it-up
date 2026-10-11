@@ -348,14 +348,15 @@ export default function ClipEditorPage() {
         <div className="flex-1 h-3 bg-zinc-800 rounded-full overflow-hidden flex relative">
           {edl?.keep_segments && edl.keep_segments.length > 0 ? (
             edl.keep_segments.map((seg, i) => {
+              const segDur = seg.out_end_ms - seg.out_start_ms;
               const totalOut = Math.max(1, edl.total_out_duration_ms);
-              const widthPct = (seg.duration_ms / totalOut) * 100;
+              const widthPct = (segDur / totalOut) * 100;
               return (
                 <div
                   key={i}
                   style={{ width: `${widthPct}%` }}
                   className="h-full bg-purple-500 border-r border-zinc-950/40 relative group"
-                  title={`Segment ${i + 1}: ${(seg.duration_ms / 1000).toFixed(1)}s`}
+                  title={`Segment ${i + 1}: ${(segDur / 1000).toFixed(1)}s`}
                 />
               );
             })

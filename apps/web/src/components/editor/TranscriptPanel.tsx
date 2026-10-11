@@ -57,7 +57,7 @@ export const TranscriptPanel: React.FC<TranscriptPanelProps> = ({ videoId }) => 
         const marginMs = 30000;
         const fromMs = Math.max(0, startMs - marginMs);
         const toMs = endMs + marginMs;
-        const res = await api.getTranscriptWords(videoId, fromMs, toMs);
+        const res = await api.getTranscriptWords(videoId, { from_ms: fromMs, to_ms: toMs });
         if (res && res.words) {
           setWords(res.words);
         }
@@ -118,7 +118,7 @@ export const TranscriptPanel: React.FC<TranscriptPanelProps> = ({ videoId }) => 
     if (!selectedSpan || words.length === 0) return;
     const sWord = words[selectedSpan.startIdx];
     if (sWord.start_ms < endMs - 2000) {
-      setRange({ start_ms: sWord.start_ms, end_ms });
+      setRange({ start_ms: sWord.start_ms, end_ms: endMs });
     }
     clearSelection();
   };
@@ -127,7 +127,7 @@ export const TranscriptPanel: React.FC<TranscriptPanelProps> = ({ videoId }) => 
     if (!selectedSpan || words.length === 0) return;
     const eWord = words[selectedSpan.endIdx];
     if (eWord.end_ms > startMs + 2000) {
-      setRange({ start_ms, end_ms: eWord.end_ms });
+      setRange({ start_ms: startMs, end_ms: eWord.end_ms });
     }
     clearSelection();
   };
