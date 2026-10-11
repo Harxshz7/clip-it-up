@@ -1,10 +1,9 @@
-'use client';
-
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { ClipMoment, Clip, VariantLength, FeedbackReasonTag } from '@clip-it-up/shared';
 import { ReframeViewer } from './ReframeViewer';
 import { ExportPanel } from './ExportPanel';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, Edit3, Check } from 'lucide-react';
 
 interface ClipCardProps {
   moment: ClipMoment;
@@ -13,6 +12,8 @@ interface ClipCardProps {
   onFeedback: (clipId: string, value: 'up' | 'down', reasonTag?: FeedbackReasonTag) => Promise<void>;
   onDeleteFeedback: (clipId: string) => Promise<void>;
   isPlaying?: boolean;
+  isSelected?: boolean;
+  onToggleSelect?: (clipId: string) => void;
 }
 
 export const ClipCard: React.FC<ClipCardProps> = ({
@@ -22,6 +23,8 @@ export const ClipCard: React.FC<ClipCardProps> = ({
   onFeedback,
   onDeleteFeedback,
   isPlaying,
+  isSelected,
+  onToggleSelect,
 }) => {
   const [selectedVariantLength, setSelectedVariantLength] = useState<VariantLength>('auto');
   const [showTooltip, setShowTooltip] = useState(false);
@@ -108,6 +111,14 @@ export const ClipCard: React.FC<ClipCardProps> = ({
       <div>
         <div className="flex items-center justify-between gap-3 mb-3">
           <div className="flex items-center gap-2">
+            {onToggleSelect && (
+              <input
+                type="checkbox"
+                checked={isSelected || false}
+                onChange={() => onToggleSelect(activeClip.id)}
+                className="w-4 h-4 rounded border-zinc-700 bg-zinc-900 text-purple-600 focus:ring-purple-500 cursor-pointer"
+              />
+            )}
             {moment.rank ? (
               <span className="flex items-center justify-center w-6 h-6 rounded-full bg-purple-600/30 text-purple-300 font-bold text-xs border border-purple-500/40">
                 #{moment.rank}
@@ -118,6 +129,9 @@ export const ClipCard: React.FC<ClipCardProps> = ({
             </span>
             <span className="text-xs font-semibold text-zinc-300 bg-zinc-800/80 px-2 py-0.5 rounded-full border border-white/5">
               {activeClip.duration_seconds.toFixed(0)}s
+            </span>
+            <span className="text-[10px] font-medium text-emerald-400 bg-emerald-950/60 px-1.5 py-0.5 rounded border border-emerald-800/40">
+              New
             </span>
           </div>
 
@@ -239,17 +253,25 @@ export const ClipCard: React.FC<ClipCardProps> = ({
         )}
       </div>
 
-      {/* Card Footer: Preview Seek & Thumbs Feedback */}
+      {/* Card Footer: Edit (Primary Action), Preview Seek & Thumbs Feedback */}
       <div className="pt-3 border-t border-white/10 flex items-center justify-between gap-2 mt-auto">
+        <Link
+          href={`/videos/${moment.video_id}/clips/${activeClip.id}/edit`}
+          className="flex items-center gap-1.5 px-3.5 py-1.5 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-xs font-bold transition-all shadow-md shadow-purple-900/30 hover:scale-102"
+        >
+          <Edit3 className="w-3.5 h-3.5" />
+          <span>Edit</span>
+        </Link>
+
         <button
           type="button"
           onClick={() => onSeek(activeClip.start_ms, activeClip.end_ms)}
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-600/20 hover:bg-purple-600/40 text-purple-200 border border-purple-500/30 rounded-lg text-xs font-medium transition-all hover:scale-102"
+          className="flex items-center gap-1.5 px-2.5 py-1.5 bg-zinc-800/80 hover:bg-zinc-700 text-zinc-300 rounded-lg text-xs font-medium transition-all"
         >
           <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
             <path d="M8 5v14l11-7z" />
           </svg>
-          <span>Preview Range</span>
+          <span>Seek</span>
         </button>
 
         {/* Reframe 9:16 Studio Button */}
