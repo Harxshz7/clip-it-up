@@ -1,8 +1,27 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { ClipMoment, Clip, VideoClipsResponse, FeedbackReasonTag, ClipScoredEventPayload } from '@clip-it-up/shared';
-import { ClipCard } from './ClipCard';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import {
+  ClipMoment,
+  Clip,
+  VideoClipsResponse,
+  FeedbackReasonTag,
+  ClipScoredEventPayload,
+} from "@clip-it-up/shared";
+import { api } from "@/lib/api";
+import { ClipCard } from "./ClipCard";
+import {
+  Download,
+  Trash2,
+  Sparkles,
+  Layers,
+  ArrowUpDown,
+  Filter,
+  RefreshCw,
+  CheckSquare,
+  Square,
+  AlertCircle,
+} from "lucide-react";
 
 interface ClipsDeckProps {
   videoId: string;
@@ -18,93 +37,177 @@ export const ClipsDeck: React.FC<ClipsDeckProps> = ({
   isJobRunning,
 }) => {
   const [moments, setMoments] = useState<ClipMoment[]>([]);
+  const [pendingCount, setPendingCount] = useState<number>(0);
+  const pendingMomentsRef = useRef<ClipMoment[]>([]);
+
   const [loading, setLoading] = useState(true);
-  const [filterStatus, setFilterStatus] = useState<string>('all');
-  const [sortBy, setSortBy] = useState<'score' | 'time' | 'rank'>('score');
+  const [filterStatus, setFilterStatus] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<"score" | "time" | "rank">("score");
   const [minScore, setMinScore] = useState<number>(0);
   const [isRescoring, setIsRescoring] = useState(false);
   const [streamingNotice, setStreamingNotice] = useState<string | null>(null);
 
-  const fetchClips = useCallback(async () => {
+  // Bulk selection
+  const [selectedClipIds, setSelectedClipIds] = useState<Set<string>>(new Set());
+  const [isBulkProcessing, setIsBulkProcessing] = useState(false);
+
+  const fetchClips = useCallback(async (isInitial = false) => {
     try {
-      const res = await fetch(`/api/videos/${videoId}/clips?sort=${sortBy}`, {
-        headers: { 'Content-Type': 'application/json' },
-      });
-      if (res.ok) {
-        const data: VideoClipsResponse = await res.json();
-        setMoments(data.moments || []);
+      const res = await api.getVideoClips(videoId, { sort: sortBy });
+      const fetchedMoments = res.moments || [];
+
+      if (isInitial || moments.length === 0) {
+        setMoments(fetchedMoments);
+        setPendingCount(0);
+      } else {
+        // Compare with current moments
+        const currentIds = new Set(moments.map((m) => m.id));
+        const newOnes = fetchedMoments.filter((m) => !currentIds.has(m.id));
+        if (newOnes.length > 0) {
+          pendingMomentsRef.current = fetchedMoments;
+          setPendingCount(newOnes.length);
+        } else {
+          setMoments(fetchedMoments);
+        }
       }
     } catch (err) {
-      console.error('Failed to fetch clips:', err);
+      console.error("Failed to fetch clips:", err);
     } finally {
       setLoading(false);
     }
-  }, [videoId, sortBy]);
+  }, [videoId, sortBy, moments]);
 
   useEffect(() => {
-    fetchClips();
+    fetchClips(true);
   }, [fetchClips]);
 
-  // Listen for real-time clip_scored SSE events emitted by the backend
-  useEffect(() => {
-    const handleClipScoredEvent = (e: CustomEvent<ClipScoredEventPayload>) => {
-      const payload = e.detail;
-      if (payload && payload.video_id === videoId) {
-        setStreamingNotice(`Scored ${payload.scored_count} of ${payload.total_count} candidate clips...`);
-        fetchClips();
-      }
-    };
+  // Merge pending streamed clips without shifting layout unexpectedly
+  const handleMergeNewClips = () => {
+    if (pendingMomentsRef.current.length > 0) {
+      setMoments(pendingMomentsRef.current);
+      pendingMomentsRef.current = [];
+      setPendingCount(0);
+    }
+  };
 
-    window.addEventListener('clip_scored' as any, handleClipScoredEvent as any);
+  // SSE clip_scored listener
+  useEffect(() => {
+    if (!videoId) return;
+    const sseUrl = `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/jobs/stream?video_id=${videoId}`;
+    let eventSource: EventSource | null = null;
+
+    try {
+      eventSource = new EventSource(sseUrl);
+      eventSource.addEventListener("clip_scored", (e: any) => {
+        try {
+          const payload = JSON.parse(e.data);
+          setStreamingNotice(
+            `Scored ${payload.scored_count || ""} clips... analyzing virality`
+          );
+          fetchClips(false);
+        } catch {}
+      });
+    } catch {}
+
     return () => {
-      window.removeEventListener('clip_scored' as any, handleClipScoredEvent as any);
+      if (eventSource) eventSource.close();
     };
   }, [videoId, fetchClips]);
 
-  const handleFeedback = async (clipId: string, value: 'up' | 'down', reasonTag?: FeedbackReasonTag) => {
+  const handleFeedback = async (
+    clipId: string,
+    value: "up" | "down",
+    reasonTag?: FeedbackReasonTag
+  ) => {
     try {
-      await fetch(`/api/clips/${clipId}/feedback`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ value, reason_tag: reasonTag }),
-      });
-      fetchClips();
+      await api.submitClipFeedback(clipId, { value, reason_tag: reasonTag });
+      fetchClips(false);
     } catch (err) {
-      console.error('Failed to submit feedback:', err);
+      console.error("Failed to submit feedback:", err);
     }
   };
 
   const handleDeleteFeedback = async (clipId: string) => {
     try {
-      await fetch(`/api/clips/${clipId}/feedback`, {
-        method: 'DELETE',
-      });
-      fetchClips();
+      await api.deleteClipFeedback(clipId);
+      fetchClips(false);
     } catch (err) {
-      console.error('Failed to delete feedback:', err);
+      console.error("Failed to delete feedback:", err);
     }
   };
 
   const handleRescore = async () => {
     setIsRescoring(true);
     try {
-      const res = await fetch(`/api/videos/${videoId}/rescore`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-      });
-      if (res.ok) {
-        setStreamingNotice('Rescoring enqueued... Analyzing viral hooks.');
-      }
+      await api.rescoreVideo(videoId);
+      setStreamingNotice("Rescoring enqueued... Analyzing viral hooks.");
     } catch (err) {
-      console.error('Failed to trigger rescore:', err);
+      console.error("Failed to trigger rescore:", err);
     } finally {
       setIsRescoring(false);
     }
   };
 
+  const handleToggleSelect = (clipId: string) => {
+    setSelectedClipIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(clipId)) {
+        next.delete(clipId);
+      } else {
+        next.add(clipId);
+      }
+      return next;
+    });
+  };
+
+  const handleSelectAll = () => {
+    const allClipIds = new Set(
+      moments.flatMap((m) => m.clips.map((c) => c.id))
+    );
+    setSelectedClipIds(allClipIds);
+  };
+
+  const handleClearSelection = () => {
+    setSelectedClipIds(new Set());
+  };
+
+  const handleBulkExport = async () => {
+    if (selectedClipIds.size === 0) return;
+    try {
+      setIsBulkProcessing(true);
+      await api.bulkClipActions({
+        action: "export",
+        clip_ids: Array.from(selectedClipIds),
+        preset: "tiktok",
+      });
+      setSelectedClipIds(new Set());
+    } catch (err) {
+      console.error("Bulk export failed", err);
+    } finally {
+      setIsBulkProcessing(false);
+    }
+  };
+
+  const handleBulkDismiss = async () => {
+    if (selectedClipIds.size === 0) return;
+    try {
+      setIsBulkProcessing(true);
+      await api.bulkClipActions({
+        action: "dismiss",
+        clip_ids: Array.from(selectedClipIds),
+      });
+      setSelectedClipIds(new Set());
+      fetchClips(true);
+    } catch (err) {
+      console.error("Bulk dismiss failed", err);
+    } finally {
+      setIsBulkProcessing(false);
+    }
+  };
+
   const filteredMoments = useMemo(() => {
     return moments.filter((m) => {
-      if (filterStatus !== 'all' && m.status !== filterStatus) return false;
+      if (filterStatus !== "all" && m.status !== filterStatus) return false;
       if (minScore > 0 && (m.final_score || 0) < minScore) return false;
       return true;
     });
@@ -126,13 +229,15 @@ export const ClipsDeck: React.FC<ClipsDeckProps> = ({
         <div className="flex flex-wrap items-center gap-3">
           {/* Status Filter */}
           <div className="flex items-center gap-1 bg-zinc-900/90 p-1 rounded-lg border border-white/5 text-xs">
-            {['all', 'selected', 'scored'].map((st) => (
+            {["all", "selected", "scored"].map((st) => (
               <button
                 key={st}
                 type="button"
                 onClick={() => setFilterStatus(st)}
                 className={`px-3 py-1 rounded capitalize font-medium transition-colors ${
-                  filterStatus === st ? 'bg-purple-600 text-white' : 'text-zinc-400 hover:text-zinc-200'
+                  filterStatus === st
+                    ? "bg-purple-600 text-white"
+                    : "text-zinc-400 hover:text-zinc-200"
                 }`}
               >
                 {st}
@@ -140,7 +245,7 @@ export const ClipsDeck: React.FC<ClipsDeckProps> = ({
             ))}
           </div>
 
-          {/* Sort By */}
+          {/* Sort By Dropdown */}
           <div className="flex items-center gap-2 text-xs text-zinc-400">
             <span>Sort:</span>
             <select
@@ -173,7 +278,7 @@ export const ClipsDeck: React.FC<ClipsDeckProps> = ({
         {/* Right side: Rescore Button & Stats */}
         <div className="flex items-center gap-3">
           <span className="text-xs text-zinc-400 font-mono">
-            {filteredMoments.length} {filteredMoments.length === 1 ? 'clip' : 'clips'} found
+            {filteredMoments.length} {filteredMoments.length === 1 ? "clip" : "clips"} found
           </span>
           <button
             type="button"
@@ -181,19 +286,76 @@ export const ClipsDeck: React.FC<ClipsDeckProps> = ({
             disabled={isRescoring}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded-lg text-xs font-semibold shadow-md transition-transform hover:scale-102 disabled:opacity-50"
           >
-            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
-            </svg>
-            <span>{isRescoring ? 'Rescoring...' : 'Rescore Video'}</span>
+            <RefreshCw className={`w-3.5 h-3.5 ${isRescoring ? "animate-spin" : ""}`} />
+            <span>{isRescoring ? "Rescoring..." : "Rescore Video"}</span>
           </button>
         </div>
       </div>
 
-      {/* Streaming / Analysis Notice */}
+      {/* Stable Streaming Pill Banner */}
+      {pendingCount > 0 && (
+        <div className="flex items-center justify-between p-3 rounded-xl bg-purple-900/60 border border-purple-500/80 shadow-lg text-xs text-white animate-in slide-in-from-top-2">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
+            <span className="font-semibold">
+              {pendingCount} new scored clips discovered in the background!
+            </span>
+          </div>
+          <button
+            onClick={handleMergeNewClips}
+            className="px-3 py-1 bg-purple-600 hover:bg-purple-500 rounded-lg text-xs font-bold transition-colors"
+          >
+            Merge Into Grid
+          </button>
+        </div>
+      )}
+
+      {/* Floating Bulk Actions Bar */}
+      {selectedClipIds.size > 0 && (
+        <div className="sticky top-20 z-30 p-3 bg-zinc-900/95 border border-purple-500/50 rounded-xl shadow-2xl backdrop-blur-md flex items-center justify-between gap-4 text-xs animate-in fade-in">
+          <div className="flex items-center gap-2 font-bold text-white">
+            <span className="bg-purple-600 px-2 py-0.5 rounded-full text-white text-[11px]">
+              {selectedClipIds.size}
+            </span>
+            <span>Clips Selected</span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleBulkExport}
+              disabled={isBulkProcessing}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-lg transition-colors disabled:opacity-50"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>Export Selected</span>
+            </button>
+
+            <button
+              onClick={handleBulkDismiss}
+              disabled={isBulkProcessing}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold rounded-lg transition-colors disabled:opacity-50"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+              <span>Dismiss</span>
+            </button>
+
+            <button
+              onClick={handleClearSelection}
+              className="text-zinc-400 hover:text-white px-2 py-1"
+            >
+              Deselect All
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Streaming Notice while background job runs */}
       {(isJobRunning || streamingNotice) && (
-        <div className="flex items-center gap-3 p-3.5 rounded-xl bg-purple-950/40 border border-purple-500/30 text-xs text-purple-200 animate-pulse">
+        <div className="flex items-center gap-3 p-3.5 rounded-xl bg-purple-950/40 border border-purple-500/30 text-xs text-purple-200">
           <div className="w-2 h-2 rounded-full bg-purple-400 animate-ping" />
-          <span>{streamingNotice || 'Pipeline running: Analyzing audio acoustics & scoring viral hooks...'}</span>
+          <span>
+            {streamingNotice || "Pipeline running: Analyzing audio acoustics & scoring viral hooks..."}
+          </span>
         </div>
       )}
 
@@ -201,12 +363,7 @@ export const ClipsDeck: React.FC<ClipsDeckProps> = ({
       {filteredMoments.length === 0 ? (
         <div className="flex flex-col items-center justify-center p-16 rounded-2xl bg-[#111420]/40 border border-white/5 text-center space-y-3">
           <div className="p-4 rounded-full bg-purple-600/10 text-purple-400 border border-purple-500/20">
-            <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18" />
-              <line x1="7" y1="2" x2="7" y2="22" />
-              <line x1="17" y1="2" x2="17" y2="22" />
-              <line x1="2" y1="12" x2="22" y2="12" />
-            </svg>
+            <AlertCircle className="w-8 h-8" />
           </div>
           <h4 className="text-zinc-200 font-semibold">No clips found matching your filters</h4>
           <p className="text-zinc-400 text-xs max-w-sm">
@@ -216,16 +373,21 @@ export const ClipsDeck: React.FC<ClipsDeckProps> = ({
       ) : (
         /* Clips Grid */
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {filteredMoments.map((moment) => (
-            <ClipCard
-              key={moment.id}
-              moment={moment}
-              proxyUrl={proxyUrl}
-              onSeek={onSeek}
-              onFeedback={handleFeedback}
-              onDeleteFeedback={handleDeleteFeedback}
-            />
-          ))}
+          {filteredMoments.map((moment) => {
+            const isAnySelected = moment.clips.some((c) => selectedClipIds.has(c.id));
+            return (
+              <ClipCard
+                key={moment.id}
+                moment={moment}
+                proxyUrl={proxyUrl}
+                onSeek={onSeek}
+                onFeedback={handleFeedback}
+                onDeleteFeedback={handleDeleteFeedback}
+                isSelected={isAnySelected}
+                onToggleSelect={handleToggleSelect}
+              />
+            );
+          })}
         </div>
       )}
     </div>
