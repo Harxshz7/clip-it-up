@@ -1,0 +1,77 @@
+{
+  "cases": [
+    {
+      "name": "no_removals",
+      "clip_start_ms": 1000,
+      "clip_end_ms": 11000,
+      "removals": [],
+      "expected_out_duration_ms": 10000,
+      "expected_removed_ms": 0,
+      "expected_keep_segments": [
+        { "src_start_ms": 1000, "src_end_ms": 11000, "out_start_ms": 0, "out_end_ms": 10000 }
+      ]
+    },
+    {
+      "name": "single_removal",
+      "clip_start_ms": 0,
+      "clip_end_ms": 10000,
+      "removals": [
+        { "start_ms": 4000, "end_ms": 6000, "kind": "filler", "text": "um" }
+      ],
+      "expected_out_duration_ms": 8000,
+      "expected_removed_ms": 2000,
+      "expected_keep_segments": [
+        { "src_start_ms": 0, "src_end_ms": 4000, "out_start_ms": 0, "out_end_ms": 4000 },
+        { "src_start_ms": 6000, "src_end_ms": 10000, "out_start_ms": 4000, "out_end_ms": 8000 }
+      ]
+    },
+    {
+      "name": "overlapping_and_adjacent_removals",
+      "clip_start_ms": 0,
+      "clip_end_ms": 10000,
+      "removals": [
+        { "start_ms": 2000, "end_ms": 4000, "kind": "filler" },
+        { "start_ms": 3500, "end_ms": 5000, "kind": "silence" },
+        { "start_ms": 5000, "end_ms": 6000, "kind": "silence" },
+        { "start_ms": 8000, "end_ms": 9000, "kind": "filler" }
+      ],
+      "expected_out_duration_ms": 5000,
+      "expected_removed_ms": 5000,
+      "expected_keep_segments": [
+        { "src_start_ms": 0, "src_end_ms": 2000, "out_start_ms": 0, "out_end_ms": 2000 },
+        { "src_start_ms": 6000, "src_end_ms": 8000, "out_start_ms": 2000, "out_end_ms": 4000 },
+        { "src_start_ms": 9000, "src_end_ms": 10000, "out_start_ms": 4000, "out_end_ms": 5000 }
+      ]
+    },
+    {
+      "name": "boundary_removals",
+      "clip_start_ms": 0,
+      "clip_end_ms": 10000,
+      "removals": [
+        { "start_ms": 0, "end_ms": 2000, "kind": "silence" },
+        { "start_ms": 8000, "end_ms": 10000, "kind": "silence" }
+      ],
+      "expected_out_duration_ms": 6000,
+      "expected_removed_ms": 4000,
+      "expected_keep_segments": [
+        { "src_start_ms": 2000, "src_end_ms": 8000, "out_start_ms": 0, "out_end_ms": 6000 }
+      ]
+    }
+  ],
+  "words_fixture": {
+    "clip_start_ms": 0,
+    "clip_end_ms": 10000,
+    "removals": [{ "start_ms": 4000, "end_ms": 6000, "kind": "silence" }],
+    "words": [
+      { "text": "start", "start_ms": 500, "end_ms": 1500 },
+      { "text": "middle", "start_ms": 2500, "end_ms": 3500 },
+      { "text": "cut_word", "start_ms": 4200, "end_ms": 4800 },
+      { "text": "end", "start_ms": 6500, "end_ms": 7500 }
+    ],
+    "expected_remapped_words": [
+      { "text": "start", "start_ms": 500, "end_ms": 1500, "src_start_ms": 500, "src_end_ms": 1500 },
+      { "text": "middle", "start_ms": 2500, "end_ms": 3500, "src_start_ms": 2500, "src_end_ms": 3500 },
+      { "text": "end", "start_ms": 4500, "end_ms": 5500, "src_start_ms": 6500, "src_end_ms": 7500 }
+    ]
+  }
+}
