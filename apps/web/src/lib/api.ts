@@ -51,6 +51,8 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 export class ApiError extends Error {
   code: string;
   details?: any;
+  server_doc?: any;
+  server_version?: number;
 
   constructor(message: string, code: string = "UNKNOWN_ERROR", details?: any) {
     super(message);
