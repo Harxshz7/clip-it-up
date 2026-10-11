@@ -813,9 +813,165 @@ export interface CreateExportPayload {
   preset_key?: string | null;
   presets?: string[] | null;
   style_key?: string | null;
+  doc_snapshot?: ClipEditDoc | null;
   force?: boolean;
 }
 
+// ==========================================
+// Phase 5: Editor State, History, Alternatives & Metrics
+// ==========================================
 
+export interface ClipEditRemoval {
+  id: string;
+  start_ms: number;
+  end_ms: number;
+  kind: 'filler' | 'silence' | 'manual';
+  enabled: boolean;
+  text?: string | null;
+}
 
+export interface ClipEditCaptionWord {
+  text: string;
+  start_ms: number;
+  end_ms: number;
+  speaker?: string | null;
+  emphasis?: boolean;
+  deleted?: boolean;
+}
 
+export interface ClipEditCaptions {
+  words: ClipEditCaptionWord[];
+  style_key: string;
+  style_overrides: Record<string, any>;
+  enabled: boolean;
+}
+
+export interface ClipEditReframeKeyframe {
+  t_ms: number;
+  x: number;
+  y: number;
+  width?: number;
+  height?: number;
+  scale?: number;
+}
+
+export interface ClipEditReframe {
+  mode_overrides?: Record<string, string>;
+  keyframes?: ClipEditReframeKeyframe[];
+}
+
+export interface ClipEditHook {
+  text: string;
+  source: 'auto' | 'alt' | 'manual';
+  start_ms: number;
+}
+
+export interface ClipEditCleanupOptions {
+  remove_fillers: boolean;
+  remove_silence: boolean;
+  max_silence_ms: number;
+  target_silence_ms?: number;
+  crossfade_ms?: number;
+  snap_cuts?: boolean;
+}
+
+export interface ClipEditDoc {
+  clip_id: string;
+  base_clip_id: string;
+  version: number;
+  range: {
+    start_ms: number;
+    end_ms: number;
+  };
+  removals: ClipEditRemoval[];
+  captions: ClipEditCaptions;
+  reframe: ClipEditReframe;
+  hook: ClipEditHook;
+  preset_key: string;
+  cleanup_options: ClipEditCleanupOptions;
+}
+
+export interface ClipEditRecord {
+  id: string;
+  clip_id: string;
+  user_id: string;
+  version: number;
+  doc: ClipEditDoc;
+  parent_version?: number | null;
+  created_at: string;
+  label?: string | null;
+  is_checkpoint: boolean;
+}
+
+export interface ClipEditVersionSummary {
+  version: number;
+  parent_version?: number | null;
+  label?: string | null;
+  is_checkpoint: boolean;
+  created_at: string;
+}
+
+export interface ClipAlternative {
+  id: string;
+  clip_id: string;
+  kind: 'hook' | 'range';
+  start_ms: number;
+  end_ms: number;
+  text: string;
+  score?: number | null;
+  reason?: string | null;
+  source?: string | null;
+  created_at: string;
+}
+
+export interface EditorEvent {
+  id?: string;
+  user_id?: string;
+  clip_id?: string | null;
+  session_id: string;
+  type: string;
+  payload?: Record<string, any>;
+  created_at?: string;
+}
+
+export interface ClipEditSaveRequest {
+  doc: ClipEditDoc;
+  label?: string | null;
+  is_checkpoint?: boolean;
+}
+
+export interface ClipEditCheckpointRequest {
+  label: string;
+}
+
+export interface ClipEditRestoreRequest {
+  version: number;
+}
+
+export interface ClipRegenerateRequest {
+  mode: 'length' | 'hook' | 'trim' | 'similar';
+  params?: Record<string, any>;
+}
+
+export interface ClipBulkActionRequest {
+  action: 'dismiss' | 'export';
+  clip_ids: string[];
+  preset?: string;
+}
+
+export interface EditorEventsBatchRequest {
+  events: EditorEvent[];
+}
+
+export interface EditorMetricsResponse {
+  total_sessions: number;
+  median_hands_on_time_s: number;
+  p90_hands_on_time_s: number;
+  median_time_to_first_clip_s: number;
+  median_time_to_first_edit_s: number;
+  median_time_to_first_export_s: number;
+  export_without_editing_rate: number;
+  edit_type_frequencies: Record<string, number>;
+  drop_off_points: Record<string, number>;
+  total_regenerate_count: number;
+}
