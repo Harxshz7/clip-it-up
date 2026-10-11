@@ -33,6 +33,16 @@ import {
   ExportRecord,
   CreateExportPayload,
   VideoClipsResponse,
+  ClipEditRecord,
+  ClipEditDoc,
+  ClipEditSaveRequest,
+  ClipEditCheckpointRequest,
+  ClipEditVersionSummary,
+  ClipAlternative,
+  ClipRegenerateRequest,
+  ClipBulkActionRequest,
+  EditorEventsBatchRequest,
+  EditorMetricsResponse,
 } from "@clip-it-up/shared";
 
 
@@ -83,7 +93,10 @@ async function request<T>(
       code: `HTTP_${response.status}`,
       message: response.statusText || "Request failed",
     };
-    throw new ApiError(err.message, err.code, err.details);
+    const apiError = new ApiError(err.message, err.code, err.details);
+    if (err.server_doc) (apiError as any).server_doc = err.server_doc;
+    if (err.server_version) (apiError as any).server_version = err.server_version;
+    throw apiError;
   }
 
   return response.json();
@@ -642,6 +655,138 @@ export const api = {
       {},
       token
     );
+  },
+
+  // ----------------------------------------------------
+  // Phase 5: Editor Endpoints
+  // ----------------------------------------------------
+
+  async getClipEdit(clipId: string, token?: string | null): Promise<ClipEditRecord> {
+    return request<ClipEditRecord>(`/clips/${clipId}/edit`, {}, token);
+  },
+
+  async saveClipEdit(
+    clipId: string,
+    payload: ClipEditSaveRequest,
+    ifMatch?: number | null,
+    token?: string | null
+  ): Promise<ClipEditRecord> {
+    const headers: Record<string, string> = {};
+    if (ifMatch !== undefined && ifMatch !== null) {
+      headers["If-Match"] = `"${ifMatch}"`;
+    }
+    return request<ClipEditRecord>(
+      `/clips/${clipId}/edit`,
+      {
+        method: "PUT",
+        headers,
+        body: JSON.stringify(payload),
+      },
+      token
+    );
+  },
+
+  async createCheckpoint(
+    clipId: string,
+    label: string,
+    token?: string | null
+  ): Promise<ClipEditRecord> {
+    return request<ClipEditRecord>(
+      `/clips/${clipId}/edit/checkpoint`,
+      {
+        method: "POST",
+        body: JSON.stringify({ label }),
+      },
+      token
+    );
+  },
+
+  async listEditVersions(
+    clipId: string,
+    token?: string | null
+  ): Promise<ClipEditVersionSummary[]> {
+    return request<ClipEditVersionSummary[]>(`/clips/${clipId}/edit/versions`, {}, token);
+  },
+
+  async restoreEditVersion(
+    clipId: string,
+    version: number,
+    token?: string | null
+  ): Promise<ClipEditRecord> {
+    return request<ClipEditRecord>(
+      `/clips/${clipId}/edit/restore`,
+      {
+        method: "POST",
+        body: JSON.stringify({ version }),
+      },
+      token
+    );
+  },
+
+  async resetEditToAuto(clipId: string, token?: string | null): Promise<ClipEditRecord> {
+    return request<ClipEditRecord>(
+      `/clips/${clipId}/edit/reset`,
+      {
+        method: "POST",
+      },
+      token
+    );
+  },
+
+  async listClipAlternatives(
+    clipId: string,
+    kind?: "hook" | "range",
+    token?: string | null
+  ): Promise<ClipAlternative[]> {
+    const q = kind ? `?kind=${kind}` : "";
+    return request<ClipAlternative[]>(`/clips/${clipId}/alternatives${q}`, {}, token);
+  },
+
+  async regenerateClip(
+    clipId: string,
+    payload: ClipRegenerateRequest,
+    token?: string | null
+  ): Promise<{ job_id: string; mode: string; alternative: ClipAlternative }> {
+    return request<{ job_id: string; mode: string; alternative: ClipAlternative }>(
+      `/clips/${clipId}/regenerate`,
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+      },
+      token
+    );
+  },
+
+  async bulkClipActions(
+    payload: ClipBulkActionRequest,
+    token?: string | null
+  ): Promise<any> {
+    return request<any>(
+      `/clips/bulk`,
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+      },
+      token
+    );
+  },
+
+  async recordEditorEvents(
+    payload: EditorEventsBatchRequest,
+    token?: string | null
+  ): Promise<{ status: string; count: number }> {
+    return request<{ status: string; count: number }>(
+      `/editor/events`,
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+      },
+      token
+    );
+  },
+
+  async getEditorMetrics(token?: string | null): Promise<EditorMetricsResponse> {
+    return request<EditorMetricsResponse>(`/admin/editor-metrics`, {}, token);
   },
 };
 
