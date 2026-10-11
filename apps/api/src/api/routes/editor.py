@@ -64,6 +64,12 @@ router = APIRouter(tags=["editor"])
 settings = get_settings()
 
 
+def _ensure_tz(dt: datetime) -> datetime:
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=UTC)
+    return dt
+
+
 async def _get_clip_and_verify_ownership(
     clip_id: uuid.UUID, user_id: uuid.UUID, db: AsyncSession
 ) -> tuple[Clip, Video]:
@@ -407,7 +413,7 @@ async def save_clip_edit(
     # 3. Collapse window check (30s)
     # If not a checkpoint, latest is not a checkpoint, and created < 30s ago -> collapse
     now = utc_now()
-    time_since_creation = (now - latest.created_at).total_seconds()
+    time_since_creation = (now - _ensure_tz(latest.created_at)).total_seconds()
     can_collapse = (
         not payload.is_checkpoint
         and not latest.is_checkpoint
@@ -882,19 +888,19 @@ async def get_editor_metrics(
     regenerate_count = 0
 
     for s_id, s_events in sessions.items():
-        s_events.sort(key=lambda x: x.created_at)
-        start_time = s_events[0].created_at
+        s_events.sort(key=lambda x: _ensure_tz(x.created_at))
+        start_time = _ensure_tz(s_events[0].created_at)
         has_edit = False
         has_export = False
         session_active_seconds = 0.0
 
         for i in range(len(s_events) - 1):
-            gap = (s_events[i + 1].created_at - s_events[i].created_at).total_seconds()
+            gap = (_ensure_tz(s_events[i + 1].created_at) - _ensure_tz(s_events[i].created_at)).total_seconds()
             if gap <= 20.0:
                 session_active_seconds += gap
 
         for ev in s_events:
-            t_from_start = (ev.created_at - start_time).total_seconds()
+            t_from_start = (_ensure_tz(ev.created_at) - start_time).total_seconds()
             if ev.type == "clip_visible" and not time_to_first_clips:
                 time_to_first_clips.append(t_from_start)
             elif ev.type in ("edit_action", "delete_word", "trim_boundary", "style_change", "swap_hook", "toggle_cleanup"):

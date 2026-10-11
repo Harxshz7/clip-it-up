@@ -90,3 +90,13 @@ async def subscribe_export_events_async(export_id: str) -> AsyncGenerator[dict[s
         await pubsub.unsubscribe(channel)
         await pubsub.close()
 
+
+async def publish_event_async(channel: str, event_type: str, data: dict[str, Any]) -> None:
+    """Publish generic async event to Redis channel."""
+    try:
+        client = get_async_redis_client()
+        payload = json.dumps({"type": event_type, "data": data}, default=str)
+        await client.publish(channel, payload)
+    except Exception:
+        pass
+
