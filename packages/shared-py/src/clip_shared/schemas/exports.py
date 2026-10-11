@@ -117,6 +117,7 @@ class CreateExportRequest(BaseModel):
     preset_key: str | None = None
     presets: list[str] | None = None
     style_key: str | None = None
+    doc_snapshot: dict[str, Any] | None = None
     force: bool = False
 
 

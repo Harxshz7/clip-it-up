@@ -16,6 +16,7 @@ from clip_shared.db.models import (
     Clip,
     ClipCaption,
     ClipCleanup,
+    ClipEdit,
     ClipReframe,
     Export,
     ExportPreset,
@@ -582,6 +583,24 @@ async def create_clip_export(
     reframe_rec = rf_res.scalar_one_or_none()
     reframe_id = str(reframe_rec.id) if reframe_rec else "default"
 
+    # Resolve active clip edit document if available
+    active_edit_doc = payload.doc_snapshot
+    doc_version = None
+    if not active_edit_doc:
+        e_stmt = select(ClipEdit).where(ClipEdit.clip_id == clip.id).order_by(desc(ClipEdit.version)).limit(1)
+        e_res = await db.execute(e_stmt)
+        active_edit = e_res.scalar_one_or_none()
+        if active_edit:
+            active_edit_doc = active_edit.doc
+            doc_version = active_edit.version
+    else:
+        doc_version = active_edit_doc.get("version", 1)
+
+    if active_edit_doc and not payload.style_key:
+        captions_sub = active_edit_doc.get("captions", {})
+        if captions_sub.get("style_key"):
+            style_key = captions_sub.get("style_key")
+
     created_exports: list[Export] = []
 
     for p_key in presets_to_export:
@@ -593,6 +612,8 @@ async def create_clip_export(
             "cleanup_version": cleanup_version,
             "reframe_id": reframe_id,
             "watermark": bool(plan.export_watermark),
+            "doc_version": doc_version,
+            "doc_snapshot": active_edit_doc,
         }
         params_hash = compute_params_snapshot_hash(params_snapshot)
         params_snapshot["hash"] = params_hash

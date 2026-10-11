@@ -1,9 +1,4 @@
-/**
- * Edit Decision List (EDL) and Timeline Mapping.
- *
- * Deterministic module mapping source video time to rendered output timeline.
- * Strict parity with Python clip_shared.media.edl module.
- */
+import type { KeepSegment } from './types.js';
 
 export interface Removal {
   id?: string;
@@ -12,13 +7,6 @@ export interface Removal {
   kind?: string;
   text?: string | null;
   enabled?: boolean;
-}
-
-export interface KeepSegment {
-  src_start_ms: number;
-  src_end_ms: number;
-  out_start_ms: number;
-  out_end_ms: number;
 }
 
 export class EditDecisionList {

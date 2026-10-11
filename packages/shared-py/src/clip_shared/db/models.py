@@ -44,6 +44,8 @@ class User(Base):
     reframe_edits: Mapped[list["ClipReframeEdit"]] = relationship("ClipReframeEdit", back_populates="user", cascade="all, delete-orphan")
     exports: Mapped[list["Export"]] = relationship("Export", back_populates="user", cascade="all, delete-orphan")
     plan: Mapped[Optional["UserPlan"]] = relationship("UserPlan", back_populates="user", uselist=False, cascade="all, delete-orphan")
+    edits: Mapped[list["ClipEdit"]] = relationship("ClipEdit", back_populates="user", cascade="all, delete-orphan")
+    editor_events: Mapped[list["EditorEvent"]] = relationship("EditorEvent", back_populates="user", cascade="all, delete-orphan")
 
     __table_args__ = (
         Index("ix_users_created_at", "created_at"),
@@ -321,6 +323,9 @@ class Clip(Base):
     captions: Mapped[list["ClipCaption"]] = relationship("ClipCaption", back_populates="clip", cascade="all, delete-orphan")
     cleanups: Mapped[list["ClipCleanup"]] = relationship("ClipCleanup", back_populates="clip", cascade="all, delete-orphan")
     exports: Mapped[list["Export"]] = relationship("Export", back_populates="clip", cascade="all, delete-orphan")
+    edits: Mapped[list["ClipEdit"]] = relationship("ClipEdit", back_populates="clip", cascade="all, delete-orphan")
+    alternatives: Mapped[list["ClipAlternative"]] = relationship("ClipAlternative", back_populates="clip", cascade="all, delete-orphan")
+    editor_events: Mapped[list["EditorEvent"]] = relationship("EditorEvent", back_populates="clip", cascade="all, delete-orphan")
 
     __table_args__ = (
         Index("ix_clips_video_score", "video_id", "final_score"),
@@ -752,6 +757,78 @@ class Export(Base):
 
     __table_args__ = (
         Index("ix_exports_created_at", "created_at"),
+    )
+
+
+class ClipEdit(Base):
+    """Versioned edit document for a clip (single source of truth)."""
+    __tablename__ = "clip_edits"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    clip_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("clips.id", ondelete="CASCADE"), nullable=False, index=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    version: Mapped[int] = mapped_column(Integer, nullable=False)
+    doc: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, nullable=False)
+    parent_version: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+    label: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    is_checkpoint: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+
+    # Relationships
+    clip: Mapped["Clip"] = relationship("Clip", back_populates="edits")
+    user: Mapped["User"] = relationship("User", back_populates="edits")
+
+    __table_args__ = (
+        Index("ix_clip_edits_clip_version", "clip_id", "version"),
+        Index("ix_clip_edits_clip_created", "clip_id", "created_at"),
+        UniqueConstraint("clip_id", "version", name="uq_clip_edits_clip_version"),
+    )
+
+
+class ClipAlternative(Base):
+    """Alternative hook or range trims populated from scoring runs or regeneration."""
+    __tablename__ = "clip_alternatives"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    clip_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("clips.id", ondelete="CASCADE"), nullable=False, index=True)
+    kind: Mapped[str] = mapped_column(String(32), nullable=False)  # hook | range
+    start_ms: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    end_ms: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    text: Mapped[str] = mapped_column(Text, nullable=False)
+    score: Mapped[float | None] = mapped_column(Float, nullable=True)
+    reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+    source: Mapped[str | None] = mapped_column(String(64), nullable=True)  # scoring_run_id | regenerate
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+
+    # Relationships
+    clip: Mapped["Clip"] = relationship("Clip", back_populates="alternatives")
+
+    __table_args__ = (
+        Index("ix_clip_alternatives_clip_kind", "clip_id", "kind"),
+        Index("ix_clip_alternatives_created_at", "created_at"),
+    )
+
+
+class EditorEvent(Base):
+    """Instrumentation event for editor performance and user workflow tracking."""
+    __tablename__ = "editor_events"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    clip_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("clips.id", ondelete="CASCADE"), nullable=True, index=True)
+    session_id: Mapped[str] = mapped_column(String(128), nullable=False, index=True)
+    type: Mapped[str] = mapped_column(String(64), nullable=False)
+    payload: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, default=dict, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+
+    # Relationships
+    user: Mapped["User"] = relationship("User", back_populates="editor_events")
+    clip: Mapped[Optional["Clip"]] = relationship("Clip", back_populates="editor_events")
+
+    __table_args__ = (
+        Index("ix_editor_events_user_created", "user_id", "created_at"),
+        Index("ix_editor_events_session", "session_id"),
+        Index("ix_editor_events_type", "type"),
     )
 
 

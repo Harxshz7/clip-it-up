@@ -11,6 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from api.routes.clips import router as clips_router
+from api.routes.editor import router as editor_router
 from api.routes.eval import router as eval_router
 from api.routes.exports import router as exports_router
 from api.routes.health import router as health_router
@@ -155,3 +156,4 @@ app.include_router(reframe_router)
 app.include_router(reviews_router)
 app.include_router(eval_router)
 app.include_router(exports_router)
+app.include_router(editor_router)
