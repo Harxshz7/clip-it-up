@@ -89,3 +89,20 @@ The Celery worker executes 6 sequential stages. Re-running any stage is strictly
 4. **Diversity & Overlap Deduplication**: Suppresses overlapping moments ($\text{IoU} > 0.30$) and limits density to 2 clips per 5-minute window.
 5. **Multi-Length Variants**: Generates 15s, 30s, 45s, 60s, and auto cuts aligned to sentence boundaries.
 
+---
+
+## 6. Phase 5 Editor & Concurrency Architecture
+
+1. **Single Source of Truth (`clip_edit_doc`)**:
+   - Unified versioned document defining clip boundary range, removals list, caption stylings & word overrides, reframe modes & keyframes, and cleanup options.
+   - All timestamps remain strictly in source milliseconds; output timeline mapping is handled deterministically via `EditDecisionList` (both in TS and Python).
+2. **Persistence & Concurrency**:
+   - Optimistic concurrency through `If-Match: <version>`. Divergent client updates receive HTTP `409 Conflict` containing the server document.
+   - 800ms debounced autosave collapses updates occurring within a 30-second window into the active version row.
+   - Explicit checkpoints (`Cmd/Ctrl+S`, hook swaps, regenerate) increment versions and preserve rollbacks.
+   - IndexedDB / localStorage crash recovery automatically catches drafts in the event of browser termination.
+3. **Progressive Editing**:
+   - Editor opens immediately on initial scored clips while the broader video pipeline is still active.
+   - If reframe tracking is pending, falls back to progressive center crop with live in-place upgrade upon `reframe_ready` SSE event.
+
+
