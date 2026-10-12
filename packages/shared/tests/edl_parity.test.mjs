@@ -15,7 +15,7 @@ const fixtures = JSON.parse(fs.readFileSync(fixturesPath, 'utf-8'));
 
 test('TS EditDecisionList matches shared parity vectors', () => {
   for (const tc of fixtures.cases) {
-    const edl = new EditDecisionList(tc.clip_start_ms, tc.clip_end_ms, tc.removals);
+    const edl = EditDecisionList.create(tc.clip_start_ms, tc.clip_end_ms, tc.removals);
 
     assert.equal(
       edl.durationMs,
@@ -53,7 +53,7 @@ test('TS EditDecisionList matches shared parity vectors', () => {
 
 test('TS EditDecisionList remaps captions matching shared parity words fixture', () => {
   const wf = fixtures.words_fixture;
-  const edl = new EditDecisionList(wf.clip_start_ms, wf.clip_end_ms, wf.removals);
+  const edl = EditDecisionList.create(wf.clip_start_ms, wf.clip_end_ms, wf.removals);
   const remapped = edl.remapCaptions(wf.words);
 
   assert.equal(remapped.length, wf.expected_remapped_words.length);
@@ -97,7 +97,7 @@ test('clipEditDocToEDL honors disabled removals', () => {
 });
 
 test('EditDecisionList mapSrcToOut and mapOutToSrc roundtrip inside keep segments', () => {
-  const edl = new EditDecisionList(1000, 11000, [
+  const edl = EditDecisionList.create(1000, 11000, [
     { start_ms: 4000, end_ms: 6000, kind: 'filler' }
   ]);
 
