@@ -37,6 +37,32 @@ export class EditDecisionList {
     return this.total_src_duration_ms - this.total_out_duration_ms;
   }
 
+  get durationMs(): number {
+    return this.total_out_duration_ms;
+  }
+
+  get removedMs(): number {
+    return this.removed_duration_ms;
+  }
+
+  get keepSegments(): KeepSegment[] {
+    return this.keep_segments;
+  }
+
+  mapSrcToOut(src_ms: number): number {
+    return this.src_to_out_clamped(src_ms);
+  }
+
+  mapOutToSrc(out_ms: number): number {
+    return this.out_to_src(out_ms);
+  }
+
+  remapCaptions<T extends { start_ms: number; end_ms: number; deleted?: boolean }>(
+    words: T[]
+  ): (T & { src_start_ms: number; src_end_ms: number })[] {
+    return this.remap_words(words);
+  }
+
   static create(
     clip_start_ms: number,
     clip_end_ms: number,
@@ -318,3 +344,11 @@ export class EditDecisionList {
     };
   }
 }
+
+export function clipEditDocToEDL(doc: {
+  range: { start_ms: number; end_ms: number };
+  removals?: Removal[] | null;
+}): EditDecisionList {
+  return EditDecisionList.create(doc.range.start_ms, doc.range.end_ms, doc.removals);
+}
+
