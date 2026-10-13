@@ -711,6 +711,16 @@ def run_stage(self, job_id_str: str, stage_name: str):
                 if video:
                     video.status = "ready"
 
+                # Reconcile reserved vs actual measured minutes
+                actual_min = (video.duration_seconds / 60.0) if (video and video.duration_seconds) else 10.0
+                QuotaService.reconcile_minutes_sync(
+                    db=db,
+                    user_id=job.user_id,
+                    job_id=job.id,
+                    reserved_minutes=10.0,
+                    actual_minutes=actual_min,
+                )
+
             db.flush()
             all_stages = db.query(JobStage).filter(JobStage.job_id == job_id).all()
             publish_job_event_sync(str(job_id), build_job_event_payload(job, all_stages))
@@ -777,6 +787,16 @@ def run_stage(self, job_id_str: str, stage_name: str):
                 j.status = "failed"
                 j.error = str(exc)
                 j.finished_at = utc_now()
+
+                # Automatically refund reserved quota on system failure
+                refund_est = (v.duration_seconds / 60.0) if (v and v.duration_seconds) else 10.0
+                QuotaService.refund_minutes_sync(
+                    db=db,
+                    user_id=j.user_id,
+                    job_id=j.id,
+                    minutes=refund_est,
+                    reason="job_system_failure_refund",
+                )
 
             if v:
                 v.status = "failed"

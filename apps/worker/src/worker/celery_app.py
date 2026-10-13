@@ -13,6 +13,7 @@ celery_app = Celery(
         "worker.tasks.render",
         "worker.tasks.analysis",
         "worker.tasks.review",
+        "worker.tasks.supervisor",
     ],
 )
 
@@ -33,6 +34,16 @@ celery_app.conf.update(
     task_routes={
         "worker.tasks.pipeline.run_stage": lambda name, args, kwargs, options, task=None: {
             "queue": "gpu" if (args and len(args) > 1 and args[1] == "transcribe") else "cpu"
+        },
+    },
+    beat_schedule={
+        "supervise-stuck-jobs-every-minute": {
+            "task": "worker.tasks.supervisor.supervise_stuck_jobs",
+            "schedule": 60.0,
+        },
+        "cleanup-retention-hourly": {
+            "task": "worker.tasks.supervisor.cleanup_retention_and_expired_data",
+            "schedule": 3600.0,
         },
     },
 )
