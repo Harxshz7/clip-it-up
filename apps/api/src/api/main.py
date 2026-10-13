@@ -10,6 +10,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from api.routes.billing import router as billing_router
 from api.routes.clips import router as clips_router
 from api.routes.editor import router as editor_router
 from api.routes.eval import router as eval_router
@@ -20,6 +21,7 @@ from api.routes.reframe import router as reframe_router
 from api.routes.reviews import router as reviews_router
 from api.routes.usage import router as usage_router
 from api.routes.videos import router as videos_router
+from clip_shared.billing.exceptions import BillingError
 from clip_shared.config import get_settings
 
 settings = get_settings()
