@@ -7,6 +7,7 @@ import { api } from "@/lib/api";
 import { formatBytes, formatDuration, formatDateTime } from "@/lib/utils";
 import { useAppStore } from "@/lib/store";
 import { UsageSummaryCard } from "@/components/UsageSummaryCard";
+import { OnboardingChecklist } from "@/components/OnboardingChecklist";
 import {
   Film,
   Upload,
@@ -17,6 +18,8 @@ import {
   AlertCircle,
   Loader2,
   HardDrive,
+  Play,
+  Sparkles,
 } from "lucide-react";
 
 export default function DashboardPage() {
@@ -106,14 +109,27 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      {/* Onboarding Quickstart Checklist */}
+      <OnboardingChecklist hasUploadedVideos={videos.length > 0} />
+
       {/* Grid: Main Video List + Side Usage Summary */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Videos List (2 Columns) */}
         <div className="lg:col-span-2 space-y-4">
-          <h2 className="text-sm font-semibold text-zinc-300 uppercase tracking-wider flex items-center gap-2">
-            <Film className="w-4 h-4 text-purple-400" />
-            Source Videos ({videos.length})
-          </h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-semibold text-zinc-300 uppercase tracking-wider flex items-center gap-2">
+              <Film className="w-4 h-4 text-purple-400" />
+              Source Videos ({videos.length})
+            </h2>
+
+            <Link
+              href="/videos/00000000-0000-0000-0000-000000000099/clips"
+              className="text-xs font-semibold text-purple-400 hover:text-purple-300 flex items-center gap-1.5 transition-colors"
+            >
+              <Play className="w-3 h-3 fill-purple-400 text-purple-400" />
+              <span>Open Sample Demo</span>
+            </Link>
+          </div>
 
           {loading && videos.length === 0 && (
             <div className="flex items-center justify-center p-12 glass-panel rounded-2xl">
@@ -122,22 +138,33 @@ export default function DashboardPage() {
           )}
 
           {!loading && videos.length === 0 && (
-            <div className="glass-panel rounded-2xl p-8 text-center space-y-4">
+            <div className="glass-panel rounded-2xl p-8 text-center space-y-5">
               <div className="h-12 w-12 rounded-2xl bg-purple-950/60 border border-purple-800/40 text-purple-400 flex items-center justify-center mx-auto">
                 <Film className="w-6 h-6" />
               </div>
               <div>
                 <h3 className="text-base font-semibold text-white">No videos uploaded yet</h3>
-                <p className="text-xs text-zinc-400 mt-1 max-w-sm mx-auto">
-                  Upload your first video to initiate direct-to-S3 transfer and run the processing pipeline.
+                <p className="text-xs text-zinc-400 mt-1 max-w-sm mx-auto leading-relaxed">
+                  Upload your first video to run our 6-stage clipping pipeline, or explore our precomputed sample project with zero quota usage.
                 </p>
               </div>
-              <button
-                onClick={() => setUploadModalOpen(true)}
-                className="inline-flex items-center gap-2 rounded-xl bg-purple-600 px-4 py-2 text-xs font-semibold text-white shadow-md hover:bg-purple-500 transition-all"
-              >
-                <Upload className="w-3.5 h-3.5" /> Upload Video
-              </button>
+
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+                <Link
+                  href="/videos/00000000-0000-0000-0000-000000000099/clips"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 px-5 py-2.5 text-xs font-semibold text-white shadow-lg shadow-purple-500/25 hover:from-purple-500 hover:to-indigo-500 transition-all"
+                >
+                  <Play className="w-3.5 h-3.5 fill-white text-white" />
+                  Try Sample Project (Zero Quota)
+                </Link>
+
+                <button
+                  onClick={() => setUploadModalOpen(true)}
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-5 py-2.5 text-xs font-semibold text-zinc-300 hover:text-white hover:bg-white/10 transition-all"
+                >
+                  <Upload className="w-3.5 h-3.5 text-purple-400" /> Upload Your Video
+                </button>
+              </div>
             </div>
           )}
 

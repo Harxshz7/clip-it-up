@@ -3,6 +3,7 @@ import "./globals.css";
 import { Navbar } from "@/components/Navbar";
 import { UploadModal } from "@/components/UploadModal";
 import { UpgradeModal } from "@/components/UpgradeModal";
+import { SignupSurveyModal } from "@/components/SignupSurveyModal";
 import { Footer } from "@/components/Footer";
 
 export const metadata: Metadata = {
@@ -24,6 +25,7 @@ export default function RootLayout({
         </main>
         <UploadModal />
         <UpgradeModal />
+        <SignupSurveyModal />
         <Footer />
       </body>
     </html>
