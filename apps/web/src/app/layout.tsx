@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Navbar } from "@/components/Navbar";
 import { UploadModal } from "@/components/UploadModal";
+import { UpgradeModal } from "@/components/UpgradeModal";
+import { Footer } from "@/components/Footer";
 
 export const metadata: Metadata = {
   title: "clip-it-up | Turn Long Videos Into Viral Shorts",
@@ -21,7 +23,10 @@ export default function RootLayout({
           {children}
         </main>
         <UploadModal />
+        <UpgradeModal />
+        <Footer />
       </body>
     </html>
   );
 }
+

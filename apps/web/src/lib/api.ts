@@ -842,6 +842,155 @@ export const api = {
   async rescoreVideo(videoId: string, token?: string | null): Promise<any> {
     return request<any>(`/videos/${videoId}/rescore`, { method: "POST" }, token);
   },
+
+  // ----------------------------------------------------
+  // Phase 6: Billing, Legal, Admin, Ops
+  // ----------------------------------------------------
+  async getBillingPlans(): Promise<{ plans: PlanBillingItem[]; top_up_packs: TopUpPackItem[]; currency_default: string }> {
+    return request<{ plans: PlanBillingItem[]; top_up_packs: TopUpPackItem[]; currency_default: string }>("/billing/plans");
+  },
+
+  async getBillingMe(token?: string | null): Promise<UserBillingMe> {
+    return request<UserBillingMe>("/billing/me", {}, token);
+  },
+
+  async createCheckout(
+    payload: {
+      plan_key: string;
+      provider?: string;
+      currency?: string;
+      country?: string;
+      customer_name?: string;
+      customer_email?: string;
+      customer_gstin?: string;
+      billing_address?: any;
+    },
+    token?: string | null
+  ): Promise<any> {
+    return request<any>("/billing/checkout", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }, token);
+  },
+
+  async buyTopUp(
+    payload: {
+      pack_key: string;
+      provider?: string;
+      currency?: string;
+      country?: string;
+      customer_name?: string;
+      customer_email?: string;
+    },
+    token?: string | null
+  ): Promise<any> {
+    return request<any>("/billing/top-up", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }, token);
+  },
+
+  async cancelSubscription(token?: string | null): Promise<any> {
+    return request<any>("/billing/subscriptions/cancel", { method: "POST" }, token);
+  },
+
+  async resumeSubscription(token?: string | null): Promise<any> {
+    return request<any>("/billing/subscriptions/resume", { method: "POST" }, token);
+  },
+
+  async changePlan(planKey: string, token?: string | null): Promise<any> {
+    return request<any>("/billing/subscriptions/change-plan", {
+      method: "POST",
+      body: JSON.stringify({ plan_key: planKey }),
+    }, token);
+  },
+
+  async getInvoices(token?: string | null): Promise<InvoiceListItem[]> {
+    return request<InvoiceListItem[]>("/billing/invoices", {}, token);
+  },
+
+  getInvoiceDownloadUrl(invoiceId: string): string {
+    return `${API_BASE_URL}/billing/invoices/${invoiceId}/download`;
+  },
+
+  async acceptTerms(doc: string, version: string, token?: string | null): Promise<any> {
+    return request<any>("/legal/accept-terms", {
+      method: "POST",
+      body: JSON.stringify({ doc, version }),
+    }, token);
+  },
+
+  async submitTakedown(payload: TakedownNoticePayload): Promise<any> {
+    return request<any>("/legal/dmca/takedown", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+  },
+
+  async submitCounterNotice(ticketId: string, payload: { statement: string; contact_email: string; signature: string }): Promise<any> {
+    return request<any>(`/legal/dmca/${ticketId}/counter-notice`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+  },
+
+  async deleteVideo(videoId: string, token?: string | null): Promise<any> {
+    return request<any>(`/legal/videos/${videoId}`, { method: "DELETE" }, token);
+  },
+
+  async requestAccountDeletion(token?: string | null): Promise<any> {
+    return request<any>("/legal/account/delete", { method: "POST" }, token);
+  },
+
+  async downloadUserData(token?: string | null): Promise<any> {
+    return request<any>("/legal/account/export-data", {}, token);
+  },
+
+  async submitSupportTicket(payload: SupportTicketPayload, token?: string | null): Promise<any> {
+    return request<any>("/legal/support/ticket", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }, token);
+  },
+
+  async getAdminFunnelMetrics(token?: string | null): Promise<FunnelMetricsResponse> {
+    return request<FunnelMetricsResponse>("/admin/metrics/funnel", {}, token);
+  },
+
+  async getAdminProductHealthMetrics(token?: string | null): Promise<ProductHealthMetricsResponse> {
+    return request<ProductHealthMetricsResponse>("/admin/metrics/product-health", {}, token);
+  },
+
+  async getAdminMoneyMetrics(token?: string | null): Promise<MoneyMetricsResponse> {
+    return request<MoneyMetricsResponse>("/admin/metrics/money", {}, token);
+  },
+
+  async getAdminAbuseMetrics(token?: string | null): Promise<AbuseMetricsResponse> {
+    return request<AbuseMetricsResponse>("/admin/metrics/abuse", {}, token);
+  },
+
+  async getAdminInvites(token?: string | null): Promise<any[]> {
+    return request<any[]>("/admin/invites", {}, token);
+  },
+
+  async createAdminInvite(payload: { code: string; max_uses?: number; expires_in_days?: number }, token?: string | null): Promise<any> {
+    return request<any>("/admin/invites", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }, token);
+  },
+
+  async revokeAdminInvite(code: string, token?: string | null): Promise<any> {
+    return request<any>(`/admin/invites/${code}`, { method: "DELETE" }, token);
+  },
+
+  getAdminInvoicesExportUrl(month: string): string {
+    return `${API_BASE_URL}/admin/invoices/export?month=${month}`;
+  },
+
+  async getDeepHealth(): Promise<any> {
+    return request<any>("/health/deep");
+  },
 };
 
 

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Scissors, Upload, BarChart3, LayoutDashboard, Sparkles } from "lucide-react";
+import { Scissors, Upload, BarChart3, LayoutDashboard, Sparkles, CreditCard } from "lucide-react";
 import { useAppStore } from "@/lib/store";
 
 export function Navbar() {
@@ -20,7 +20,7 @@ export function Navbar() {
             <span className="font-bold text-xl tracking-tight text-white flex items-center gap-1.5">
               clip<span className="text-purple-400">it</span>up
               <span className="inline-flex items-center gap-1 rounded-full bg-purple-950/60 px-2 py-0.5 text-[10px] font-medium text-purple-300 border border-purple-800/50">
-                <Sparkles className="w-2.5 h-2.5 text-purple-400" /> Phase 0
+                <Sparkles className="w-2.5 h-2.5 text-purple-400" /> Soft Launch
               </span>
             </span>
           </Link>
@@ -29,7 +29,7 @@ export function Navbar() {
             <Link
               href="/dashboard"
               className={`flex items-center gap-2 px-3.5 py-2 rounded-lg transition-colors ${
-                pathname.startsWith("/dashboard") || pathname.startsWith("/videos")
+                pathname === "/dashboard" || pathname.startsWith("/videos")
                   ? "bg-white/10 text-white"
                   : "text-zinc-400 hover:text-white hover:bg-white/5"
               }`}
@@ -39,15 +39,27 @@ export function Navbar() {
             </Link>
 
             <Link
-              href="/reviews/gate"
+              href="/settings/billing"
               className={`flex items-center gap-2 px-3.5 py-2 rounded-lg transition-colors ${
-                pathname.startsWith("/reviews/gate")
+                pathname.startsWith("/settings/billing")
                   ? "bg-white/10 text-white"
                   : "text-zinc-400 hover:text-white hover:bg-white/5"
               }`}
             >
-              <BarChart3 className="h-4 w-4 text-purple-400" />
-              Gate Report
+              <CreditCard className="h-4 w-4 text-purple-400" />
+              Plans & Billing
+            </Link>
+
+            <Link
+              href="/admin"
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-lg transition-colors ${
+                pathname.startsWith("/admin")
+                  ? "bg-white/10 text-white"
+                  : "text-zinc-400 hover:text-white hover:bg-white/5"
+              }`}
+            >
+              <BarChart3 className="h-4 w-4 text-indigo-400" />
+              Admin
             </Link>
           </div>
         </div>
@@ -55,17 +67,20 @@ export function Navbar() {
         <div className="flex items-center gap-3">
           <button
             onClick={() => setUploadModalOpen(true)}
-            className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-purple-500/25 hover:from-purple-500 hover:to-indigo-500 hover:shadow-purple-500/35 active:scale-95 transition-all"
+            className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-2 text-xs sm:text-sm font-semibold text-white shadow-lg shadow-purple-500/25 hover:from-purple-500 hover:to-indigo-500 hover:shadow-purple-500/35 active:scale-95 transition-all"
           >
             <Upload className="h-4 w-4" />
             Upload Video
           </button>
 
           <div className="flex items-center gap-2 pl-3 border-l border-white/10">
-            <div className="flex items-center gap-2 rounded-full bg-zinc-800/80 px-3 py-1.5 border border-white/5 text-xs text-zinc-300">
+            <Link
+              href="/settings/billing"
+              className="flex items-center gap-2 rounded-full bg-zinc-800/80 px-3 py-1.5 border border-white/5 text-xs text-zinc-300 hover:border-purple-500/40 hover:text-white transition-all"
+            >
               <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>Dev User</span>
-            </div>
+              <span>Free Plan</span>
+            </Link>
           </div>
         </div>
       </div>
