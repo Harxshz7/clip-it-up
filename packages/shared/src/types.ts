@@ -975,3 +975,156 @@ export interface EditorMetricsResponse {
   drop_off_points: Record<string, number>;
   total_regenerate_count: number;
 }
+
+// ----------------------------------------------------
+// Phase 6: Plans, Metering, Billing, Legal, Admin
+// ----------------------------------------------------
+
+export interface PlanBillingItem {
+  key: string;
+  name: string;
+  badge?: string;
+  description?: string;
+  price_inr_monthly: number;
+  price_usd_monthly: number;
+  monthly_source_minutes: number;
+  max_exports_per_month: number;
+  watermark: boolean;
+  max_video_length_min: number;
+  max_concurrent_jobs: number;
+  retention_days: number;
+  priority: number;
+  features: string[];
+  is_public: boolean;
+}
+
+export interface BillingUsageInfo {
+  source_minutes_used: number;
+  source_minutes_limit: number;
+  source_minutes_remaining: number;
+  exports_used: number;
+  exports_limit: number;
+  exports_remaining: number;
+  period_start: string;
+  period_end: string;
+}
+
+export interface SubscriptionInfo {
+  id?: string;
+  provider?: string;
+  status: string;
+  current_period_end: string;
+  cancel_at_period_end: boolean;
+  provider_subscription_id?: string;
+}
+
+export interface UserBillingMe {
+  user_id: string;
+  email: string;
+  plan: PlanBillingItem;
+  subscription?: SubscriptionInfo | null;
+  usage: BillingUsageInfo;
+  top_up_minutes_balance: number;
+  reset_date: string;
+  overage_policy: string;
+  flags: {
+    stripe_enabled: boolean;
+    topups_enabled: boolean;
+    invite_only: boolean;
+  };
+}
+
+export interface TopUpPackItem {
+  key: string;
+  name: string;
+  minutes: number;
+  price_inr: number;
+  price_usd: number;
+  valid_days: number;
+}
+
+export interface InvoiceListItem {
+  id: string;
+  invoice_number: string;
+  period_start: string;
+  period_end: string;
+  amount_subtotal: number;
+  amount_tax: number;
+  amount_total: number;
+  currency: string;
+  status: string;
+  invoice_type: string;
+  invoice_url?: string | null;
+  receipt_url?: string | null;
+  created_at: string;
+}
+
+export interface TakedownNoticePayload {
+  claimant_name: string;
+  claimant_email: string;
+  claimant_phone?: string;
+  claimant_company?: string;
+  work_description: string;
+  infringing_urls_or_ids: string[];
+  good_faith_statement: boolean;
+  accuracy_statement: boolean;
+  signature: string;
+}
+
+export interface SupportTicketPayload {
+  subject: string;
+  message: string;
+  category?: string;
+  job_id?: string;
+  video_id?: string;
+  correlation_id?: string;
+}
+
+export interface FunnelMetricsResponse {
+  total_visitors: number;
+  signups: number;
+  uploads: number;
+  first_exports: number;
+  paid_subscribers: number;
+  conversion_rates: {
+    visitor_to_signup_pct: number;
+    signup_to_upload_pct: number;
+    upload_to_export_pct: number;
+    export_to_paid_pct: number;
+  };
+}
+
+export interface ProductHealthMetricsResponse {
+  jobs_per_day: number;
+  success_rate: number;
+  time_to_first_clips_p50_s: number;
+  time_to_first_clips_p90_s: number;
+  retry_rate: number;
+  queue_depth: {
+    cpu: number;
+    gpu: number;
+  };
+  error_code_breakdown: Record<string, number>;
+}
+
+export interface MoneyMetricsResponse {
+  mrr_inr: number;
+  active_subscriptions_by_plan: Record<string, number>;
+  churn_rate_pct: number;
+  failed_payments: number;
+  refunds: number;
+  arpu_inr: number;
+  revenue_vs_cost: {
+    total_revenue_inr: number;
+    estimated_cost_inr: number;
+    gross_margin_pct: number;
+  };
+}
+
+export interface AbuseMetricsResponse {
+  users_near_cap: number;
+  rate_limit_hits_24h: number;
+  flagged_uploads: number;
+  dmca_queue_count: number;
+}
+

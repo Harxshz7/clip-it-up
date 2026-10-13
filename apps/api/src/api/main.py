@@ -10,6 +10,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from api.routes.admin import router as admin_router
 from api.routes.billing import router as billing_router
 from api.routes.clips import router as clips_router
 from api.routes.editor import router as editor_router
@@ -17,6 +18,7 @@ from api.routes.eval import router as eval_router
 from api.routes.exports import router as exports_router
 from api.routes.health import router as health_router
 from api.routes.jobs import router as jobs_router
+from api.routes.legal_ops import router as legal_router
 from api.routes.reframe import router as reframe_router
 from api.routes.reviews import router as reviews_router
 from api.routes.usage import router as usage_router
@@ -165,6 +167,8 @@ async def unhandled_exception_handler(request: Request, exc: Exception):
 # Mount routes
 app.include_router(health_router)
 app.include_router(billing_router)
+app.include_router(admin_router)
+app.include_router(legal_router)
 app.include_router(videos_router)
 app.include_router(jobs_router)
 app.include_router(usage_router)
