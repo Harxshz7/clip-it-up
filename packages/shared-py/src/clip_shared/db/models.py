@@ -867,6 +867,382 @@ class EditorEvent(Base):
     )
 
 
+# ---------------------------------------------------------------------------
+# Phase 6 Models: Billing, Ledger, Invoices, Legal, Abuse & Operations
+# ---------------------------------------------------------------------------
+
+class Customer(Base):
+    """Mapping between local user and payment gateway customer IDs."""
+    __tablename__ = "customers"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    provider: Mapped[str] = mapped_column(String(32), nullable=False)  # razorpay | stripe
+    provider_customer_id: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
+    meta: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, default=dict, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+
+    # Relationships
+    user: Mapped["User"] = relationship("User", back_populates="customers")
+    subscriptions: Mapped[list["Subscription"]] = relationship("Subscription", back_populates="customer")
+
+    __table_args__ = (
+        UniqueConstraint("user_id", "provider", name="uq_customers_user_provider"),
+        Index("ix_customers_provider_cust_id", "provider", "provider_customer_id"),
+    )
+
+
+class Subscription(Base):
+    """Mirrored subscription record synced via webhooks."""
+    __tablename__ = "subscriptions"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    customer_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("customers.id", ondelete="SET NULL"), nullable=True)
+    provider: Mapped[str] = mapped_column(String(32), nullable=False)  # razorpay | stripe
+    provider_subscription_id: Mapped[str] = mapped_column(String(255), unique=True, nullable=False, index=True)
+    plan_key: Mapped[str] = mapped_column(String(64), ForeignKey("plans.key", ondelete="RESTRICT"), nullable=False, index=True)
+    status: Mapped[str] = mapped_column(String(32), default="pending", nullable=False, index=True)  # active | past_due | canceled | expired | halted | pending
+    currency: Mapped[str] = mapped_column(String(10), default="INR", nullable=False)
+    current_period_start: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    current_period_end: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    cancel_at_period_end: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    canceled_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    ended_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    meta: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, default=dict, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, onupdate=utc_now, nullable=False)
+
+    # Relationships
+    user: Mapped["User"] = relationship("User", back_populates="subscriptions")
+    customer: Mapped[Optional["Customer"]] = relationship("Customer", back_populates="subscriptions")
+    plan: Mapped["Plan"] = relationship("Plan", back_populates="subscriptions")
+    payments: Mapped[list["Payment"]] = relationship("Payment", back_populates="subscription")
+    invoices: Mapped[list["Invoice"]] = relationship("Invoice", back_populates="subscription")
+
+    __table_args__ = (
+        Index("ix_subscriptions_user_status", "user_id", "status"),
+        Index("ix_subscriptions_provider_sub_id", "provider", "provider_subscription_id"),
+    )
+
+
+class Payment(Base):
+    """Payment transaction log for audits, subscriptions, and top-ups."""
+    __tablename__ = "payments"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    subscription_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("subscriptions.id", ondelete="SET NULL"), nullable=True, index=True)
+    invoice_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("invoices.id", ondelete="SET NULL"), nullable=True, index=True)
+    provider: Mapped[str] = mapped_column(String(32), nullable=False)  # razorpay | stripe
+    provider_payment_id: Mapped[str] = mapped_column(String(255), unique=True, nullable=False, index=True)
+    amount: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
+    currency: Mapped[str] = mapped_column(String(10), default="INR", nullable=False)
+    status: Mapped[str] = mapped_column(String(32), default="succeeded", nullable=False, index=True)  # succeeded | failed | refunded | partially_refunded
+    error_code: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
+    meta: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, default=dict, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+
+    # Relationships
+    user: Mapped["User"] = relationship("User", back_populates="payments")
+    subscription: Mapped[Optional["Subscription"]] = relationship("Subscription", back_populates="payments")
+    invoice: Mapped[Optional["Invoice"]] = relationship("Invoice", back_populates="payments", foreign_keys=[invoice_id])
+
+    __table_args__ = (
+        Index("ix_payments_user_created", "user_id", "created_at"),
+    )
+
+
+class Invoice(Base):
+    """Sequential, gap-free tax invoice or receipt with GST breakdown and S3 PDF."""
+    __tablename__ = "invoices"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    subscription_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("subscriptions.id", ondelete="SET NULL"), nullable=True, index=True)
+    payment_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), nullable=True)  # Populated when payment is created
+    invoice_number: Mapped[str] = mapped_column(String(64), unique=True, nullable=False, index=True)
+    financial_year: Mapped[str] = mapped_column(String(16), nullable=False, index=True)  # e.g., 2026-27
+    seq_number: Mapped[int] = mapped_column(Integer, nullable=False)
+    type: Mapped[str] = mapped_column(String(32), default="tax_invoice", nullable=False)  # tax_invoice | receipt | credit_note
+    original_invoice_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("invoices.id", ondelete="SET NULL"), nullable=True)
+
+    # Customer & Tax details
+    customer_name: Mapped[str] = mapped_column(String(255), nullable=False)
+    customer_email: Mapped[str] = mapped_column(String(255), nullable=False)
+    customer_address: Mapped[dict[str, Any] | None] = mapped_column(JSON_TYPE, nullable=True)
+    customer_gstin: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    customer_state_code: Mapped[str | None] = mapped_column(String(10), nullable=True)
+    place_of_supply: Mapped[str] = mapped_column(String(32), default="intra_state", nullable=False)  # intra_state | inter_state | export
+
+    # Financial Breakdowns
+    taxable_amount: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
+    cgst_rate: Mapped[Decimal] = mapped_column(Numeric(6, 4), default=Decimal("0.0000"), nullable=False)
+    cgst_amount: Mapped[Decimal] = mapped_column(Numeric(12, 2), default=Decimal("0.00"), nullable=False)
+    sgst_rate: Mapped[Decimal] = mapped_column(Numeric(6, 4), default=Decimal("0.0000"), nullable=False)
+    sgst_amount: Mapped[Decimal] = mapped_column(Numeric(12, 2), default=Decimal("0.00"), nullable=False)
+    igst_rate: Mapped[Decimal] = mapped_column(Numeric(6, 4), default=Decimal("0.0000"), nullable=False)
+    igst_amount: Mapped[Decimal] = mapped_column(Numeric(12, 2), default=Decimal("0.00"), nullable=False)
+    total_tax: Mapped[Decimal] = mapped_column(Numeric(12, 2), default=Decimal("0.00"), nullable=False)
+    total_amount: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
+    currency: Mapped[str] = mapped_column(String(10), default="INR", nullable=False)
+
+    status: Mapped[str] = mapped_column(String(32), default="paid", nullable=False)  # paid | void | refunded
+    pdf_storage_key: Mapped[str | None] = mapped_column(String(1024), nullable=True)
+    lut_note: Mapped[str | None] = mapped_column(Text, nullable=True)
+    meta: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, default=dict, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+
+    # Relationships
+    user: Mapped["User"] = relationship("User", back_populates="invoices")
+    subscription: Mapped[Optional["Subscription"]] = relationship("Subscription", back_populates="invoices")
+    payments: Mapped[list["Payment"]] = relationship("Payment", back_populates="invoice", foreign_keys=[Payment.invoice_id])
+    credit_notes: Mapped[list["Invoice"]] = relationship("Invoice", remote_side=[original_invoice_id])
+
+    __table_args__ = (
+        UniqueConstraint("financial_year", "seq_number", "type", name="uq_invoice_fy_seq_type"),
+        Index("ix_invoices_user_created", "user_id", "created_at"),
+        Index("ix_invoices_status", "status"),
+    )
+
+
+class InvoiceSequence(Base):
+    """Gap-free atomic sequence counter for financial year tax invoice generation."""
+    __tablename__ = "invoice_sequences"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    prefix: Mapped[str] = mapped_column(String(32), nullable=False)
+    financial_year: Mapped[str] = mapped_column(String(16), nullable=False)
+    seq_type: Mapped[str] = mapped_column(String(32), default="tax_invoice", nullable=False)
+    last_val: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, onupdate=utc_now, nullable=False)
+
+    __table_args__ = (
+        UniqueConstraint("prefix", "financial_year", "seq_type", name="uq_invoice_seq_prefix_fy_type"),
+    )
+
+
+class WebhookEvent(Base):
+    """Idempotency log for payment webhooks to safely handle replays and out-of-order events."""
+    __tablename__ = "webhook_events"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    provider: Mapped[str] = mapped_column(String(32), nullable=False)  # razorpay | stripe
+    event_id: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
+    event_type: Mapped[str] = mapped_column(String(128), nullable=False, index=True)
+    payload: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, nullable=False)
+    status: Mapped[str] = mapped_column(String(32), default="received", nullable=False)  # received | processed | ignored | failed
+    error: Mapped[str | None] = mapped_column(Text, nullable=True)
+    processed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+
+    __table_args__ = (
+        UniqueConstraint("provider", "event_id", name="uq_webhook_events_provider_event_id"),
+        Index("ix_webhook_events_created", "created_at"),
+    )
+
+
+class TopUp(Base):
+    """One-time credit pack purchases adding source minutes with expiration."""
+    __tablename__ = "top_ups"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    pack_key: Mapped[str] = mapped_column(String(64), nullable=False)
+    minutes: Mapped[int] = mapped_column(Integer, nullable=False)
+    remaining_minutes: Mapped[int] = mapped_column(Integer, nullable=False)
+    amount: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
+    currency: Mapped[str] = mapped_column(String(10), default="INR", nullable=False)
+    status: Mapped[str] = mapped_column(String(32), default="active", nullable=False)  # active | exhausted | expired
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, index=True)
+    payment_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("payments.id", ondelete="SET NULL"), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+
+    # Relationships
+    user: Mapped["User"] = relationship("User", back_populates="top_ups")
+
+    __table_args__ = (
+        Index("ix_top_ups_user_status_exp", "user_id", "status", "expires_at"),
+    )
+
+
+class QuotaLedger(Base):
+    """Append-only audit ledger of every minute reserved, reconciled, refunded, and topped up."""
+    __tablename__ = "quota_ledger"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    delta_minutes: Mapped[Decimal] = mapped_column(Numeric(12, 4), nullable=False)
+    balance_after: Mapped[Decimal] = mapped_column(Numeric(12, 4), nullable=False)
+    reason: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    # reasons: monthly_grant | job_reserve | job_reconcile | job_refund | top_up | admin_adjustment
+    ref_id: Mapped[str | None] = mapped_column(String(128), nullable=True, index=True)  # job_id or payment_id
+    meta: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, default=dict, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+
+    # Relationships
+    user: Mapped["User"] = relationship("User", back_populates="quota_ledger_entries")
+
+    __table_args__ = (
+        Index("ix_quota_ledger_user_created", "user_id", "created_at"),
+    )
+
+
+class InviteCode(Base):
+    """Waitlist and soft-launch invite gating table."""
+    __tablename__ = "invite_codes"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    code: Mapped[str] = mapped_column(String(64), unique=True, nullable=False, index=True)
+    max_uses: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
+    uses_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    created_by: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+
+    # Relationships
+    redemptions: Mapped[list["UserInvite"]] = relationship("UserInvite", back_populates="invite_code", cascade="all, delete-orphan")
+
+
+class UserInvite(Base):
+    """User invite redemption audit record."""
+    __tablename__ = "user_invites"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), unique=True, nullable=False, index=True)
+    invite_code_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("invite_codes.id", ondelete="CASCADE"), nullable=False, index=True)
+    redeemed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+
+    # Relationships
+    invite_code: Mapped["InviteCode"] = relationship("InviteCode", back_populates="redemptions")
+
+
+class TermsAcceptance(Base):
+    """Versioned legal document acceptance records for DPDP Act and compliance."""
+    __tablename__ = "terms_acceptances"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    doc_type: Mapped[str] = mapped_column(String(64), nullable=False)  # terms | privacy | aup | refund | dmca
+    doc_version: Mapped[str] = mapped_column(String(32), nullable=False)
+    ip_hash: Mapped[str] = mapped_column(String(128), nullable=False)
+    user_agent: Mapped[str | None] = mapped_column(String(512), nullable=True)
+    accepted_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+
+    # Relationships
+    user: Mapped["User"] = relationship("User", back_populates="terms_acceptances")
+
+    __table_args__ = (
+        Index("ix_terms_acceptances_user_doc", "user_id", "doc_type", "doc_version"),
+    )
+
+
+class TakedownRequest(Base):
+    """DMCA and copyright takedown notices queue with counter-notice flow and SLA timers."""
+    __tablename__ = "takedown_requests"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    ticket_number: Mapped[str] = mapped_column(String(64), unique=True, nullable=False, index=True)
+    claimant_name: Mapped[str] = mapped_column(String(255), nullable=False)
+    claimant_email: Mapped[str] = mapped_column(String(255), nullable=False)
+    claimant_organization: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    work_description: Mapped[str] = mapped_column(Text, nullable=False)
+    infringing_url_or_id: Mapped[str] = mapped_column(String(1024), nullable=False)
+    video_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("videos.id", ondelete="SET NULL"), nullable=True, index=True)
+    good_faith_confirmed: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    perjury_confirmed: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    signature: Mapped[str] = mapped_column(String(255), nullable=False)
+    status: Mapped[str] = mapped_column(String(32), default="submitted", nullable=False, index=True)
+    # status: submitted | under_review | actioned_blocked | counter_notice_received | restored | rejected
+    counter_notice_payload: Mapped[dict[str, Any] | None] = mapped_column(JSON_TYPE, nullable=True)
+    sla_deadline: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    actioned_by: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    audit_trail: Mapped[list[dict[str, Any]]] = mapped_column(JSON_TYPE, default=list, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, onupdate=utc_now, nullable=False)
+
+    __table_args__ = (
+        Index("ix_takedown_requests_created_status", "created_at", "status"),
+    )
+
+
+class DeletionAudit(Base):
+    """Auditable log of video or account deletion operations."""
+    __tablename__ = "deletion_audits"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    entity_type: Mapped[str] = mapped_column(String(32), nullable=False)  # video | account
+    entity_id: Mapped[str] = mapped_column(String(128), nullable=False, index=True)
+    user_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), nullable=True, index=True)
+    status: Mapped[str] = mapped_column(String(32), default="pending_grace", nullable=False)  # pending_grace | completed | cancelled
+    requested_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+    grace_period_ends_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    s3_objects_deleted_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    db_rows_deleted_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    audit_data: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, default=dict, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+
+    __table_args__ = (
+        Index("ix_deletion_audits_entity", "entity_type", "entity_id"),
+    )
+
+
+class DeadLetterJob(Base):
+    """Permanent graveyard for stuck/exhausted jobs to prevent silent hangs and enable debugging."""
+    __tablename__ = "dead_letter_jobs"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    job_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("jobs.id", ondelete="CASCADE"), unique=True, nullable=False, index=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    failed_stage: Mapped[str] = mapped_column(String(64), nullable=False)
+    error_code: Mapped[str] = mapped_column(String(64), nullable=False)
+    error_message: Mapped[str] = mapped_column(Text, nullable=False)
+    attempts: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
+    context: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, default=dict, nullable=False)
+    resolved: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+
+    # Relationships
+    job: Mapped["Job"] = relationship("Job", back_populates="dead_letter_record")
+
+    __table_args__ = (
+        Index("ix_dead_letter_jobs_created", "created_at"),
+        Index("ix_dead_letter_jobs_resolved", "resolved"),
+    )
+
+
+class AnalyticsEvent(Base):
+    """Self-hosted telemetry and conversion event table (no PII in properties)."""
+    __tablename__ = "analytics_events"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), nullable=True, index=True)
+    event_name: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    properties: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, default=dict, nullable=False)
+    session_id: Mapped[str | None] = mapped_column(String(128), nullable=True, index=True)
+    ip_hash: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False, index=True)
+
+    __table_args__ = (
+        Index("ix_analytics_events_name_created", "event_name", "created_at"),
+    )
+
+
+class AppConfigFlag(Base):
+    """Dynamic application feature flags and runtime configurations."""
+    __tablename__ = "app_config_flags"
+
+    key: Mapped[str] = mapped_column(String(64), primary_key=True)
+    value: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, nullable=False)
+    description: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, onupdate=utc_now, nullable=False)
+
+
+
 
 
 
