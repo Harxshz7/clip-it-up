@@ -1,0 +1,57 @@
+# Billing, Invoicing & GST Configuration for clip-it-up
+# Used for invoicing, taxes, Razorpay, Stripe, and abuse caps.
+# Note: For production, GST registration numbers and legal addresses are supplied via ENV or CA review.
+
+seller:
+  legal_name: "<SELLER_LEGAL_ENTITY_NAME_PLACEHOLDER>"
+  trade_name: "clip-it-up"
+  gstin: "<GSTIN_PLACEHOLDER_e.g._27AAAAA0000A1Z5>"
+  state_code: "27" # Maharashtra (default, configurable)
+  state_name: "Maharashtra"
+  address_line1: "<OFFICE_ADDRESS_LINE1_PLACEHOLDER>"
+  address_line2: "<OFFICE_ADDRESS_LINE2_PLACEHOLDER>"
+  city: "Mumbai"
+  pincode: "400001"
+  country: "India"
+  sac_code: "998314" # IT and software application services (verify with CA)
+  support_email: "billing@clipitup.com"
+  grievance_email: "grievance@clipitup.com"
+  invoice_prefix: "CIU"
+
+taxes:
+  gst_enabled: false # Set to true once GST registration is active; issues tax invoices instead of receipts
+  default_tax_rate: 0.18 # 18% GST (9% CGST + 9% SGST intra-state, or 18% IGST inter-state)
+  prices_include_tax: false # Prices in config/plans.yaml are tax-exclusive
+
+gateways:
+  razorpay:
+    enabled: true
+    primary_currency: "INR"
+    key_id_env: "RAZORPAY_KEY_ID"
+    key_secret_env: "RAZORPAY_KEY_SECRET"
+    webhook_secret_env: "RAZORPAY_WEBHOOK_SECRET"
+  stripe:
+    enabled: false # Behind PROVIDER_STRIPE_ENABLED flag
+    primary_currency: "USD"
+    publishable_key_env: "STRIPE_PUBLISHABLE_KEY"
+    secret_key_env: "STRIPE_SECRET_KEY"
+    webhook_secret_env: "STRIPE_WEBHOOK_SECRET"
+
+billing_policy:
+  overage_policy: "block" # "block" (default) or "topup"
+  grace_period_days: 3
+  dunning_max_retries: 3
+  prorate_upgrades: true
+
+abuse_caps:
+  max_free_signups_per_ip_per_day: 3
+  free_account_max_source_minutes_lifetime: 60
+  disposable_email_domains:
+    - "tempmail.com"
+    - "guerrillamail.com"
+    - "10minutemail.com"
+    - "mailinator.com"
+    - "throwawaymail.com"
+    - "trashmail.com"
+    - "yopmail.com"
+    - "sharklasers.com"

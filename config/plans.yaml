@@ -1,0 +1,128 @@
+# Plan Configurations and Quotas for clip-it-up
+# Loaded dynamically by the application and seeded into the DB.
+# NEVER hardcode plan prices or limits in business logic.
+
+plans:
+  free:
+    key: "free"
+    name: "Free Tier"
+    description: "Try clip-it-up with sample videos or short clips."
+    price_inr_monthly: 0
+    price_usd_monthly: 0
+    monthly_source_minutes: 30
+    max_exports_per_month: 10
+    watermark: true
+    max_video_length_min: 15
+    max_concurrent_jobs: 1
+    retention_days: 7
+    priority: "normal"
+    is_active: true
+    is_public: true
+    features:
+      watermark: true
+      max_resolution: "1080p"
+      indic_subtitles: true
+      cleanup_fillers: true
+      priority_queue: false
+
+  creator:
+    key: "creator"
+    name: "Creator Plan"
+    description: "Ideal for podcasters, interviewers, and regular video creators."
+    price_inr_monthly: 1499
+    price_usd_monthly: 19
+    monthly_source_minutes: 300
+    max_exports_per_month: 100
+    watermark: false
+    max_video_length_min: 60
+    max_concurrent_jobs: 2
+    retention_days: 30
+    priority: "high"
+    is_active: true
+    is_public: true
+    razorpay_plan_id: "plan_creator_inr_monthly"
+    stripe_price_id: "price_creator_usd_monthly"
+    features:
+      watermark: false
+      max_resolution: "1080p"
+      indic_subtitles: true
+      cleanup_fillers: true
+      priority_queue: true
+      custom_branding: true
+
+  pro:
+    key: "pro"
+    name: "Pro Studio"
+    description: "For prolific creators, video editors, and production teams."
+    price_inr_monthly: 3999
+    price_usd_monthly: 49
+    monthly_source_minutes: 1200
+    max_exports_per_month: 500
+    watermark: false
+    max_video_length_min: 120
+    max_concurrent_jobs: 5
+    retention_days: 90
+    priority: "highest"
+    is_active: true
+    is_public: true
+    razorpay_plan_id: "plan_pro_inr_monthly"
+    stripe_price_id: "price_pro_usd_monthly"
+    features:
+      watermark: false
+      max_resolution: "4k"
+      indic_subtitles: true
+      cleanup_fillers: true
+      priority_queue: true
+      custom_fonts: true
+      batch_export: true
+      api_access: true
+
+  agency:
+    key: "agency"
+    name: "Agency"
+    description: "High-throughput workspace for digital marketing and editing agencies."
+    price_inr_monthly: 14999
+    price_usd_monthly: 179
+    monthly_source_minutes: 6000
+    max_exports_per_month: 2500
+    watermark: false
+    max_video_length_min: 240
+    max_concurrent_jobs: 15
+    retention_days: 365
+    priority: "vip"
+    is_active: true
+    is_public: false # Hidden from standard pricing table
+    razorpay_plan_id: "plan_agency_inr_monthly"
+    stripe_price_id: "price_agency_usd_monthly"
+    features:
+      watermark: false
+      max_resolution: "4k"
+      indic_subtitles: true
+      cleanup_fillers: true
+      priority_queue: true
+      custom_fonts: true
+      batch_export: true
+      dedicated_support: true
+
+top_up_packs:
+  pack_60:
+    key: "pack_60"
+    name: "60 Minute Boost"
+    minutes: 60
+    price_inr: 399
+    price_usd: 5
+    validity_days: 30
+  pack_180:
+    key: "pack_180"
+    name: "180 Minute Creator Pack"
+    minutes: 180
+    price_inr: 999
+    price_usd: 12
+    validity_days: 60
+  pack_600:
+    key: "pack_600"
+    name: "600 Minute Studio Pack"
+    minutes: 600
+    price_inr: 2499
+    price_usd: 30
+    validity_days: 90
