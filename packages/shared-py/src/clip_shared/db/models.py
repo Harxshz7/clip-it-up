@@ -33,6 +33,11 @@ class User(Base):
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     clerk_user_id: Mapped[str] = mapped_column(String(255), unique=True, nullable=False, index=True)
     email: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
+    is_admin: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    is_suspended: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    status: Mapped[str] = mapped_column(String(32), default="active", nullable=False)
+    survey_response: Mapped[dict[str, Any] | None] = mapped_column(JSON_TYPE, nullable=True)
+    deletion_scheduled_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
 
     # Relationships
@@ -46,6 +51,13 @@ class User(Base):
     plan: Mapped[Optional["UserPlan"]] = relationship("UserPlan", back_populates="user", uselist=False, cascade="all, delete-orphan")
     edits: Mapped[list["ClipEdit"]] = relationship("ClipEdit", back_populates="user", cascade="all, delete-orphan")
     editor_events: Mapped[list["EditorEvent"]] = relationship("EditorEvent", back_populates="user", cascade="all, delete-orphan")
+    customers: Mapped[list["Customer"]] = relationship("Customer", back_populates="user", cascade="all, delete-orphan")
+    subscriptions: Mapped[list["Subscription"]] = relationship("Subscription", back_populates="user", cascade="all, delete-orphan")
+    payments: Mapped[list["Payment"]] = relationship("Payment", back_populates="user", cascade="all, delete-orphan")
+    invoices: Mapped[list["Invoice"]] = relationship("Invoice", back_populates="user", cascade="all, delete-orphan")
+    top_ups: Mapped[list["TopUp"]] = relationship("TopUp", back_populates="user", cascade="all, delete-orphan")
+    quota_ledger_entries: Mapped[list["QuotaLedger"]] = relationship("QuotaLedger", back_populates="user", cascade="all, delete-orphan")
+    terms_acceptances: Mapped[list["TermsAcceptance"]] = relationship("TermsAcceptance", back_populates="user", cascade="all, delete-orphan")
 
     __table_args__ = (
         Index("ix_users_created_at", "created_at"),
@@ -117,6 +129,9 @@ class Job(Base):
     status: Mapped[str] = mapped_column(String(32), default="queued", nullable=False)  # queued | running | succeeded | failed | cancelled
     current_stage: Mapped[str | None] = mapped_column(String(64), nullable=True)
     progress: Mapped[int] = mapped_column(BigInteger, default=0, nullable=False)
+    priority: Mapped[int] = mapped_column(Integer, default=1, nullable=False)  # 1 (normal) to 4 (vip)
+    attempts: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    stage_heartbeat: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     error: Mapped[str | None] = mapped_column(Text, nullable=True)
     partial_results: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, default=dict, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
@@ -128,6 +143,7 @@ class Job(Base):
     video: Mapped["Video"] = relationship("Video", back_populates="jobs")
     stages: Mapped[list["JobStage"]] = relationship("JobStage", back_populates="job", cascade="all, delete-orphan", order_by="JobStage.started_at")
     usage_records: Mapped[list["Usage"]] = relationship("Usage", back_populates="job")
+    dead_letter_record: Mapped[Optional["DeadLetterJob"]] = relationship("DeadLetterJob", back_populates="job", uselist=False, cascade="all, delete-orphan")
 
     __table_args__ = (
         Index("ix_jobs_user_created_at", "user_id", "created_at"),
@@ -662,15 +678,29 @@ class Plan(Base):
 
     key: Mapped[str] = mapped_column(String(64), primary_key=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
-    monthly_minutes: Mapped[int] = mapped_column(Integer, default=30, nullable=False)
-    export_watermark: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
-    max_export_height: Mapped[int] = mapped_column(Integer, default=1920, nullable=False)
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    price_inr_monthly: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    price_usd_monthly: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    monthly_source_minutes: Mapped[int] = mapped_column(Integer, default=30, nullable=False)
+    monthly_minutes: Mapped[int] = mapped_column(Integer, default=30, nullable=False)  # Alias for backward compatibility
     max_exports_per_month: Mapped[int] = mapped_column(Integer, default=10, nullable=False)
+    watermark: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    export_watermark: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)  # Alias for backward compatibility
+    max_export_height: Mapped[int] = mapped_column(Integer, default=1920, nullable=False)
+    max_video_length_min: Mapped[int] = mapped_column(Integer, default=15, nullable=False)
+    max_concurrent_jobs: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
+    retention_days: Mapped[int] = mapped_column(Integer, default=7, nullable=False)
+    priority: Mapped[str] = mapped_column(String(32), default="normal", nullable=False)  # normal | high | highest | vip
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    is_public: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    razorpay_plan_id: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    stripe_price_id: Mapped[str | None] = mapped_column(String(128), nullable=True)
     features: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, default=dict, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
 
     # Relationships
     user_plans: Mapped[list["UserPlan"]] = relationship("UserPlan", back_populates="plan")
+    subscriptions: Mapped[list["Subscription"]] = relationship("Subscription", back_populates="plan")
 
 
 class UserPlan(Base):
@@ -681,6 +711,11 @@ class UserPlan(Base):
     user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), unique=True, nullable=False, index=True)
     plan_key: Mapped[str] = mapped_column(String(64), ForeignKey("plans.key", ondelete="CASCADE"), nullable=False)
     period_start: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+    period_end: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    status: Mapped[str] = mapped_column(String(32), default="active", nullable=False)  # active | past_due | canceled | expired
+    auto_renew: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    cancel_at_period_end: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    canceled_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
 
     # Relationships
