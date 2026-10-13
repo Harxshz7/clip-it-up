@@ -27,6 +27,7 @@ from clip_shared.db.models import (
     UserPlan,
     Video,
 )
+from clip_shared.billing.quota import QuotaService
 from clip_shared.db.session import get_db
 from clip_shared.media.captions import build_clip_captions_data
 from clip_shared.media.cleanup import plan_clip_cleanup
@@ -516,53 +517,17 @@ async def create_clip_export(
     """
     clip, video = await _get_clip_and_verify_ownership(clip_id, user.id, db)
 
-    # 1. Enforce Plan Limits
-    # Get user plan
-    up_stmt = select(UserPlan).where(UserPlan.user_id == user.id)
-    up_res = await db.execute(up_stmt)
-    user_plan = up_res.scalar_one_or_none()
-    plan_key = user_plan.plan_key if user_plan else "free"
-    period_start = user_plan.period_start if user_plan else datetime.now(UTC).replace(day=1, hour=0, minute=0, second=0)
-
-    p_stmt = select(Plan).where(Plan.key == plan_key)
-    p_res = await db.execute(p_stmt)
-    plan = p_res.scalar_one_or_none()
-    if not plan:
-        plan = Plan(
-            key="free",
-            name="Free Tier",
-            monthly_minutes=30,
-            export_watermark=True,
-            max_export_height=1920,
-            max_exports_per_month=10,
-            features={"watermark": True},
-        )
-
-    # Check monthly exports limit
-    cnt_stmt = select(func.count(Export.id)).where(
-        Export.user_id == user.id,
-        Export.status.in_(["queued", "rendering", "succeeded"]),
-        Export.created_at >= period_start,
-    )
-    cnt_res = await db.execute(cnt_stmt)
-    exports_count = int(cnt_res.scalar() or 0)
-
+    # 1. Enforce Plan Limits via QuotaService
     presets_to_export = payload.presets if payload.presets else [payload.preset_key or "tiktok"]
+    await QuotaService.check_quota(
+        db=db,
+        user_id=user.id,
+        action="export",
+        amount=float(len(presets_to_export)),
+    )
 
-    if exports_count + len(presets_to_export) > plan.max_exports_per_month:
-        raise HTTPException(
-            status_code=status.HTTP_402_PAYMENT_REQUIRED,
-            detail={
-                "error": {
-                    "code": "PLAN_LIMIT_EXCEEDED",
-                    "message": f"Monthly export limit ({plan.max_exports_per_month}) reached for plan '{plan.name}'. Please upgrade to export more clips.",
-                    "limit_type": "max_exports_per_month",
-                    "limit_value": plan.max_exports_per_month,
-                    "current_value": exports_count,
-                    "reset_date": period_start.strftime("%Y-%m-%d"),
-                }
-            },
-        )
+    # Fetch active plan to check watermark and resolution requirements
+    plan, period_start, _ = await QuotaService.get_user_plan_and_period(db, user.id)
 
     # Resolve active captions version & style
     c_stmt = select(ClipCaption).where(ClipCaption.clip_id == clip.id).order_by(desc(ClipCaption.created_at))

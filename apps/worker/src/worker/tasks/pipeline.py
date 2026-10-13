@@ -24,6 +24,7 @@ from clip_shared.db.models import (
     Usage,
     Video,
 )
+from clip_shared.billing.quota import QuotaService
 from clip_shared.db.session import get_sync_db
 from clip_shared.media.audio_features import extract_audio_features
 from clip_shared.media.ffmpeg import (
@@ -562,6 +563,7 @@ def run_stage(self, job_id_str: str, stage_name: str):
                 video.status = "processing"
 
         job.current_stage = stage_name
+        job.stage_heartbeat = utc_now()
         db.flush()
 
         # Upsert Stage
@@ -600,6 +602,7 @@ def run_stage(self, job_id_str: str, stage_name: str):
             if stg:
                 stg.progress = pct
             j.progress = overall_pct
+            j.stage_heartbeat = utc_now()
             db.flush()
             all_stgs = db.query(JobStage).filter(JobStage.job_id == job_id).all()
             publish_job_event_sync(str(job_id), build_job_event_payload(j, all_stgs))

@@ -6,6 +6,7 @@ from sqlalchemy import desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.dependencies import get_current_user
+from clip_shared.billing.quota import QuotaService
 from clip_shared.config import get_settings
 from clip_shared.db.base import utc_now
 from clip_shared.db.models import (
@@ -252,6 +253,16 @@ async def complete_video_upload(
             },
         )
 
+    # 1. Enforce Plan Limits and Concurrency
+    estimated_duration_min = (video.duration_seconds / 60.0) if video.duration_seconds else 10.0
+    await QuotaService.check_quota(
+        db=db,
+        user_id=user.id,
+        action="source_minutes",
+        amount=estimated_duration_min,
+        video_duration_minutes=estimated_duration_min,
+    )
+
     # Update video
     video.status = "uploaded"
 
@@ -263,10 +274,20 @@ async def complete_video_upload(
         status="queued",
         current_stage="ingest",
         progress=0,
+        stage_heartbeat=utc_now(),
         created_at=utc_now(),
     )
     db.add(job)
     await db.flush()
+
+    # Reserve source minutes in append-only quota ledger
+    await QuotaService.reserve_minutes(
+        db=db,
+        user_id=user.id,
+        job_id=job.id,
+        minutes=estimated_duration_min,
+        reason="job_reserve",
+    )
 
     # Create initial stages
     stages_order = ["ingest", "proxy", "transcribe", "candidates", "score", "render"]

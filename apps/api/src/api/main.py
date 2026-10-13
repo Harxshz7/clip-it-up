@@ -83,6 +83,10 @@ async def request_logging_middleware(request: Request, call_next):
     duration_ms = round((time.time() - start_time) * 1000, 2)
 
     response.headers["X-Request-ID"] = request_id
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    response.headers["Content-Security-Policy"] = "default-src 'self'; frame-ancestors 'none';"
 
     # Do not log healthcheck polling in verbose level
     if request.url.path != "/health":
@@ -99,6 +103,14 @@ async def request_logging_middleware(request: Request, call_next):
 
 
 # Global Exception Handlers
+@app.exception_handler(BillingError)
+async def billing_error_handler(request: Request, exc: BillingError):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"error": exc.to_dict()},
+    )
+
+
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
     if isinstance(exc.detail, dict) and "error" in exc.detail:
@@ -152,6 +164,7 @@ async def unhandled_exception_handler(request: Request, exc: Exception):
 
 # Mount routes
 app.include_router(health_router)
+app.include_router(billing_router)
 app.include_router(videos_router)
 app.include_router(jobs_router)
 app.include_router(usage_router)
