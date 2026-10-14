@@ -178,73 +178,81 @@ class EditDecisionList:
     def removed_duration_ms(self) -> int:
         return self.total_src_duration_ms - self.total_out_duration_ms
 
-    def src_to_out(self, src_ms: int) -> int | None:
+    def src_to_out(self, src_ms: int, intro_offset_ms: int = 0) -> int | None:
         """
         Map a source millisecond timestamp to output timeline millisecond.
         Returns None if src_ms falls outside the clip or inside a removed cut.
+        Shifts by intro_offset_ms when an intro precedes the main clip.
         """
         if src_ms < self.clip_start_ms or src_ms > self.clip_end_ms:
             return None
 
         # Boundary edge case
         if src_ms == self.clip_end_ms:
-            return self.total_out_duration_ms
+            return self.total_out_duration_ms + intro_offset_ms
 
         for seg in self.keep_segments:
             if seg.src_start_ms <= src_ms < seg.src_end_ms:
-                return seg.out_start_ms + (src_ms - seg.src_start_ms)
+                return seg.out_start_ms + (src_ms - seg.src_start_ms) + intro_offset_ms
 
         return None
 
-    def src_to_out_clamped(self, src_ms: int) -> int:
+    def src_to_out_clamped(self, src_ms: int, intro_offset_ms: int = 0) -> int:
         """
         Map a source millisecond timestamp to the closest valid output timeline position.
         If src_ms falls inside a removal, it maps to the cut point boundary.
-        Clamped to [0, total_out_duration_ms].
+        Clamped to [0, total_out_duration_ms] + intro_offset_ms.
         """
         if not self.keep_segments:
-            return 0
+            return intro_offset_ms
 
         if src_ms <= self.clip_start_ms:
-            return 0
+            return intro_offset_ms
         if src_ms >= self.clip_end_ms:
-            return self.total_out_duration_ms
+            return self.total_out_duration_ms + intro_offset_ms
 
         for seg in self.keep_segments:
             if src_ms < seg.src_start_ms:
-                return seg.out_start_ms
+                return seg.out_start_ms + intro_offset_ms
             if seg.src_start_ms <= src_ms <= seg.src_end_ms:
-                return seg.out_start_ms + (src_ms - seg.src_start_ms)
+                return seg.out_start_ms + (src_ms - seg.src_start_ms) + intro_offset_ms
 
-        return self.total_out_duration_ms
+        return self.total_out_duration_ms + intro_offset_ms
 
-    def out_to_src(self, out_ms: int) -> int:
+    def out_to_src(self, out_ms: int, intro_offset_ms: int = 0) -> int:
         """
         Map an output timeline millisecond back to the source timestamp.
         Invertible mapping on all kept segments.
+        Accounts for intro_offset_ms by subtracting it before mapping.
         """
+        effective_out_ms = max(0, out_ms - intro_offset_ms)
         if not self.keep_segments:
             return self.clip_start_ms
 
-        if out_ms <= 0:
+        if effective_out_ms <= 0:
             return self.keep_segments[0].src_start_ms
-        if out_ms >= self.total_out_duration_ms:
+        if effective_out_ms >= self.total_out_duration_ms:
             return self.keep_segments[-1].src_end_ms
 
         for i, seg in enumerate(self.keep_segments):
             if i == len(self.keep_segments) - 1:
-                if seg.out_start_ms <= out_ms <= seg.out_end_ms:
-                    return seg.src_start_ms + (out_ms - seg.out_start_ms)
+                if seg.out_start_ms <= effective_out_ms <= seg.out_end_ms:
+                    return seg.src_start_ms + (effective_out_ms - seg.out_start_ms)
             else:
-                if seg.out_start_ms <= out_ms < seg.out_end_ms:
-                    return seg.src_start_ms + (out_ms - seg.out_start_ms)
+                if seg.out_start_ms <= effective_out_ms < seg.out_end_ms:
+                    return seg.src_start_ms + (effective_out_ms - seg.out_start_ms)
 
         return self.keep_segments[-1].src_end_ms
 
-    def remap_words(self, words: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    def remap_words(
+        self,
+        words: list[dict[str, Any]],
+        intro_offset_ms: int = 0,
+    ) -> list[dict[str, Any]]:
         """
         Remap a list of word dictionaries from source time to the output timeline.
         Words in removed intervals are dropped or marked deleted.
+        Shifts all timings forward by intro_offset_ms if an intro video is applied.
         """
         remapped: list[dict[str, Any]] = []
 
@@ -268,8 +276,8 @@ class EditDecisionList:
             if is_removed:
                 continue
 
-            out_start = self.src_to_out_clamped(w_start)
-            out_end = self.src_to_out_clamped(w_end)
+            out_start = self.src_to_out_clamped(w_start, intro_offset_ms=intro_offset_ms)
+            out_end = self.src_to_out_clamped(w_end, intro_offset_ms=intro_offset_ms)
 
             if out_end > out_start:
                 w_copy = dict(w)
@@ -281,10 +289,15 @@ class EditDecisionList:
 
         return remapped
 
-    def remap_crop_path(self, crop_path: dict[str, Any]) -> dict[str, Any]:
+    def remap_crop_path(
+        self,
+        crop_path: dict[str, Any],
+        intro_offset_ms: int = 0,
+    ) -> dict[str, Any]:
         """
         Remap 9:16 crop path keyframes from source time to output timeline.
         Keyframes are positioned on the new contiguous timeline and deduplicated.
+        Shifts keyframe times by intro_offset_ms if intro exists.
         """
         raw_keyframes = crop_path.get("keyframes", [])
         if not raw_keyframes:
@@ -299,7 +312,7 @@ class EditDecisionList:
 
         for kf in raw_keyframes:
             src_t = (self.clip_start_ms + kf["t_ms"]) if is_relative else kf["t_ms"]
-            out_t = self.src_to_out_clamped(src_t)
+            out_t = self.src_to_out_clamped(src_t, intro_offset_ms=intro_offset_ms)
 
             if out_t not in seen_times:
                 seen_times.add(out_t)
@@ -309,21 +322,28 @@ class EditDecisionList:
 
         remapped_kfs.sort(key=lambda k: k["t_ms"])
 
-        # Ensure we have a keyframe at t=0 and t=total_out_duration_ms
-        if remapped_kfs and remapped_kfs[0]["t_ms"] > 0:
+        min_t = intro_offset_ms
+        max_t = self.total_out_duration_ms + intro_offset_ms
+
+        # Ensure we have a keyframe at t=min_t and t=max_t
+        if remapped_kfs and remapped_kfs[0]["t_ms"] > min_t:
             first_copy = dict(remapped_kfs[0])
-            first_copy["t_ms"] = 0
+            first_copy["t_ms"] = min_t
             remapped_kfs.insert(0, first_copy)
 
-        if remapped_kfs and remapped_kfs[-1]["t_ms"] < self.total_out_duration_ms:
+        if remapped_kfs and remapped_kfs[-1]["t_ms"] < max_t:
             last_copy = dict(remapped_kfs[-1])
-            last_copy["t_ms"] = self.total_out_duration_ms
+            last_copy["t_ms"] = max_t
             remapped_kfs.append(last_copy)
 
         result = dict(crop_path)
         result["keyframes"] = remapped_kfs
-        result["duration_ms"] = self.total_out_duration_ms
+        result["duration_ms"] = self.total_out_duration_ms + intro_offset_ms
         return result
+
+    def total_output_duration_ms(self, intro_duration_ms: int = 0, outro_duration_ms: int = 0) -> int:
+        """Total composite duration including prepended intro and appended outro."""
+        return max(0, intro_duration_ms) + self.total_out_duration_ms + max(0, outro_duration_ms)
 
     def to_dict(self) -> dict[str, Any]:
         return {

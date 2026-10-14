@@ -49,18 +49,19 @@ export class EditDecisionList {
     return this.keep_segments;
   }
 
-  mapSrcToOut(src_ms: number): number {
-    return this.src_to_out_clamped(src_ms);
+  mapSrcToOut(src_ms: number, intro_offset_ms: number = 0): number {
+    return this.src_to_out_clamped(src_ms, intro_offset_ms);
   }
 
-  mapOutToSrc(out_ms: number): number {
-    return this.out_to_src(out_ms);
+  mapOutToSrc(out_ms: number, intro_offset_ms: number = 0): number {
+    return this.out_to_src(out_ms, intro_offset_ms);
   }
 
   remapCaptions<T extends { start_ms: number; end_ms: number; deleted?: boolean }>(
-    words: T[]
+    words: T[],
+    intro_offset_ms: number = 0
   ): (T & { src_start_ms: number; src_end_ms: number })[] {
-    return this.remap_words(words);
+    return this.remap_words(words, intro_offset_ms);
   }
 
   static create(
@@ -179,53 +180,54 @@ export class EditDecisionList {
     );
   }
 
-  src_to_out(src_ms: number): number | null {
+  src_to_out(src_ms: number, intro_offset_ms: number = 0): number | null {
     if (src_ms < this.clip_start_ms || src_ms > this.clip_end_ms) {
       return null;
     }
     if (src_ms === this.clip_end_ms) {
-      return this.total_out_duration_ms;
+      return this.total_out_duration_ms + intro_offset_ms;
     }
     for (const seg of this.keep_segments) {
       if (seg.src_start_ms <= src_ms && src_ms < seg.src_end_ms) {
-        return seg.out_start_ms + (src_ms - seg.src_start_ms);
+        return seg.out_start_ms + (src_ms - seg.src_start_ms) + intro_offset_ms;
       }
     }
     return null;
   }
 
-  src_to_out_clamped(src_ms: number): number {
-    if (this.keep_segments.length === 0) return 0;
-    if (src_ms <= this.clip_start_ms) return 0;
-    if (src_ms >= this.clip_end_ms) return this.total_out_duration_ms;
+  src_to_out_clamped(src_ms: number, intro_offset_ms: number = 0): number {
+    if (this.keep_segments.length === 0) return intro_offset_ms;
+    if (src_ms <= this.clip_start_ms) return intro_offset_ms;
+    if (src_ms >= this.clip_end_ms) return this.total_out_duration_ms + intro_offset_ms;
 
     for (const seg of this.keep_segments) {
       if (src_ms < seg.src_start_ms) {
-        return seg.out_start_ms;
+        return seg.out_start_ms + intro_offset_ms;
       }
       if (seg.src_start_ms <= src_ms && src_ms <= seg.src_end_ms) {
-        return seg.out_start_ms + (src_ms - seg.src_start_ms);
+        return seg.out_start_ms + (src_ms - seg.src_start_ms) + intro_offset_ms;
       }
     }
-    return this.total_out_duration_ms;
+    return this.total_out_duration_ms + intro_offset_ms;
   }
 
-  out_to_src(out_ms: number): number {
+  out_to_src(out_ms: number, intro_offset_ms: number = 0): number {
+    const effective_out_ms = Math.max(0, out_ms - intro_offset_ms);
     if (this.keep_segments.length === 0) return this.clip_start_ms;
-    if (out_ms <= 0) return this.keep_segments[0].src_start_ms;
-    if (out_ms >= this.total_out_duration_ms) {
+    if (effective_out_ms <= 0) return this.keep_segments[0].src_start_ms;
+    if (effective_out_ms >= this.total_out_duration_ms) {
       return this.keep_segments[this.keep_segments.length - 1].src_end_ms;
     }
 
     for (let i = 0; i < this.keep_segments.length; i++) {
       const seg = this.keep_segments[i];
       if (i === this.keep_segments.length - 1) {
-        if (seg.out_start_ms <= out_ms && out_ms <= seg.out_end_ms) {
-          return seg.src_start_ms + (out_ms - seg.out_start_ms);
+        if (seg.out_start_ms <= effective_out_ms && effective_out_ms <= seg.out_end_ms) {
+          return seg.src_start_ms + (effective_out_ms - seg.out_start_ms);
         }
       } else {
-        if (seg.out_start_ms <= out_ms && out_ms < seg.out_end_ms) {
-          return seg.src_start_ms + (out_ms - seg.out_start_ms);
+        if (seg.out_start_ms <= effective_out_ms && effective_out_ms < seg.out_end_ms) {
+          return seg.src_start_ms + (effective_out_ms - seg.out_start_ms);
         }
       }
     }
@@ -233,7 +235,8 @@ export class EditDecisionList {
   }
 
   remap_words<T extends { start_ms: number; end_ms: number; deleted?: boolean }>(
-    words: T[]
+    words: T[],
+    intro_offset_ms: number = 0
   ): (T & { src_start_ms: number; src_end_ms: number })[] {
     const remapped: (T & { src_start_ms: number; src_end_ms: number })[] = [];
 
@@ -253,8 +256,8 @@ export class EditDecisionList {
       }
       if (is_removed) continue;
 
-      const out_start = this.src_to_out_clamped(w_start);
-      const out_end = this.src_to_out_clamped(w_end);
+      const out_start = this.src_to_out_clamped(w_start, intro_offset_ms);
+      const out_end = this.src_to_out_clamped(w_end, intro_offset_ms);
 
       if (out_end > out_start) {
         remapped.push({
@@ -270,10 +273,13 @@ export class EditDecisionList {
     return remapped;
   }
 
-  remap_crop_path(crop_path: {
-    keyframes?: Array<{ t_ms: number; [key: string]: any }>;
-    [key: string]: any;
-  }): {
+  remap_crop_path(
+    crop_path: {
+      keyframes?: Array<{ t_ms: number; [key: string]: any }>;
+      [key: string]: any;
+    },
+    intro_offset_ms: number = 0
+  ): {
     keyframes: Array<{ t_ms: number; [key: string]: any }>;
     duration_ms: number;
     [key: string]: any;
@@ -283,7 +289,7 @@ export class EditDecisionList {
       return {
         ...crop_path,
         keyframes: [],
-        duration_ms: this.total_out_duration_ms,
+        duration_ms: this.total_out_duration_ms + intro_offset_ms,
       };
     }
 
@@ -295,7 +301,7 @@ export class EditDecisionList {
 
     for (const kf of raw_kfs) {
       const src_t = is_relative ? this.clip_start_ms + kf.t_ms : kf.t_ms;
-      const out_t = this.src_to_out_clamped(src_t);
+      const out_t = this.src_to_out_clamped(src_t, intro_offset_ms);
 
       if (!seen_times.has(out_t)) {
         seen_times.add(out_t);
@@ -308,28 +314,35 @@ export class EditDecisionList {
 
     remapped_kfs.sort((a, b) => a.t_ms - b.t_ms);
 
-    if (remapped_kfs.length > 0 && remapped_kfs[0].t_ms > 0) {
+    const min_t = intro_offset_ms;
+    const max_t = this.total_out_duration_ms + intro_offset_ms;
+
+    if (remapped_kfs.length > 0 && remapped_kfs[0].t_ms > min_t) {
       remapped_kfs.unshift({
         ...remapped_kfs[0],
-        t_ms: 0,
+        t_ms: min_t,
       });
     }
 
     if (
       remapped_kfs.length > 0 &&
-      remapped_kfs[remapped_kfs.length - 1].t_ms < this.total_out_duration_ms
+      remapped_kfs[remapped_kfs.length - 1].t_ms < max_t
     ) {
       remapped_kfs.push({
         ...remapped_kfs[remapped_kfs.length - 1],
-        t_ms: this.total_out_duration_ms,
+        t_ms: max_t,
       });
     }
 
     return {
       ...crop_path,
       keyframes: remapped_kfs,
-      duration_ms: this.total_out_duration_ms,
+      duration_ms: this.total_out_duration_ms + intro_offset_ms,
     };
+  }
+
+  total_output_duration_ms(intro_duration_ms: number = 0, outro_duration_ms: number = 0): number {
+    return Math.max(0, intro_duration_ms) + this.total_out_duration_ms + Math.max(0, outro_duration_ms);
   }
 
   to_dict() {

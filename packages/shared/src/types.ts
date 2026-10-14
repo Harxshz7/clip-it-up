@@ -875,6 +875,20 @@ export interface ClipEditCleanupOptions {
   snap_cuts?: boolean;
 }
 
+export interface ClipEditBrand {
+  kit_id?: string | null;
+  apply_logo: boolean;
+  apply_intro: boolean;
+  apply_outro: boolean;
+  apply_style: boolean;
+}
+
+export interface ClipEditCTA {
+  text: string;
+  style?: string;
+  duration_s?: number;
+}
+
 export interface ClipEditDoc {
   clip_id: string;
   base_clip_id: string;
@@ -889,6 +903,8 @@ export interface ClipEditDoc {
   hook: ClipEditHook;
   preset_key: string;
   cleanup_options: ClipEditCleanupOptions;
+  brand?: ClipEditBrand;
+  cta?: ClipEditCTA | null;
 }
 
 export interface ClipEditRecord {
@@ -1127,4 +1143,113 @@ export interface AbuseMetricsResponse {
   flagged_uploads: number;
   dmca_queue_count: number;
 }
+
+// ----------------------------------------------------
+// Phase 7a: Brand Kit and Auto-Variants
+// ----------------------------------------------------
+
+export interface BrandColors {
+  primary: string;
+  secondary: string;
+  text: string;
+  highlight: string;
+  background: string;
+}
+
+export interface BrandFonts {
+  heading_asset_id?: string | null;
+  body_asset_id?: string | null;
+  font_family?: string | null;
+}
+
+export type BrandAssetKind = 'logo' | 'font' | 'intro' | 'outro';
+export type LogoPosition = 'top_left' | 'top_right' | 'bottom_left' | 'bottom_right';
+
+export interface BrandAsset {
+  id: string;
+  user_id: string;
+  kind: BrandAssetKind;
+  storage_key: string;
+  filename: string;
+  content_type: string;
+  size_bytes: number;
+  width?: number | null;
+  height?: number | null;
+  duration_ms?: number | null;
+  status: 'processing' | 'ready' | 'failed';
+  metadata_json: Record<string, any>;
+  created_at: string;
+  download_url?: string | null;
+}
+
+export interface BrandKit {
+  id: string;
+  user_id: string;
+  name: string;
+  is_default: boolean;
+  colors: BrandColors;
+  fonts: BrandFonts;
+  logo_asset_id?: string | null;
+  logo_position: LogoPosition;
+  logo_opacity: number;
+  logo_scale: number;
+  caption_style_key?: string | null;
+  caption_overrides: Record<string, any>;
+  intro_asset_id?: string | null;
+  outro_asset_id?: string | null;
+  watermark_free_override: boolean;
+  created_at: string;
+  updated_at: string;
+  logo_asset?: BrandAsset | null;
+  intro_asset?: BrandAsset | null;
+  outro_asset?: BrandAsset | null;
+}
+
+export type VariantDimension = 'hook' | 'style' | 'cta';
+
+export interface ClipVariant {
+  id: string;
+  set_id: string;
+  edit_doc: ClipEditDoc;
+  label: string;
+  hook_text?: string | null;
+  caption_style_key?: string | null;
+  cta_text?: string | null;
+  cta_style?: string | null;
+  score_hint?: number | null;
+  export_id?: string | null;
+  created_at: string;
+}
+
+export interface VariantSet {
+  id: string;
+  clip_id: string;
+  user_id: string;
+  status: 'pending' | 'ready' | 'failed';
+  dimensions: VariantDimension[];
+  requested_count: number;
+  created_at: string;
+  variants: ClipVariant[];
+}
+
+export interface VariantGenerateRequest {
+  count?: number;
+  dimensions?: VariantDimension[];
+  cta_goal?: string;
+  include_baseline?: boolean;
+}
+
+export interface VariantBatchExportRequest {
+  variant_ids: string[];
+  preset_key?: string;
+}
+
+export interface ExportPerformanceMetrics {
+  platform?: string;
+  url?: string;
+  views?: number;
+  likes?: number;
+  avg_watch_pct?: number;
+}
+
 
