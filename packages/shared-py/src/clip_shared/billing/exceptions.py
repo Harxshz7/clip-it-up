@@ -43,7 +43,9 @@ class PlanLimitExceededError(BillingError):
             "message": self.message,
             "limit_type": self.limit_type,
             "limit": self.limit_value,
+            "limit_value": self.limit_value,
             "used": self.used_value,
+            "used_value": self.used_value,
             "reset_date": self.reset_date,
             "upgrade_url": self.upgrade_url,
         }
