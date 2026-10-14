@@ -58,6 +58,9 @@ class User(Base):
     top_ups: Mapped[list["TopUp"]] = relationship("TopUp", back_populates="user", cascade="all, delete-orphan")
     quota_ledger_entries: Mapped[list["QuotaLedger"]] = relationship("QuotaLedger", back_populates="user", cascade="all, delete-orphan")
     terms_acceptances: Mapped[list["TermsAcceptance"]] = relationship("TermsAcceptance", back_populates="user", cascade="all, delete-orphan")
+    brand_kits: Mapped[list["BrandKit"]] = relationship("BrandKit", back_populates="user", cascade="all, delete-orphan")
+    brand_assets: Mapped[list["BrandAsset"]] = relationship("BrandAsset", back_populates="user", cascade="all, delete-orphan")
+    variant_sets: Mapped[list["VariantSet"]] = relationship("VariantSet", back_populates="user", cascade="all, delete-orphan")
 
     __table_args__ = (
         Index("ix_users_created_at", "created_at"),
@@ -342,6 +345,7 @@ class Clip(Base):
     edits: Mapped[list["ClipEdit"]] = relationship("ClipEdit", back_populates="clip", cascade="all, delete-orphan")
     alternatives: Mapped[list["ClipAlternative"]] = relationship("ClipAlternative", back_populates="clip", cascade="all, delete-orphan")
     editor_events: Mapped[list["EditorEvent"]] = relationship("EditorEvent", back_populates="clip", cascade="all, delete-orphan")
+    variant_sets: Mapped[list["VariantSet"]] = relationship("VariantSet", back_populates="clip", cascade="all, delete-orphan")
 
     __table_args__ = (
         Index("ix_clips_video_score", "video_id", "final_score"),
@@ -783,15 +787,20 @@ class Export(Base):
     size_bytes: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
     render_ms: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
     error: Mapped[str | None] = mapped_column(Text, nullable=True)
+    variant_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("clip_variants.id", ondelete="SET NULL"), nullable=True, index=True)
+    external_post_url: Mapped[str | None] = mapped_column(String(1024), nullable=True)
+    performance_metrics: Mapped[dict[str, Any] | None] = mapped_column(JSON_TYPE, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
     finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     # Relationships
     clip: Mapped["Clip"] = relationship("Clip", back_populates="exports")
     user: Mapped["User"] = relationship("User", back_populates="exports")
+    variant: Mapped[Optional["ClipVariant"]] = relationship("ClipVariant", foreign_keys=[variant_id], back_populates="export", post_update=True)
 
     __table_args__ = (
         Index("ix_exports_created_at", "created_at"),
+        Index("ix_exports_variant_id", "variant_id"),
     )
 
 
@@ -1240,6 +1249,120 @@ class AppConfigFlag(Base):
     value: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, nullable=False)
     description: Mapped[str | None] = mapped_column(String(255), nullable=True)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, onupdate=utc_now, nullable=False)
+
+
+# ---------------------------------------------------------------------------
+# Phase 7a Models: Brand Kit and Auto-Variants
+# ---------------------------------------------------------------------------
+
+class BrandAsset(Base):
+    """Uploaded user assets for brand kits: logos, fonts, intro/outro clips."""
+    __tablename__ = "brand_assets"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    kind: Mapped[str] = mapped_column(String(32), nullable=False, index=True)  # logo | font | intro | outro
+    storage_key: Mapped[str] = mapped_column(String(1024), nullable=False)
+    filename: Mapped[str] = mapped_column(String(512), nullable=False)
+    content_type: Mapped[str] = mapped_column(String(128), nullable=False)
+    size_bytes: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    width: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    height: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    duration_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    status: Mapped[str] = mapped_column(String(32), default="processing", nullable=False, index=True)  # processing | ready | failed
+    metadata_json: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, default=dict, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+
+    # Relationships
+    user: Mapped["User"] = relationship("User", back_populates="brand_assets")
+
+    __table_args__ = (
+        Index("ix_brand_assets_user_kind", "user_id", "kind"),
+        Index("ix_brand_assets_created_at", "created_at"),
+    )
+
+
+class BrandKit(Base):
+    """Reusable brand identity kit (logo, colors, typography, intro/outro, caption style)."""
+    __tablename__ = "brand_kits"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    is_default: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    colors: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, default=dict, nullable=False)  # primary, secondary, text, highlight, background
+    fonts: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, default=dict, nullable=False)   # heading_asset_id, body_asset_id, font_family
+    logo_asset_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("brand_assets.id", ondelete="SET NULL"), nullable=True)
+    logo_position: Mapped[str] = mapped_column(String(32), default="top_right", nullable=False)  # top_left | top_right | bottom_left | bottom_right
+    logo_opacity: Mapped[float] = mapped_column(Float, default=1.0, nullable=False)
+    logo_scale: Mapped[float] = mapped_column(Float, default=0.15, nullable=False)
+    caption_style_key: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    caption_overrides: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, default=dict, nullable=False)
+    intro_asset_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("brand_assets.id", ondelete="SET NULL"), nullable=True)
+    outro_asset_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("brand_assets.id", ondelete="SET NULL"), nullable=True)
+    watermark_free_override: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, onupdate=utc_now, nullable=False)
+
+    # Relationships
+    user: Mapped["User"] = relationship("User", back_populates="brand_kits")
+    logo_asset: Mapped[Optional["BrandAsset"]] = relationship("BrandAsset", foreign_keys=[logo_asset_id])
+    intro_asset: Mapped[Optional["BrandAsset"]] = relationship("BrandAsset", foreign_keys=[intro_asset_id])
+    outro_asset: Mapped[Optional["BrandAsset"]] = relationship("BrandAsset", foreign_keys=[outro_asset_id])
+
+    __table_args__ = (
+        Index("ix_brand_kits_user_default", "user_id", "is_default"),
+        Index("ix_brand_kits_created_at", "created_at"),
+    )
+
+
+class VariantSet(Base):
+    """A generated set of auto-variants for a single clip moment."""
+    __tablename__ = "variant_sets"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    clip_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("clips.id", ondelete="CASCADE"), nullable=False, index=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    status: Mapped[str] = mapped_column(String(32), default="ready", nullable=False)  # pending | ready | failed
+    dimensions: Mapped[list[str]] = mapped_column(JSON_TYPE, default=list, nullable=False)  # ["hook", "style", "cta"]
+    requested_count: Mapped[int] = mapped_column(Integer, default=4, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+
+    # Relationships
+    clip: Mapped["Clip"] = relationship("Clip", back_populates="variant_sets")
+    user: Mapped["User"] = relationship("User", back_populates="variant_sets")
+    variants: Mapped[list["ClipVariant"]] = relationship("ClipVariant", back_populates="variant_set", cascade="all, delete-orphan", order_by="ClipVariant.created_at.asc()")
+
+    __table_args__ = (
+        Index("ix_variant_sets_clip_created", "clip_id", "created_at"),
+    )
+
+
+class ClipVariant(Base):
+    """An individual variant of a clip moment with lightweight edit_doc snapshot."""
+    __tablename__ = "clip_variants"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    set_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("variant_sets.id", ondelete="CASCADE"), nullable=False, index=True)
+    edit_doc: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, nullable=False)
+    label: Mapped[str] = mapped_column(String(128), nullable=False)
+    hook_text: Mapped[str | None] = mapped_column(Text, nullable=True)
+    caption_style_key: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    cta_text: Mapped[str | None] = mapped_column(String(512), nullable=True)
+    cta_style: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    score_hint: Mapped[float | None] = mapped_column(Float, nullable=True)
+    export_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("exports.id", ondelete="SET NULL"), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+
+    # Relationships
+    variant_set: Mapped["VariantSet"] = relationship("VariantSet", back_populates="variants")
+    export: Mapped[Optional["Export"]] = relationship("Export", foreign_keys=[export_id], back_populates="variant")
+
+    __table_args__ = (
+        Index("ix_clip_variants_set_id", "set_id"),
+        Index("ix_clip_variants_created_at", "created_at"),
+    )
+
 
 
 

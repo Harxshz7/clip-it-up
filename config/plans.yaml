@@ -24,6 +24,12 @@ plans:
       indic_subtitles: true
       cleanup_fillers: true
       priority_queue: false
+      brand_kit: false
+      max_brand_kits: 0
+      auto_variants: false
+      max_variants_per_clip: 0
+      max_brand_asset_size_mb: 5
+      max_intro_outro_length_s: 0
 
   creator:
     key: "creator"
@@ -49,6 +55,12 @@ plans:
       cleanup_fillers: true
       priority_queue: true
       custom_branding: true
+      brand_kit: true
+      max_brand_kits: 1
+      auto_variants: true
+      max_variants_per_clip: 4
+      max_brand_asset_size_mb: 25
+      max_intro_outro_length_s: 5
 
   pro:
     key: "pro"
@@ -76,6 +88,12 @@ plans:
       custom_fonts: true
       batch_export: true
       api_access: true
+      brand_kit: true
+      max_brand_kits: 5
+      auto_variants: true
+      max_variants_per_clip: 6
+      max_brand_asset_size_mb: 50
+      max_intro_outro_length_s: 10
 
   agency:
     key: "agency"
@@ -103,6 +121,12 @@ plans:
       custom_fonts: true
       batch_export: true
       dedicated_support: true
+      brand_kit: true
+      max_brand_kits: 20
+      auto_variants: true
+      max_variants_per_clip: 10
+      max_brand_asset_size_mb: 100
+      max_intro_outro_length_s: 15
 
 top_up_packs:
   pack_60:
