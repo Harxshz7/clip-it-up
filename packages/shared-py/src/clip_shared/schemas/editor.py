@@ -75,6 +75,20 @@ class CleanupOptionsModel(BaseModel):
     snap_cuts: bool = True
 
 
+class BrandConfigModel(BaseModel):
+    kit_id: str | None = None
+    apply_logo: bool = True
+    apply_intro: bool = True
+    apply_outro: bool = True
+    apply_style: bool = True
+
+
+class CTAModel(BaseModel):
+    text: str = ""
+    style: str | None = "overlay"  # overlay | end_card
+    duration_s: float = 2.0
+
+
 class ClipEditDoc(BaseModel):
     clip_id: str
     base_clip_id: str
@@ -86,6 +100,8 @@ class ClipEditDoc(BaseModel):
     hook: HookModel
     preset_key: str = "tiktok"
     cleanup_options: CleanupOptionsModel = Field(default_factory=CleanupOptionsModel)
+    brand: BrandConfigModel | None = Field(default_factory=BrandConfigModel)
+    cta: CTAModel | None = None
 
     @model_validator(mode="after")
     def validate_doc(self) -> "ClipEditDoc":
