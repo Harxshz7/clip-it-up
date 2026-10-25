@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Link from "next/link";
 import { useEditorStore } from "@/lib/editorStore";
 import { api } from "@/lib/api";
 import { ExportPreset, ExportRecord, UserPlanMe } from "@clip-it-up/shared";
@@ -17,7 +18,7 @@ import {
 } from "lucide-react";
 
 export const ExportTab: React.FC = () => {
-  const { doc } = useEditorStore();
+  const { doc, setBrandConfig } = useEditorStore();
   const [presets, setPresets] = useState<ExportPreset[]>([]);
   const [selectedPreset, setSelectedPreset] = useState<string>("tiktok");
   const [userPlan, setUserPlan] = useState<UserPlanMe | null>(null);
@@ -94,6 +95,49 @@ export const ExportTab: React.FC = () => {
           <span>{exportError}</span>
         </div>
       )}
+
+      {/* Brand Identity Toggle */}
+      <div className="p-3.5 rounded-xl bg-zinc-900 border border-zinc-800 space-y-2.5">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-purple-400" />
+            <div>
+              <span className="font-semibold text-white block text-xs">Apply Brand Kit to Export</span>
+              <span className="text-[10px] text-zinc-400">
+                Overlay transparent logo, custom intro &amp; outro bumpers
+              </span>
+            </div>
+          </div>
+          <label className="relative inline-flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              checked={doc?.brand?.apply_logo !== false}
+              onChange={(e) =>
+                setBrandConfig({
+                  apply_logo: e.target.checked,
+                  apply_intro: e.target.checked,
+                  apply_outro: e.target.checked,
+                })
+              }
+              className="sr-only peer"
+            />
+            <div className="w-9 h-5 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-600"></div>
+          </label>
+        </div>
+
+        {userPlan?.watermark_required && (
+          <div className="pt-2 border-t border-zinc-800/80 flex items-center justify-between text-[11px]">
+            <span className="text-zinc-400">Free plan exports retain watermark</span>
+            <Link
+              href="/settings/billing"
+              className="text-purple-400 hover:text-purple-300 font-semibold flex items-center gap-1"
+            >
+              <span>Upgrade</span>
+              <ExternalLink className="w-3 h-3" />
+            </Link>
+          </div>
+        )}
+      </div>
 
       {/* Preset Selector */}
       <div className="space-y-3">

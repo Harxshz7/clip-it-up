@@ -1009,8 +1009,8 @@ export interface PlanBillingItem {
   max_video_length_min: number;
   max_concurrent_jobs: number;
   retention_days: number;
-  priority: number;
-  features: string[];
+  priority: number | string;
+  features: Record<string, any>;
   is_public: boolean;
 }
 

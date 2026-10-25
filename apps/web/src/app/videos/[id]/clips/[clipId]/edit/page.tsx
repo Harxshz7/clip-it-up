@@ -13,6 +13,7 @@ import { FramingTab } from "@/components/editor/FramingTab";
 import { CleanupTab } from "@/components/editor/CleanupTab";
 import { HookTab } from "@/components/editor/HookTab";
 import { ExportTab } from "@/components/editor/ExportTab";
+import { VariantsTab } from "@/components/editor/VariantsTab";
 import { ConflictDialog } from "@/components/editor/ConflictDialog";
 import { DraftRecoveryBanner } from "@/components/editor/DraftRecoveryBanner";
 import { RegenerateDialog } from "@/components/editor/RegenerateDialog";
@@ -306,6 +307,7 @@ export default function ClipEditorPage() {
                 { id: "framing", label: "Framing", icon: Crop },
                 { id: "cleanup", label: "Clean-up", icon: Scissors },
                 { id: "hook", label: "Hook", icon: Bookmark },
+                { id: "variants", label: "Variants", icon: Layers },
                 { id: "export", label: "Export", icon: Download },
               ] as const
             ).map((tab) => {
@@ -334,6 +336,7 @@ export default function ClipEditorPage() {
             {activeTab === "framing" && <FramingTab />}
             {activeTab === "cleanup" && <CleanupTab />}
             {activeTab === "hook" && <HookTab />}
+            {activeTab === "variants" && <VariantsTab />}
             {activeTab === "export" && <ExportTab />}
           </div>
         </div>

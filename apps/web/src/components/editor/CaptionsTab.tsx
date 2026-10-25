@@ -37,11 +37,13 @@ export const CaptionsTab: React.FC = () => {
     setCaptionStyle,
     setCaptionStyleOverrides,
     setCaptionEnabled,
+    setBrandConfig,
   } = useEditorStore();
 
   const activeStyleKey = doc?.captions.style_key || "bold_pop";
   const isEnabled = doc?.captions.enabled !== false;
   const overrides = doc?.captions.style_overrides || {};
+  const applyBrandStyle = doc?.brand?.apply_style !== false;
 
   return (
     <div className="p-4 space-y-6 text-xs text-zinc-300 overflow-y-auto max-h-[calc(100vh-220px)]">
@@ -56,6 +58,28 @@ export const CaptionsTab: React.FC = () => {
             type="checkbox"
             checked={isEnabled}
             onChange={(e) => setCaptionEnabled(e.target.checked)}
+            className="sr-only peer"
+          />
+          <div className="w-9 h-5 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-600"></div>
+        </label>
+      </div>
+
+      {/* Brand Style Override Toggle */}
+      <div className="p-3 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Sparkles className="w-4 h-4 text-purple-400" />
+          <div>
+            <span className="font-semibold text-white block text-xs">Apply Brand Kit Styling</span>
+            <span className="text-[10px] text-zinc-400">
+              Use brand kit font family and color palette
+            </span>
+          </div>
+        </div>
+        <label className="relative inline-flex items-center cursor-pointer">
+          <input
+            type="checkbox"
+            checked={applyBrandStyle}
+            onChange={(e) => setBrandConfig({ apply_style: e.target.checked })}
             className="sr-only peer"
           />
           <div className="w-9 h-5 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-600"></div>
