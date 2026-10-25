@@ -105,4 +105,27 @@ The Celery worker executes 6 sequential stages. Re-running any stage is strictly
    - Editor opens immediately on initial scored clips while the broader video pipeline is still active.
    - If reframe tracking is pending, falls back to progressive center crop with live in-place upgrade upon `reframe_ready` SSE event.
 
+---
+
+## 7. Phase 7a Brand Kit & Auto-Variants Architecture
+
+1. **Relational Schema**:
+   - `brand_kits`: User-owned visual identity configurations with partial unique index for user default kits.
+   - `brand_assets`: S3-backed binary assets (logos, custom fonts, intro/outro video bumpers) with asynchronous worker validation (`validate_brand_asset_task`).
+   - `variant_sets`: Logical container of variant permutations for a given clip moment.
+   - `clip_variants`: Permutation rows storing hook text, caption style, CTA, and complete `EditDoc` forks ready for direct rendering.
+   - `exports`: Linked to `clip_variants.id` with circular cascade protection (`post_update=True`, `use_alter=True`) and post-performance telemetry tracking.
+
+2. **Render Filtergraph Compositing**:
+   - Logo overlay, custom typography, and intro/outro video bumpers are integrated into the single-pass FFmpeg filtergraph inside `clip_shared.media.render`.
+   - Strict 9:16 safe-zone margins (top: 12%, bottom: 20%, sides: 8%) prevent UI overlay collision.
+   - Watermark plan gating enforced server-side (cannot be bypassed from the client).
+
+3. **Auto-Variants Combinatorics & LLM Caching**:
+   - Generates A/B testing variations across `{hook, caption_style, cta}` dimensions.
+   - Strict invariant: `Variant A (Baseline)` is always preserved as the user's initial edit state.
+   - Deduplication and plan limits (Creator: 4, Pro: 8) enforced before generation.
+   - Deterministic SHA256 prompt hashing guarantees cached reruns cost ₹0.00.
+
+
 

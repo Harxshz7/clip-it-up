@@ -61,3 +61,44 @@ This document defines the unit rates and cost measurement model across the 6 vid
      GROUP BY metric;
      ```
 
+---
+
+## 4. Phase 7a: Brand Kit & Auto-Variants Cost Model & Margins
+
+### 4.1 Unit Costs Added in Phase 7a
+
+| Component | Metric | Rate / Unit | Mechanism |
+| :--- | :--- | :--- | :--- |
+| **Auto-Variants LLM** | Per 4-variant generation set | **₹0.15** (~$0.0018 USD) | Claude 3.5 Haiku structured prompt (~450 in / ~300 out tokens) |
+| **Auto-Variants LLM (Cached)** | Rerun with identical doc/dims | **₹0.00** | SHA256 input hash cache in Redis/Postgres |
+| **Logo Overlay Render Overhead** | Per export | **~₹0.002** | Extra `overlay` filter in single-pass filtergraph (+0.5s CPU) |
+| **Intro/Outro Concat Overhead** | Per export (when enabled) | **~₹0.03** | 3-input video/audio concat + 40ms crossfade (+3.5s CPU) |
+| **Brand Asset S3 Storage** | Per user/month (avg 6 MB) | **~₹0.01 / mo** | S3 Standard storage (logos, TTF/OTF fonts, MP4 bumpers) |
+
+---
+
+### 4.2 Updated Plan Margin Analysis
+
+#### Creator Plan (₹1,499 / month)
+- **Included Quotas**: 300 source minutes (5 hrs), 100 exports, 1 Brand Kit, 4 variants/clip.
+- **Monthly Processing COGS (5 hrs @ ₹42.00/hr)**: ₹210.00
+- **Export Renders (100 exports with brand overlay @ ₹0.29/ea)**: ₹29.00
+- **Auto-Variants Generation (est. 25 sets generated @ ₹0.15/set)**: ₹3.75
+- **S3 Storage & Bandwidth (30-day retention, ~15 GB)**: ₹25.50
+- **Payment Gateway Fee (Razorpay 2% + 18% GST)**: ₹35.38
+- **Total Monthly Cost of Goods Sold (COGS)**: **₹303.63**
+- **Net Monthly Profit**: **₹1,195.37**
+- **Gross Margin**: **79.7% ~ 82.1%** (comfortably surpasses > 75% target)
+
+#### Pro Plan (₹3,999 / month)
+- **Included Quotas**: 1,200 source minutes (20 hrs), 500 exports, 3 Brand Kits, 8 variants/clip.
+- **Monthly Processing COGS (20 hrs @ ₹42.00/hr)**: ₹840.00
+- **Export Renders (500 exports with brand overlay @ ₹0.29/ea)**: ₹145.00
+- **Auto-Variants Generation (est. 100 sets generated @ ₹0.15/set)**: ₹15.00
+- **S3 Storage & Bandwidth (90-day retention, ~60 GB)**: ₹102.00
+- **Payment Gateway Fee (Razorpay 2% + 18% GST)**: ₹94.38
+- **Total Monthly Cost of Goods Sold (COGS)**: **₹1,196.38**
+- **Net Monthly Profit**: **₹2,802.62**
+- **Gross Margin**: **70.1% ~ 72.5%** (exceeds > 70% target)
+
+

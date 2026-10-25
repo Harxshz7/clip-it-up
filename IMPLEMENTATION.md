@@ -26,10 +26,27 @@
 | **2.5 Reality Check**| W9 | Tooling for 5 creators to review raw AI cuts, download crude clips, exit survey & gate report | **Complete** | `<DEV_A>` / `<DEV_B>` |
 | **3 & 4. Reframe/Captions/Export**| W10–14 | MediaPipe/YOLO reframe, 3 caption style packs, cleanup (fillers/silence), EDL & export presets | **Complete** | `<DEV_A>` / `<DEV_B>` |
 | **5. Editor & Grid**| W15–16 | Single source-of-truth edit doc, 9:16 canvas preview, transcript trim/edit, inspector tabs, autosave/409, streaming grid | **Complete** | `<DEV_A>` / `<DEV_B>` |
+| **6. Billing & Quotas**| W17–18 | Razorpay & Stripe dual gateways, dynamic quotas from `config/plans.yaml`, meter ledger, GST invoices | **Complete** | `<DEV_A>` / `<DEV_B>` |
+| **7a. Brand Kit & Auto-Variants**| W19–20 | Custom logos/fonts/bumpers, single-pass render concat, 9:16 safe-zones, combinatoric A/B auto-variants, ZIP download | **Complete** | `<DEV_A>` / `<DEV_B>` |
 
 ---
 
 ## 4. Phase Task Checklist
+
+### Phase 7a: Brand Kit & Auto-Variants (Weeks 19–20) — COMPLETE
+- [x] `[db]` Alembic migration `0009_phase7a_brand_and_variants` (`brand_kits`, `brand_assets`, `variant_sets`, `clip_variants`, `exports.variant_id` with bidirectional relation fix and circular cascade protection).
+- [x] `[shared]` Pydantic schemas in `clip_shared.schemas.brand` and `clip_shared.schemas.variants`, plus TypeScript interfaces in `@clip-it-up/shared`.
+- [x] `[shared]` Asset validator in `clip_shared.media.brand_validator` supporting logo dimension/format check (Pillow), TTF/OTF font tables (fontTools), and video bumpers (ffprobe).
+- [x] `[shared]` Render filtergraph in `clip_shared.media.render` supporting 9:16 safe-zone logo overlay, intro/outro video+audio concat with silence padding and acrossfades, and composite loudnorm.
+- [x] `[worker]` Celery tasks `validate_brand_asset_task` and updated `render_export_task` with brand asset download, watermark enforcement, and temp cleanup.
+- [x] `[api]` Brand Kit REST API: `/brand-kits` CRUD, `/brand-kits/default`, `/brand-assets` presigned upload, server-side plan gating.
+- [x] `[api]` Auto-variants generator: combinatorics across `{hook, caption_style, cta}` with baseline Variant A preservation, deduplication, LLM prompt caching, and cost tracking (₹0.15 / set).
+- [x] `[api]` Variants REST API: `/clips/{id}/variants`, `/variant-sets/{id}/export`, `/variant-sets/{id}/download-zip` with `manifest.csv`, `/exports/{id}/metrics`.
+- [x] `[api]` Account purge in `supervisor.purge_account_data_task` cascading brand asset S3 deletions and relational rows.
+- [x] `[web]` Brand Settings page `/settings/brand` with interactive 9:16 safe-zone preview canvas, WCAG 2.1 color contrast check, and font license modal.
+- [x] `[web]` Variants Inspector Tab `VariantsTab.tsx` with combinatoric generator controls, variant preview cards, batch export, and ZIP download.
+- [x] `[web]` Brand toggles integrated into `CaptionsTab.tsx` and `ExportTab.tsx`.
+- [x] `[test]` Test coverage: DB models, migrations, brand API, variants generator, variants API, single-pass render filtergraph, and frontend unit/Playwright specs.
 
 ### Phase 5: Editor Experience & Clip Grid (Weeks 15–16) — COMPLETE
 - [x] `[db]` Alembic migration `0007_phase5_editor` (`clip_edits`, `clip_alternatives`, `editor_events`).

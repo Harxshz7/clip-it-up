@@ -3,7 +3,6 @@ import csv
 import io
 import uuid
 import zipfile
-from typing import Any
 
 import structlog
 from fastapi import APIRouter, Depends, HTTPException, Response, status
@@ -24,7 +23,6 @@ from clip_shared.db.models import (
     ClipEdit,
     ClipVariant,
     Export,
-    ExportPreset,
     Usage,
     VariantSet,
 )
@@ -117,7 +115,7 @@ async def generate_variants_for_clip(
     latest_edit = e_res.scalar_one_or_none()
 
     if latest_edit:
-        base_edit_doc = copy_doc = latest_edit.doc
+        base_edit_doc = latest_edit.doc
     else:
         auto_doc = await _build_auto_edit_doc(clip, video, db)
         base_edit_doc = auto_doc.model_dump()

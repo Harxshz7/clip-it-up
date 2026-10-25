@@ -113,10 +113,10 @@ def call_variant_llm(
     # Mock / Offline deterministic generator
     mock_hooks = [
         HookCandidate(text=f"The real truth about {original_hook[:24]}...", angle="intrigue", predicted_score=0.92),
-        HookCandidate(text=f"Stop scrolling if you want to understand this:", angle="pattern_interrupt", predicted_score=0.88),
-        HookCandidate(text=f"Why 99% of people get this completely backwards:", angle="contrarian", predicted_score=0.95),
-        HookCandidate(text=f"Wait until you see how this ends...", angle="curiosity_gap", predicted_score=0.86),
-        HookCandidate(text=f"The #1 shortcut nobody talks about:", angle="bold_claim", predicted_score=0.90),
+        HookCandidate(text="Stop scrolling if you want to understand this:", angle="pattern_interrupt", predicted_score=0.88),
+        HookCandidate(text="Why 99% of people get this completely backwards:", angle="contrarian", predicted_score=0.95),
+        HookCandidate(text="Wait until you see how this ends...", angle="curiosity_gap", predicted_score=0.86),
+        HookCandidate(text="The #1 shortcut nobody talks about:", angle="bold_claim", predicted_score=0.90),
     ]
 
     goal_key = cta_goal.lower() if cta_goal.lower() in DEFAULT_CTA_TEMPLATES else "follow"

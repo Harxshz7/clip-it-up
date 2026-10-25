@@ -1,0 +1,98 @@
+# Brand Kit & Visual Identity Architecture (Phase 7a)
+
+## 1. Overview & Objectives
+
+Phase 7a delivers the **Brand Kit** subsystem for `clip-it-up`, empowering creators and social media teams to maintain visual consistency across all generated clips. Brand Kit encapsulates typography, color palettes, watermark/logo placement within 9:16 vertical safe zones, and branded video bumpers (intros and outros).
+
+---
+
+## 2. Data Model & Storage
+
+Brand configuration is persisted across two primary relational entities in PostgreSQL:
+
+1. **`BrandKit`**:
+   - `id`: UUID (Primary Key).
+   - `user_id`: UUID (Foreign Key to `users.id`, cascaded on delete).
+   - `name`: string (e.g. "Acme Media Main").
+   - `is_default`: boolean (unique per user enforced via partial index `ix_brand_kits_user_default`).
+   - `primary_color`, `secondary_color`, `accent_color`: Hex codes (e.g. `#8B5CF6`).
+   - `logo_position`: Enum (`top_left`, `top_right`, `bottom_left`, `bottom_right`, `center`).
+   - `logo_opacity`: Float between 0.0 and 1.0.
+   - `logo_scale`: Float relative to 1080p width (0.05 to 0.40).
+   - `font_family`: string (standard or custom).
+   - `intro_mode`: Enum (`none`, `prepend`, `overlay_hook`).
+   - `outro_mode`: Enum (`none`, `append`, `overlay_cta`).
+   - `intro_duration_ms`, `outro_duration_ms`: Duration in milliseconds.
+
+2. **`BrandAsset`**:
+   - `id`: UUID (Primary Key).
+   - `brand_kit_id`: UUID (Foreign Key to `brand_kits.id`, cascaded on delete).
+   - `user_id`: UUID (Foreign Key to `users.id`, indexed).
+   - `asset_type`: Enum (`logo`, `font`, `intro_video`, `outro_video`).
+   - `storage_key`: S3 key (`brand_assets/{user_id}/{asset_id}.{ext}`).
+   - `filename`, `content_type`, `size_bytes`: File metadata.
+   - `validation_status`: Enum (`pending`, `valid`, `failed`).
+   - `validation_error`: string or null.
+   - `meta`: JSONB (extracted metadata: resolution, sample rate, channels, glyph counts, font family name).
+
+---
+
+## 3. Asset Validation Pipeline (`clip_shared.media.brand_validator`)
+
+All uploaded assets undergo asynchronous verification in the Celery worker before being allowed in renders:
+
+- **Logos (`validate_logo`)**:
+  - Validated via Pillow (`PIL.Image.open`).
+  - Max dimension: 4096x4096. Max file size: 5 MB.
+  - Allowed formats: PNG, WEBP, JPEG.
+  - Transparent alpha channel preserved for clean compositing.
+- **Custom Fonts (`validate_font`)**:
+  - Validated via `fontTools.ttLib.TTFont`.
+  - Max file size: 10 MB. Allowed extensions: `.ttf`, `.otf`, `.woff2`.
+  - Verifies presence of required table headers (`glyf` or `CFF `, `cmap`, `head`, `name`).
+  - Checks Unicode mapping coverage for Basic Latin + common diacritics.
+- **Intro & Outro Bumpers (`validate_intro_outro`)**:
+  - Validated via `ffprobe` JSON stream inspection.
+  - Max duration: 10 seconds (enforced via `config/plans.yaml`).
+  - Must contain valid H.264/H.265 video stream. Audio stream inspected for sample rate and channels (auto-resampled to 48kHz stereo during render).
+
+---
+
+## 4. Single-Pass Render Filtergraph Integration
+
+Brand assets are composed directly inside `build_render_filtergraph()` in `clip_shared.media.render`, eliminating multi-pass encoding artifacts:
+
+```
+[0:v] (source segments) ─> concat ─> reframe(1080x1920) ─┐
+[1:v] (intro bumper)    ─> scale(1080x1920,setsar=1)    ──┼─> concat(v) ─> ass(subtitles) ─> overlay(logo) ─> [v_out]
+[2:v] (outro bumper)    ─> scale(1080x1920,setsar=1)    ─┘                                     ▲
+                                                                                               │
+[3:v] (brand logo)      ─> scale(w=...,h=-1),format(yuva420p),colorchannelmixer(aa=opacity) ───┘
+
+[0:a] (source audio)    ─> acrossfade ─┐
+[1:a] (intro audio)     ─> aresample   ──┼─> concat(a) ─> loudnorm(-14 LUFS) ─> [a_out]
+[2:a] (outro audio)     ─> aresample   ─┘
+```
+
+### 4.1 Safe Zone Placement
+To prevent logos and watermarks from colliding with platform UI elements (TikTok captions, Reels audio labels, Shorts thumbs-up icons):
+- **Top Safe Margin**: 12% (~230px on 1080x1920)
+- **Bottom Safe Margin**: 20% (~384px on 1080x1920)
+- **Side Safe Margins**: 8% (~86px on 1080x1920)
+- Position coordinates are dynamically clamped inside `build_render_filtergraph()`:
+  - `top_left`: `x=86, y=230`
+  - `top_right`: `x=W-w-86, y=230`
+  - `bottom_left`: `x=86, y=H-h-384`
+  - `bottom_right`: `x=W-w-86, y=H-h-384`
+
+### 4.2 Server-Side Watermark Enforcement
+When `user_plan.watermark` is true (e.g. Free Tier):
+- The `clip-it-up` watermark is baked into the top-right safe zone via FFmpeg `drawtext` or pre-scaled PNG overlay.
+- Users cannot disable the watermark; frontend requests to suppress it are rejected with `402 Payment Required` or silently overridden by server-side plan policies in `render_export_task`.
+
+---
+
+## 5. Security & Lifecycle Policies
+
+- **Presigned Uploads**: Assets are uploaded directly to S3 via short-lived presigned URLs generated by `POST /brand-assets`.
+- **GDPR / Account Purge**: Extended `supervisor.purge_account_data_task` deletes all brand assets from S3 and cascades deletion across `BrandAsset` and `BrandKit` rows upon account termination.
