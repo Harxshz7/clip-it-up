@@ -23,6 +23,7 @@ from api.routes.legal_ops import router as legal_router
 from api.routes.reframe import router as reframe_router
 from api.routes.reviews import router as reviews_router
 from api.routes.usage import router as usage_router
+from api.routes.variants import router as variants_router
 from api.routes.videos import router as videos_router
 from clip_shared.billing.exceptions import BillingError
 from clip_shared.config import get_settings
@@ -180,3 +181,4 @@ app.include_router(eval_router)
 app.include_router(exports_router)
 app.include_router(editor_router)
 app.include_router(brand_router)
+app.include_router(variants_router)

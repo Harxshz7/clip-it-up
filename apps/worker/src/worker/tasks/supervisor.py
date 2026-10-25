@@ -10,6 +10,9 @@ from clip_shared.billing.quota import QuotaService
 from clip_shared.config import get_settings
 from clip_shared.db.base import utc_now
 from clip_shared.db.models import (
+    BrandAsset,
+    BrandKit,
+    ClipVariant,
     DeadLetterJob,
     DeletionAudit,
     Job,
@@ -18,6 +21,7 @@ from clip_shared.db.models import (
     ReviewSession,
     User,
     UserPlan,
+    VariantSet,
     Video,
 )
 from clip_shared.db.session import get_sync_db
@@ -184,6 +188,12 @@ def cleanup_retention_and_expired_data() -> dict[str, Any]:
                 created_at=utc_now(),
             )
             db.add(audit)
+
+            # Explicitly purge user's brand assets from S3
+            brand_assets = db.query(BrandAsset).filter(BrandAsset.user_id == del_user.id).all()
+            for ba in brand_assets:
+                if ba.storage_key:
+                    s3.delete_object(ba.storage_key)
 
             # Purge all S3 keys for user
             prefix = f"users/{del_user.id}/"
