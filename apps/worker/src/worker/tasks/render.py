@@ -13,6 +13,8 @@ from celery import shared_task
 
 from clip_shared.config import get_settings
 from clip_shared.db.models import (
+    BrandAsset,
+    BrandKit,
     CaptionStyle,
     Clip,
     ClipCaption,
@@ -74,11 +76,64 @@ def render_export_task(self, export_id: str) -> dict[str, Any]:
         video = db.query(Video).filter(Video.id == clip.video_id).first()
         user = db.query(User).filter(User.id == export_rec.user_id).first()
 
+        # Check Brand Kit options from snapshot
+        params_snapshot = dict(export_rec.params_snapshot or {})
+        brand_opts = params_snapshot.get("brand")
+        if not brand_opts and "edit_doc" in params_snapshot and isinstance(params_snapshot["edit_doc"], dict):
+            brand_opts = params_snapshot["edit_doc"].get("brand")
+
         # Resolve user plan and server-side watermark rule
         user_plan = db.query(UserPlan).filter(UserPlan.user_id == user.id).first()
         plan_key = user_plan.plan_key if user_plan else "free"
         plan = db.query(Plan).filter(Plan.key == plan_key).first()
         watermark_enabled = bool(plan.export_watermark if plan else True)
+        plan_brand_allowed = bool(plan.brand_kit if plan else False)
+
+        brand_kit = None
+        brand_logo_asset = None
+        brand_intro_asset = None
+        brand_outro_asset = None
+        brand_font_asset = None
+
+        if plan_brand_allowed and brand_opts and brand_opts.get("kit_id"):
+            try:
+                kit_uuid = uuid.UUID(str(brand_opts["kit_id"]))
+                brand_kit = db.query(BrandKit).filter(BrandKit.id == kit_uuid, BrandKit.user_id == user.id).first()
+            except (ValueError, TypeError):
+                brand_kit = None
+
+        if brand_kit:
+            # Paid plans can replace/remove platform watermark
+            if brand_kit.watermark_free_override or not bool(plan.export_watermark if plan else True):
+                watermark_enabled = False
+
+            # Brand style overrides
+            if brand_opts.get("apply_style", True):
+                if brand_kit.caption_style_key:
+                    style_key = brand_kit.caption_style_key
+                if brand_kit.colors:
+                    if "text" in brand_kit.colors:
+                        style_spec["primary_color"] = brand_kit.colors["text"]
+                    if "highlight" in brand_kit.colors:
+                        style_spec["highlight_color"] = brand_kit.colors["highlight"]
+                    elif "primary" in brand_kit.colors:
+                        style_spec["highlight_color"] = brand_kit.colors["primary"]
+                if brand_kit.fonts and "font_family" in brand_kit.fonts:
+                    style_spec["font_family"] = brand_kit.fonts["font_family"]
+
+            # Resolve attached assets
+            if brand_opts.get("apply_logo", True) and brand_kit.logo_asset_id:
+                brand_logo_asset = db.query(BrandAsset).filter(BrandAsset.id == brand_kit.logo_asset_id).first()
+            if brand_opts.get("apply_intro", True) and brand_kit.intro_asset_id:
+                brand_intro_asset = db.query(BrandAsset).filter(BrandAsset.id == brand_kit.intro_asset_id).first()
+            if brand_opts.get("apply_outro", True) and brand_kit.outro_asset_id:
+                brand_outro_asset = db.query(BrandAsset).filter(BrandAsset.id == brand_kit.outro_asset_id).first()
+            if brand_kit.fonts and brand_kit.fonts.get("heading_asset_id"):
+                try:
+                    font_uuid = uuid.UUID(str(brand_kit.fonts["heading_asset_id"]))
+                    brand_font_asset = db.query(BrandAsset).filter(BrandAsset.id == font_uuid).first()
+                except (ValueError, TypeError):
+                    brand_font_asset = None
 
         # Resolve preset
         preset = db.query(ExportPreset).filter(ExportPreset.key == export_rec.preset_key).first()
@@ -108,21 +163,10 @@ def render_export_task(self, export_id: str) -> dict[str, Any]:
 
         # Resolve captions and style
         captions_rec = db.query(ClipCaption).filter(ClipCaption.clip_id == clip.id).first()
-        style_key = captions_rec.style_key if captions_rec else "bold_pop"
+        style_key = style_key or (captions_rec.style_key if captions_rec else "bold_pop")
         caption_style = db.query(CaptionStyle).filter(CaptionStyle.key == style_key).first()
-        style_spec = caption_style.spec if caption_style else {
-            "font_family": "Montserrat",
-            "font_size_pt": 68,
-            "uppercase": True,
-            "primary_color": "&H00FFFFFF",
-            "highlight_color": "&H0000E6FF",
-            "outline_color": "&H00000000",
-            "outline_width": 5.0,
-            "alignment": 2,
-            "margin_v": 280,
-            "margin_h": 60,
-            "animation": "pop",
-        }
+        if caption_style:
+            style_spec = {**caption_style.spec, **style_spec}
 
         # Apply any style overrides
         if captions_rec and captions_rec.style_overrides:
@@ -156,6 +200,53 @@ def render_export_task(self, export_id: str) -> dict[str, Any]:
             Filename=local_source_video,
         )
 
+        # Download brand assets if attached
+        local_logo_path = None
+        if brand_logo_asset:
+            local_logo_path = os.path.join(temp_dir, f"logo_{brand_logo_asset.id}_{brand_logo_asset.filename}")
+            s3.download_file(
+                Bucket=settings.S3_BUCKET_NAME,
+                Key=brand_logo_asset.storage_key,
+                Filename=local_logo_path,
+            )
+
+        local_intro_path = None
+        intro_dur_ms = 0
+        intro_has_audio = True
+        if brand_intro_asset:
+            local_intro_path = os.path.join(temp_dir, f"intro_{brand_intro_asset.id}_{brand_intro_asset.filename}")
+            s3.download_file(
+                Bucket=settings.S3_BUCKET_NAME,
+                Key=brand_intro_asset.storage_key,
+                Filename=local_intro_path,
+            )
+            intro_dur_ms = brand_intro_asset.duration_ms or 0
+            intro_has_audio = brand_intro_asset.metadata_json.get("has_audio", True)
+
+        local_outro_path = None
+        outro_dur_ms = 0
+        outro_has_audio = True
+        if brand_outro_asset:
+            local_outro_path = os.path.join(temp_dir, f"outro_{brand_outro_asset.id}_{brand_outro_asset.filename}")
+            s3.download_file(
+                Bucket=settings.S3_BUCKET_NAME,
+                Key=brand_outro_asset.storage_key,
+                Filename=local_outro_path,
+            )
+            outro_dur_ms = brand_outro_asset.duration_ms or 0
+            outro_has_audio = brand_outro_asset.metadata_json.get("has_audio", True)
+
+        brand_fonts_dir = None
+        if brand_font_asset:
+            brand_fonts_dir = os.path.join(temp_dir, "custom_fonts")
+            os.makedirs(brand_fonts_dir, exist_ok=True)
+            local_font_path = os.path.join(brand_fonts_dir, brand_font_asset.filename)
+            s3.download_file(
+                Bucket=settings.S3_BUCKET_NAME,
+                Key=brand_font_asset.storage_key,
+                Filename=local_font_path,
+            )
+
         snapshot = RenderJobSnapshot(
             clip_id=str(clip.id),
             user_id=str(user.id),
@@ -171,6 +262,18 @@ def render_export_task(self, export_id: str) -> dict[str, Any]:
             watermark_enabled=watermark_enabled,
             watermark_text="Clip It Up",
             crossfade_ms=cleanup_rec.options.get("crossfade_ms", 40) if cleanup_rec else 40,
+            brand_logo_path=local_logo_path,
+            brand_logo_position=brand_kit.logo_position if brand_kit else "top_right",
+            brand_logo_opacity=brand_kit.logo_opacity if brand_kit else 1.0,
+            brand_logo_scale=brand_kit.logo_scale if brand_kit else 0.15,
+            intro_path=local_intro_path,
+            intro_duration_ms=intro_dur_ms,
+            intro_has_audio=intro_has_audio,
+            outro_path=local_outro_path,
+            outro_duration_ms=outro_dur_ms,
+            outro_has_audio=outro_has_audio,
+            brand_fonts_dir=brand_fonts_dir,
+            brand_kit_id=str(brand_kit.id) if brand_kit else None,
         )
 
         def on_progress(pct: float):
@@ -212,6 +315,16 @@ def render_export_task(self, export_id: str) -> dict[str, Any]:
             export_rec.size_bytes = render_metrics["size_bytes"]
             export_rec.render_ms = render_metrics["render_ms"]
             export_rec.finished_at = datetime.now(UTC)
+
+            # Record brand kit version in params_snapshot
+            if brand_kit:
+                cur_snapshot = dict(export_rec.params_snapshot or {})
+                cur_snapshot["brand_kit_version"] = {
+                    "kit_id": str(brand_kit.id),
+                    "name": brand_kit.name,
+                    "updated_at": brand_kit.updated_at.isoformat() if brand_kit.updated_at else None,
+                }
+                export_rec.params_snapshot = cur_snapshot
 
             # Record usage
             exp_seconds = Decimal(str(render_metrics["duration_ms"] / 1000.0)).quantize(Decimal("0.01"))

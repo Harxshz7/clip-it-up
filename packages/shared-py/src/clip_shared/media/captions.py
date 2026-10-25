@@ -276,6 +276,23 @@ def _format_ass_time(ms: int) -> str:
     return f"{hours}:{mins:02d}:{secs:02d}.{cs:02d}"
 
 
+def hex_to_ass_color(hex_str: str, alpha: int = 0) -> str:
+    """Convert #RRGGBB or #RGB to ASS &HAABBGGRR color format."""
+    if not hex_str:
+        return "&H00FFFFFF"
+    if hex_str.startswith("&H"):
+        return hex_str
+    h = hex_str.lstrip("#")
+    if len(h) == 3:
+        h = "".join(c * 2 for c in h)
+    if len(h) == 6:
+        r = int(h[0:2], 16)
+        g = int(h[2:4], 16)
+        b = int(h[4:6], 16)
+        return f"&H{alpha:02X}{b:02X}{g:02X}{r:02X}"
+    return "&H00FFFFFF"
+
+
 def generate_ass_subtitles(
     words: list[dict[str, Any]],
     style_spec: dict[str, Any],
@@ -283,13 +300,14 @@ def generate_ass_subtitles(
     width: int = 1080,
     height: int = 1920,
     title: str = "Clip Subtitles",
+    intro_offset_ms: int = 0,
 ) -> str:
     """
     Generate Advanced SubStation Alpha (.ass) subtitle file content driven by style_spec.
     Words are remapped onto the output timeline via the EDL.
     Supports Bold Pop, Clean Minimal, and Karaoke Dynamic animations.
     """
-    remapped_words = edl.remap_words(words)
+    remapped_words = edl.remap_words(words, intro_offset_ms=intro_offset_ms)
     if not remapped_words:
         # Return empty ASS script
         return _build_empty_ass(width, height)
@@ -297,11 +315,15 @@ def generate_ass_subtitles(
     font_family = style_spec.get("font_family", "Montserrat")
     font_size = int(style_spec.get("font_size_pt", 68))
     font_weight = "1" if str(style_spec.get("font_weight", "900")) in ("700", "800", "900", "bold") else "0"
-    primary_color = style_spec.get("primary_color", "&H00FFFFFF")
-    highlight_color = style_spec.get("highlight_color", "&H0000E6FF")
-    outline_color = style_spec.get("outline_color", "&H00000000")
+    raw_primary = style_spec.get("primary_color", "&H00FFFFFF")
+    primary_color = hex_to_ass_color(raw_primary)
+    raw_highlight = style_spec.get("highlight_color", "&H0000E6FF")
+    highlight_color = hex_to_ass_color(raw_highlight)
+    raw_outline = style_spec.get("outline_color", "&H00000000")
+    outline_color = hex_to_ass_color(raw_outline)
     outline_width = float(style_spec.get("outline_width", 5.0))
-    shadow_color = style_spec.get("shadow_color", "&H80000000")
+    raw_shadow = style_spec.get("shadow_color", "&H80000000")
+    shadow_color = hex_to_ass_color(raw_shadow, alpha=128)
     shadow_offset = float(style_spec.get("shadow_offset", 2.0))
     alignment = int(style_spec.get("alignment", 2))  # 2 = Bottom-Center
     margin_v = int(style_spec.get("margin_v", 280))

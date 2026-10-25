@@ -42,9 +42,14 @@ class HeuristicLaughterDetector(LaughterDetector):
                 if end - start < sr // 4:
                     continue
                 frame = y[start:end]
-                rms = float(np.sqrt(np.mean(frame**2)))
-                zcr = float(np.mean(librosa.feature.zero_crossing_rate(frame)))
-                spectral_centroid = float(np.mean(librosa.feature.spectral_centroid(y=frame, sr=sr)))
+                try:
+                    zcr = float(np.mean(librosa.feature.zero_crossing_rate(frame)))
+                    spectral_centroid = float(np.mean(librosa.feature.spectral_centroid(y=frame, sr=sr)))
+                except Exception:
+                    zcr = float(np.mean(np.diff(frame > 0) != 0))
+                    freqs = np.fft.rfftfreq(len(frame), d=1.0 / sr)
+                    fft_mag = np.abs(np.fft.rfft(frame))
+                    spectral_centroid = float(np.sum(freqs * fft_mag) / (np.sum(fft_mag) + 1e-9))
 
                 # Laughter typically has moderate-high RMS, high ZCR variations, and mid-high spectral centroid (1500 - 3500 Hz)
                 if rms > 0.02 and zcr > 0.08 and (1200.0 <= spectral_centroid <= 3800.0):
@@ -195,16 +200,22 @@ def extract_audio_features(
         else:
             rms_val = float(np.sqrt(np.mean(chunk**2)))
 
-            # Spectral flux
-            stft = np.abs(librosa.stft(chunk, n_fft=min(512, len(chunk)), hop_length=256))
-            if stft.shape[1] > 1:
-                flux_val = float(np.mean(np.diff(stft, axis=1)**2))
-            else:
-                flux_val = 0.0
-
-            # Pitch variance proxy (using spectral centroid standard deviation or zero-crossing variance)
-            sc = librosa.feature.spectral_centroid(y=chunk, sr=sr, hop_length=256)
-            pitch_val = float(np.std(sc))
+            # Spectral flux & pitch variance proxy
+            try:
+                stft = np.abs(librosa.stft(chunk, n_fft=min(512, len(chunk)), hop_length=256))
+                if stft.shape[1] > 1:
+                    flux_val = float(np.mean(np.diff(stft, axis=1)**2))
+                else:
+                    flux_val = 0.0
+                sc = librosa.feature.spectral_centroid(y=chunk, sr=sr, hop_length=256)
+                pitch_val = float(np.std(sc))
+            except Exception:
+                fft_mag = np.abs(np.fft.rfft(chunk))
+                flux_val = float(np.std(fft_mag))
+                freqs = np.fft.rfftfreq(len(chunk), d=1.0 / sr)
+                mag_sum = np.sum(fft_mag)
+                sc_mean = float(np.sum(freqs * fft_mag) / (mag_sum + 1e-9))
+                pitch_val = float(sc_mean / 1000.0)
 
         rms_per_sec.append(rms_val)
         spectral_flux_per_sec.append(flux_val)

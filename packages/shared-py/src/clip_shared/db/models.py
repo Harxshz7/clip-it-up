@@ -787,7 +787,12 @@ class Export(Base):
     size_bytes: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
     render_ms: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
     error: Mapped[str | None] = mapped_column(Text, nullable=True)
-    variant_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("clip_variants.id", ondelete="SET NULL"), nullable=True, index=True)
+    variant_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("clip_variants.id", ondelete="SET NULL", use_alter=True, name="fk_exports_variant_id"),
+        nullable=True,
+        index=True,
+    )
     external_post_url: Mapped[str | None] = mapped_column(String(1024), nullable=True)
     performance_metrics: Mapped[dict[str, Any] | None] = mapped_column(JSON_TYPE, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
@@ -796,11 +801,15 @@ class Export(Base):
     # Relationships
     clip: Mapped["Clip"] = relationship("Clip", back_populates="exports")
     user: Mapped["User"] = relationship("User", back_populates="exports")
-    variant: Mapped[Optional["ClipVariant"]] = relationship("ClipVariant", foreign_keys=[variant_id], back_populates="export", post_update=True)
+    variant: Mapped[Optional["ClipVariant"]] = relationship(
+        "ClipVariant",
+        foreign_keys=[variant_id],
+        back_populates="export",
+        post_update=True,
+    )
 
     __table_args__ = (
         Index("ix_exports_created_at", "created_at"),
-        Index("ix_exports_variant_id", "variant_id"),
     )
 
 
@@ -1351,15 +1360,24 @@ class ClipVariant(Base):
     cta_text: Mapped[str | None] = mapped_column(String(512), nullable=True)
     cta_style: Mapped[str | None] = mapped_column(String(64), nullable=True)
     score_hint: Mapped[float | None] = mapped_column(Float, nullable=True)
-    export_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("exports.id", ondelete="SET NULL"), nullable=True)
+    export_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("exports.id", ondelete="SET NULL", use_alter=True, name="fk_clip_variants_export_id"),
+        nullable=True,
+    )
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
 
     # Relationships
     variant_set: Mapped["VariantSet"] = relationship("VariantSet", back_populates="variants")
-    export: Mapped[Optional["Export"]] = relationship("Export", foreign_keys=[export_id], back_populates="variant")
+    export: Mapped[Optional["Export"]] = relationship(
+        "Export",
+        foreign_keys="[Export.variant_id]",
+        back_populates="variant",
+        uselist=False,
+        post_update=True,
+    )
 
     __table_args__ = (
-        Index("ix_clip_variants_set_id", "set_id"),
         Index("ix_clip_variants_created_at", "created_at"),
     )
 

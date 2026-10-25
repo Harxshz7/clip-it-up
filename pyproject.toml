@@ -1,3 +1,20 @@
+[project]
+name = "clip-it-up"
+version = "0.1.0"
+description = "clip-it-up root workspace"
+requires-python = ">=3.12"
+dependencies = []
+
+[tool.uv.workspace]
+members = [
+    "packages/shared-py",
+    "apps/api",
+    "apps/worker",
+]
+
+[tool.uv.sources]
+clip-shared = { workspace = true }
+
 [tool.ruff]
 line-length = 120
 target-version = "py312"
@@ -18,3 +35,8 @@ ignore = [
 
 [tool.ruff.lint.isort]
 known-first-party = ["clip_shared", "api", "worker"]
+
+[tool.pytest.ini_options]
+markers = [
+    "heavy: marks tests as heavy FFmpeg / end-to-end (deselect with '-m \"not heavy\"')",
+]

@@ -39,6 +39,19 @@ class RenderJobSnapshot:
     watermark_text: str = "Clip It Up"
     crossfade_ms: int = 40
     two_pass_loudnorm: bool = False
+    # Brand Kit assets & intro/outro
+    brand_logo_path: str | None = None
+    brand_logo_position: str = "top_right"
+    brand_logo_opacity: float = 1.0
+    brand_logo_scale: float = 0.15
+    intro_path: str | None = None
+    intro_duration_ms: int = 0
+    intro_has_audio: bool = True
+    outro_path: str | None = None
+    outro_duration_ms: int = 0
+    outro_has_audio: bool = True
+    brand_fonts_dir: str | None = None
+    brand_kit_id: str | None = None
 
 
 def escape_ffmpeg_filter_path(path: str) -> str:
@@ -64,9 +77,20 @@ def build_render_filtergraph(
     crossfade_ms: int = 40,
     loudness_lufs: float = -14.0,
     has_audio: bool = True,
+    logo_input_idx: int | None = None,
+    logo_position: str = "top_right",
+    logo_opacity: float = 1.0,
+    logo_scale: float = 0.15,
+    intro_input_idx: int | None = None,
+    intro_duration_ms: int = 0,
+    intro_has_audio: bool = True,
+    outro_input_idx: int | None = None,
+    outro_duration_ms: int = 0,
+    outro_has_audio: bool = True,
 ) -> tuple[str, str, str]:
     """
-    Construct single-pass FFmpeg filter_complex string.
+    Construct single-pass FFmpeg filter_complex string with safe-zone logo,
+    ASS subtitles, intro/outro concatenation, and loudness normalization.
     Returns (filtergraph_str, out_video_label, out_audio_label).
     """
     filter_parts: list[str] = []
@@ -96,7 +120,6 @@ def build_render_filtergraph(
         v_cur = "[v_seg0]"
 
     # 3. Video Reframing (Crop + Scale or Fit Blur)
-    # Check if fit_blur mode is requested in segments
     segments_spec = crop_path.get("segments", [])
     is_fit_blur = any(s.get("mode") == "fit_blur" for s in segments_spec)
 
@@ -110,7 +133,6 @@ def build_render_filtergraph(
         )
         v_cur = "[v_reframe]"
     else:
-        # Generate reframe crop from keyframes
         crop_filter = reframe_crop_to_filter(
             crop_path=crop_path,
             src_w=src_w,
@@ -125,7 +147,31 @@ def build_render_filtergraph(
     filter_parts.append(f"{v_cur}scale={out_w}:{out_h}:flags=lanczos,setsar=1[v_scaled];")
     v_cur = "[v_scaled]"
 
-    # 5. Burn Subtitles via libass
+    # 5. Brand Logo Overlay (Safe-Zone Aware, never covering captions)
+    if logo_input_idx is not None:
+        SAFE_MARGIN_X = 60
+        SAFE_MARGIN_TOP = 120
+        SAFE_MARGIN_BOTTOM = 280
+
+        if logo_position == "top_left":
+            pos_x, pos_y = f"{SAFE_MARGIN_X}", f"{SAFE_MARGIN_TOP}"
+        elif logo_position == "bottom_left":
+            pos_x, pos_y = f"{SAFE_MARGIN_X}", f"H-h-{SAFE_MARGIN_BOTTOM}"
+        elif logo_position == "bottom_right":
+            pos_x, pos_y = f"W-w-{SAFE_MARGIN_X}", f"H-h-{SAFE_MARGIN_BOTTOM}"
+        elif logo_position == "center":
+            pos_x, pos_y = "(W-w)/2", f"{SAFE_MARGIN_TOP}"
+        else:  # top_right default
+            pos_x, pos_y = f"W-w-{SAFE_MARGIN_X}", f"{SAFE_MARGIN_TOP}"
+
+        logo_w = max(32, int(out_w * logo_scale))
+        filter_parts.append(
+            f"[{logo_input_idx}:v]scale={logo_w}:-1,format=rgba,colorchannelmixer=aa={logo_opacity:.2f}[v_logo];"
+        )
+        filter_parts.append(f"{v_cur}[v_logo]overlay={pos_x}:{pos_y}[v_logo_applied];")
+        v_cur = "[v_logo_applied]"
+
+    # 6. Burn Subtitles via libass
     if ass_path and os.path.exists(ass_path):
         esc_ass = escape_ffmpeg_filter_path(os.path.abspath(ass_path))
         if fonts_dir and os.path.exists(fonts_dir):
@@ -137,22 +183,43 @@ def build_render_filtergraph(
         filter_parts.append(f"{v_cur}{subs_filter}[v_subs];")
         v_cur = "[v_subs]"
 
-    # 6. Watermark (free tier enforcement - server applied last)
+    # 7. Watermark (free tier enforcement - server applied last)
     if has_watermark:
-        # Drawtext watermark placed in top-right corner, semi-transparent
         safe_text = watermark_text.replace("'", "").replace(":", "")
         wm_filter = (
             f"drawtext=text='{safe_text}':fontcolor=white@0.75:fontsize=26:"
             f"box=1:boxcolor=black@0.4:boxborderw=6:x=w-tw-40:y=60"
         )
-        filter_parts.append(f"{v_cur}{wm_filter}[v_out];")
+        filter_parts.append(f"{v_cur}{wm_filter}[v_wm];")
+        v_cur = "[v_wm]"
+
+    # 8. Video Concatenation with Intro & Outro
+    v_concat_inputs = []
+    if intro_input_idx is not None:
+        filter_parts.append(
+            f"[{intro_input_idx}:v]scale={out_w}:{out_h}:force_original_aspect_ratio=decrease,"
+            f"pad={out_w}:{out_h}:(ow-iw)/2:(oh-ih)/2,setsar=1,setpts=PTS-STARTPTS[v_intro];"
+        )
+        v_concat_inputs.append("[v_intro]")
+
+    v_concat_inputs.append(v_cur)
+
+    if outro_input_idx is not None:
+        filter_parts.append(
+            f"[{outro_input_idx}:v]scale={out_w}:{out_h}:force_original_aspect_ratio=decrease,"
+            f"pad={out_w}:{out_h}:(ow-iw)/2:(oh-ih)/2,setsar=1,setpts=PTS-STARTPTS[v_outro];"
+        )
+        v_concat_inputs.append("[v_outro]")
+
+    if len(v_concat_inputs) > 1:
+        concat_str = "".join(v_concat_inputs)
+        filter_parts.append(f"{concat_str}concat=n={len(v_concat_inputs)}:v=1:a=0[v_out];")
         v_out_label = "[v_out]"
     else:
-        # Alias last stage to [v_out]
         filter_parts.append(f"{v_cur}null[v_out];")
         v_out_label = "[v_out]"
 
-    # 7. Audio processing: joins with crossfade and loudnorm
+    # 9. Audio processing: joins, intro/outro, and final loudnorm
     if has_audio:
         xfade_s = max(0.01, crossfade_ms / 1000.0)
         if num_segs > 1:
@@ -167,9 +234,45 @@ def build_render_filtergraph(
         else:
             a_cur = "[a_seg0]"
 
-        # EBU R128 Loudness Normalization (-14 LUFS default for TikTok/Shorts/Reels)
+        filter_parts.append(f"{a_cur}aformat=sample_fmts=fltp:sample_rates=48000:channel_layouts=stereo[a_main];")
+
+        a_concat_inputs = []
+        if intro_input_idx is not None:
+            if intro_has_audio:
+                filter_parts.append(
+                    f"[{intro_input_idx}:a]asetpts=PTS-STARTPTS,aformat=sample_fmts=fltp:sample_rates=48000:channel_layouts=stereo[a_intro];"
+                )
+            else:
+                intro_dur_s = max(0.1, intro_duration_ms / 1000.0)
+                filter_parts.append(
+                    f"aevalsrc=0:d={intro_dur_s:.3f}:s=48000,aformat=sample_fmts=fltp:sample_rates=48000:channel_layouts=stereo[a_intro];"
+                )
+            a_concat_inputs.append("[a_intro]")
+
+        a_concat_inputs.append("[a_main]")
+
+        if outro_input_idx is not None:
+            if outro_has_audio:
+                filter_parts.append(
+                    f"[{outro_input_idx}:a]asetpts=PTS-STARTPTS,aformat=sample_fmts=fltp:sample_rates=48000:channel_layouts=stereo[a_outro];"
+                )
+            else:
+                outro_dur_s = max(0.1, outro_duration_ms / 1000.0)
+                filter_parts.append(
+                    f"aevalsrc=0:d={outro_dur_s:.3f}:s=48000,aformat=sample_fmts=fltp:sample_rates=48000:channel_layouts=stereo[a_outro];"
+                )
+            a_concat_inputs.append("[a_outro]")
+
+        if len(a_concat_inputs) > 1:
+            a_concat_str = "".join(a_concat_inputs)
+            filter_parts.append(f"{a_concat_str}concat=n={len(a_concat_inputs)}:v=0:a=1[a_combined];")
+            a_target = "[a_combined]"
+        else:
+            a_target = "[a_main]"
+
+        # EBU R128 Loudness Normalization on the final composite mix
         loudnorm_filter = f"loudnorm=I={loudness_lufs:.1f}:TP=-1.5:LRA=11:linear=true"
-        filter_parts.append(f"{a_cur}{loudnorm_filter}[a_out]")
+        filter_parts.append(f"{a_target}{loudnorm_filter}[a_out]")
         a_out_label = "[a_out]"
     else:
         a_out_label = "[a_none]"
@@ -191,10 +294,11 @@ def build_render_ffmpeg_cmd(
     audio_bitrate: str = "192k",
     has_audio: bool = True,
     threads: int = 4,
+    extra_inputs: list[str] | None = None,
 ) -> list[str]:
     """
     Build complete FFmpeg argument list with accurate input seeking (-ss),
-    filter_complex, hardware/CPU encoder settings, and faststart MP4 flags.
+    filter_complex, extra inputs (logo, intro, outro), hardware/CPU encoder settings.
     Safe argument list only (no shell=True).
     """
     seek_s = max(0.0, edl.clip_start_ms / 1000.0)
@@ -208,9 +312,16 @@ def build_render_ffmpeg_cmd(
         "-filter_complex_threads", str(threads),
         "-ss", f"{seek_s:.3f}",
         "-i", input_video,
+    ]
+
+    if extra_inputs:
+        for extra in extra_inputs:
+            cmd.extend(["-i", extra])
+
+    cmd.extend([
         "-filter_complex", filtergraph_str,
         "-map", v_label,
-    ]
+    ])
 
     if has_audio and a_label != "[a_none]":
         cmd.extend(["-map", a_label])
@@ -233,6 +344,7 @@ def build_render_ffmpeg_cmd(
     ])
 
     return cmd
+
 
 
 def validate_rendered_output(
@@ -319,6 +431,26 @@ def execute_export_render(
         src_w = src_meta.width
         src_h = src_meta.height
 
+        # Resolve extra inputs for brand kit and intro/outro
+        extra_inputs: list[str] = []
+        logo_input_idx: int | None = None
+        intro_input_idx: int | None = None
+        outro_input_idx: int | None = None
+
+        if snapshot.brand_logo_path and os.path.exists(snapshot.brand_logo_path):
+            logo_input_idx = 1 + len(extra_inputs)
+            extra_inputs.append(snapshot.brand_logo_path)
+
+        if snapshot.intro_path and os.path.exists(snapshot.intro_path):
+            intro_input_idx = 1 + len(extra_inputs)
+            extra_inputs.append(snapshot.intro_path)
+
+        if snapshot.outro_path and os.path.exists(snapshot.outro_path):
+            outro_input_idx = 1 + len(extra_inputs)
+            extra_inputs.append(snapshot.outro_path)
+
+        intro_offset_ms = snapshot.intro_duration_ms if (intro_input_idx is not None and snapshot.intro_duration_ms > 0) else 0
+
         # 2. Generate ASS subtitles (if captions provided)
         if snapshot.captions_words:
             ass_content = generate_ass_subtitles(
@@ -327,14 +459,17 @@ def execute_export_render(
                 edl=snapshot.edl,
                 width=out_w,
                 height=out_h,
+                intro_offset_ms=intro_offset_ms,
             )
             with open(ass_path, "w", encoding="utf-8") as f:
                 f.write(ass_content)
         else:
             ass_path = None
 
-        # 3. Remap crop path through EDL
-        remapped_crop_path = snapshot.edl.remap_crop_path(snapshot.crop_path)
+        # 3. Remap crop path through EDL (accounting for intro offset)
+        remapped_crop_path = snapshot.edl.remap_crop_path(snapshot.crop_path, intro_offset_ms=intro_offset_ms)
+
+        effective_fonts_dir = snapshot.brand_fonts_dir or fonts_dir
 
         # 4. Build single-pass filtergraph
         filtergraph, v_label, a_label = build_render_filtergraph(
@@ -345,12 +480,22 @@ def execute_export_render(
             out_w=out_w,
             out_h=out_h,
             ass_path=ass_path,
-            fonts_dir=fonts_dir,
+            fonts_dir=effective_fonts_dir,
             has_watermark=snapshot.watermark_enabled,
             watermark_text=snapshot.watermark_text,
             crossfade_ms=snapshot.crossfade_ms,
             loudness_lufs=loudness_lufs,
             has_audio=src_meta.has_audio,
+            logo_input_idx=logo_input_idx,
+            logo_position=snapshot.brand_logo_position,
+            logo_opacity=snapshot.brand_logo_opacity,
+            logo_scale=snapshot.brand_logo_scale,
+            intro_input_idx=intro_input_idx,
+            intro_duration_ms=snapshot.intro_duration_ms,
+            intro_has_audio=snapshot.intro_has_audio,
+            outro_input_idx=outro_input_idx,
+            outro_duration_ms=snapshot.outro_duration_ms,
+            outro_has_audio=snapshot.outro_has_audio,
         )
 
         # 5. Build FFmpeg command
@@ -366,9 +511,16 @@ def execute_export_render(
             video_bitrate=video_bitrate,
             audio_bitrate=audio_bitrate,
             has_audio=src_meta.has_audio,
+            extra_inputs=extra_inputs,
         )
 
         logger.info("executing_render_job", export_id=snapshot.export_id, out_w=out_w, out_h=out_h)
+
+        expected_dur_ms = snapshot.edl.total_output_duration_ms(
+            intro_duration_ms=snapshot.intro_duration_ms if intro_input_idx is not None else 0,
+            outro_duration_ms=snapshot.outro_duration_ms if outro_input_idx is not None else 0,
+        )
+        expected_dur_s = expected_dur_ms / 1000.0
 
         # 6. Execute subprocess with progress monitoring
         proc = subprocess.Popen(
@@ -378,7 +530,6 @@ def execute_export_render(
             text=True,
         )
 
-        expected_dur_s = snapshot.edl.total_out_duration_ms / 1000.0
         _monitor_ffmpeg_progress(proc, expected_dur_s, progress_cb)
         _, stderr_text = proc.communicate()
 
@@ -389,7 +540,7 @@ def execute_export_render(
         # 7. Validate rendered output
         val_result = validate_rendered_output(
             file_path=output_mp4,
-            expected_duration_ms=snapshot.edl.total_out_duration_ms,
+            expected_duration_ms=expected_dur_ms,
             expected_w=out_w,
             expected_h=out_h,
         )
