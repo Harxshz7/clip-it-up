@@ -12,6 +12,7 @@ from fastapi.responses import JSONResponse
 
 from api.routes.admin import router as admin_router
 from api.routes.billing import router as billing_router
+from api.routes.brand import router as brand_router
 from api.routes.clips import router as clips_router
 from api.routes.editor import router as editor_router
 from api.routes.eval import router as eval_router
@@ -178,3 +179,4 @@ app.include_router(reviews_router)
 app.include_router(eval_router)
 app.include_router(exports_router)
 app.include_router(editor_router)
+app.include_router(brand_router)
