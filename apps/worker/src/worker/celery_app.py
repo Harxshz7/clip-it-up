@@ -14,6 +14,7 @@ celery_app = Celery(
         "worker.tasks.analysis",
         "worker.tasks.review",
         "worker.tasks.supervisor",
+        "worker.tasks.brand",
     ],
 )
 

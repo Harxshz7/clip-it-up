@@ -34,6 +34,7 @@ class BrandAssetUploadUrlResponse(BaseModel):
 
 
 class BrandAssetCompleteRequest(BaseModel):
+    asset_id: uuid.UUID | None = None
     license_acknowledged: bool = Field(
         default=False,
         description="Required true for custom font uploads acknowledging commercial license rights",
