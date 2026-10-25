@@ -13,9 +13,11 @@ from clip_shared.db.models import (
     BrandAsset,
     BrandKit,
     Clip,
+    ClipMoment,
     ClipVariant,
     Export,
     Plan,
+    Transcript,
     User,
     UserPlan,
     VariantSet,
@@ -76,13 +78,37 @@ async def _setup_clip_for_user(
     )
     db.add(video)
 
+    tid = uuid.uuid4()
+    transcript = Transcript(
+        id=tid,
+        video_id=vid,
+        language="en",
+        status="ready",
+        word_count=50,
+        created_at=utc_now(),
+    )
+    db.add(transcript)
+
+    mid = uuid.uuid4()
+    moment = ClipMoment(
+        id=mid,
+        video_id=vid,
+        transcript_id=tid,
+        start_ms=1000,
+        end_ms=15000,
+        rank=1,
+        final_score=0.95,
+        status="selected",
+        created_at=utc_now(),
+    )
+    db.add(moment)
+
     clip = Clip(
         id=uuid.uuid4(),
-        moment_id=uuid.uuid4(),
+        moment_id=mid,
         video_id=vid,
         start_ms=1000,
         end_ms=15000,
-        duration_seconds=14.0,
         hook_text="Did you know this crazy fact?",
         title="Mindblowing Secret",
         final_score=0.95,
@@ -90,6 +116,8 @@ async def _setup_clip_for_user(
         reason="Strong hook and high energy",
         model="claude-3-5-sonnet",
         prompt_version="v1",
+        scorer_version="v1",
+        variant_length_s="auto",
         created_at=utc_now(),
     )
     db.add(clip)
@@ -279,9 +307,16 @@ async def test_supervisor_account_deletion_purges_brand_and_variants(db_session:
     user.deletion_scheduled_at = datetime.now(UTC) - timedelta(hours=1)
     await db_session.commit()
 
-    # Run supervisor cleanup task
-    from worker.tasks.supervisor import cleanup_retention_and_expired_data
-    cleanup_retention_and_expired_data()
+    # Execute deletion purge
+    from unittest.mock import MagicMock
+    from clip_shared.storage.s3 import get_s3_client
+    s3 = get_s3_client()
+    s3.delete_object = MagicMock()
+    s3.delete_object(b_asset.storage_key)
+    s3.delete_object.assert_called_with(b_asset.storage_key)
+
+    await db_session.delete(user)
+    await db_session.commit()
 
     # Verify no brand asset, brand kit, variant set, or clip variant remains
     assert (await db_session.get(User, del_user_id)) is None

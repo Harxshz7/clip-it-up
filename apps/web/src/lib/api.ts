@@ -53,6 +53,13 @@ import {
   ProductHealthMetricsResponse,
   MoneyMetricsResponse,
   AbuseMetricsResponse,
+  BrandKit,
+  BrandAsset,
+  VariantSet,
+  ClipVariant,
+  VariantGenerateRequest,
+  VariantBatchExportRequest,
+  ExportPerformanceMetrics,
 } from "@clip-it-up/shared";
 
 
@@ -990,6 +997,149 @@ export const api = {
 
   async getDeepHealth(): Promise<any> {
     return request<any>("/health/deep");
+  },
+
+  // ----------------------------------------------------
+  // Phase 7a: Brand Kit and Auto-Variants
+  // ----------------------------------------------------
+  async listBrandKits(token?: string | null): Promise<BrandKit[]> {
+    return request<BrandKit[]>("/brand-kits", {}, token);
+  },
+
+  async getBrandKit(id: string, token?: string | null): Promise<BrandKit> {
+    return request<BrandKit>(`/brand-kits/${id}`, {}, token);
+  },
+
+  async getDefaultBrandKit(token?: string | null): Promise<BrandKit | null> {
+    try {
+      return await request<BrandKit>("/brand-kits/default", {}, token);
+    } catch {
+      return null;
+    }
+  },
+
+  async createBrandKit(payload: Partial<BrandKit>, token?: string | null): Promise<BrandKit> {
+    return request<BrandKit>(
+      "/brand-kits",
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+      },
+      token
+    );
+  },
+
+  async updateBrandKit(id: string, payload: Partial<BrandKit>, token?: string | null): Promise<BrandKit> {
+    return request<BrandKit>(
+      `/brand-kits/${id}`,
+      {
+        method: "PUT",
+        body: JSON.stringify(payload),
+      },
+      token
+    );
+  },
+
+  async setDefaultBrandKit(id: string, token?: string | null): Promise<BrandKit> {
+    return request<BrandKit>(`/brand-kits/${id}/default`, { method: "PUT" }, token);
+  },
+
+  async deleteBrandKit(id: string, token?: string | null): Promise<any> {
+    return request<any>(`/brand-kits/${id}`, { method: "DELETE" }, token);
+  },
+
+  async getBrandAssetUploadUrl(
+    payload: { filename: string; content_type: string; size_bytes: number; kind: string },
+    token?: string | null
+  ): Promise<{ asset_id: string; upload_url: string; storage_key: string }> {
+    return request<{ asset_id: string; upload_url: string; storage_key: string }>(
+      "/brand-assets/upload-url",
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+      },
+      token
+    );
+  },
+
+  async completeBrandAsset(
+    assetId: string,
+    payload: { license_acknowledged?: boolean },
+    token?: string | null
+  ): Promise<BrandAsset> {
+    return request<BrandAsset>(
+      `/brand-assets/${assetId}/complete`,
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+      },
+      token
+    );
+  },
+
+  async deleteBrandAsset(assetId: string, token?: string | null): Promise<any> {
+    return request<any>(`/brand-assets/${assetId}`, { method: "DELETE" }, token);
+  },
+
+  async generateVariants(
+    clipId: string,
+    payload: VariantGenerateRequest,
+    token?: string | null
+  ): Promise<VariantSet> {
+    return request<VariantSet>(
+      `/clips/${clipId}/variants`,
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+      },
+      token
+    );
+  },
+
+  async getClipVariants(clipId: string, token?: string | null): Promise<VariantSet | null> {
+    try {
+      return await request<VariantSet>(`/clips/${clipId}/variants`, {}, token);
+    } catch {
+      return null;
+    }
+  },
+
+  async deleteVariant(variantId: string, token?: string | null): Promise<any> {
+    return request<any>(`/variants/${variantId}`, { method: "DELETE" }, token);
+  },
+
+  async batchExportVariants(
+    setId: string,
+    payload: VariantBatchExportRequest,
+    token?: string | null
+  ): Promise<{ set_id: string; export_ids: string[]; count: number; message: string }> {
+    return request<{ set_id: string; export_ids: string[]; count: number; message: string }>(
+      `/variant-sets/${setId}/export`,
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+      },
+      token
+    );
+  },
+
+  async updateExportMetrics(
+    exportId: string,
+    payload: ExportPerformanceMetrics,
+    token?: string | null
+  ): Promise<any> {
+    return request<any>(
+      `/exports/${exportId}/metrics`,
+      {
+        method: "PATCH",
+        body: JSON.stringify(payload),
+      },
+      token
+    );
+  },
+
+  getVariantSetZipDownloadUrl(setId: string): string {
+    return `${API_BASE_URL}/variant-sets/${setId}/download-zip`;
   },
 };
 

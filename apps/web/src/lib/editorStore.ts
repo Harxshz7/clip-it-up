@@ -4,13 +4,14 @@ import {
   ClipEditRemoval,
   ClipEditCleanupOptions,
   ClipEditRecord,
+  ClipEditBrand,
   EditDecisionList,
 } from "@clip-it-up/shared";
 import { api, ApiError } from "./api";
 import { instrumentation } from "./instrumentation";
 
 export type SaveStatus = "idle" | "saving" | "saved" | "error" | "conflict";
-export type EditorTab = "transcript" | "captions" | "framing" | "cleanup" | "hook" | "export";
+export type EditorTab = "transcript" | "captions" | "framing" | "cleanup" | "hook" | "variants" | "export";
 
 export interface LocalDraft {
   clip_id: string;
@@ -75,6 +76,7 @@ interface EditorState {
 
   setHook: (hook: { text: string; source: "auto" | "alt" | "manual"; start_ms: number }) => void;
   setPresetKey: (presetKey: string) => void;
+  setBrandConfig: (brand: Partial<ClipEditBrand>) => void;
 
   // Playback actions
   setCurrentTimeMs: (ms: number) => void;
@@ -582,6 +584,36 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     if (!doc) return;
 
     const newDoc: ClipEditDoc = { ...doc, preset_key: presetKey };
+    set({
+      doc: newDoc,
+      history: [...history, doc].slice(-HISTORY_LIMIT),
+      future: [],
+      isDirty: true,
+    });
+    saveDraftToStorage(doc.clip_id, newDoc);
+    get().triggerAutosave();
+  },
+
+  setBrandConfig: (brandUpdate) => {
+    const { doc, history } = get();
+    if (!doc) return;
+
+    const currentBrand = doc.brand || {
+      kit_id: null,
+      apply_logo: true,
+      apply_intro: true,
+      apply_outro: true,
+      apply_style: true,
+    };
+
+    const newDoc: ClipEditDoc = {
+      ...doc,
+      brand: {
+        ...currentBrand,
+        ...brandUpdate,
+      },
+    };
+
     set({
       doc: newDoc,
       history: [...history, doc].slice(-HISTORY_LIMIT),
