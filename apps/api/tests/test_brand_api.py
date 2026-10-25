@@ -1,13 +1,12 @@
 """Tests for Phase 7a Brand Kit & Brand Assets API routes: ownership, plan gating, quotas, and upload."""
 import uuid
-from datetime import UTC, datetime
 
 import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from clip_shared.db.base import utc_now
-from clip_shared.db.models import BrandAsset, BrandKit, Plan, User, UserPlan
+from clip_shared.db.models import Plan, User, UserPlan
 
 
 async def _create_user_with_plan(
@@ -62,8 +61,8 @@ async def test_brand_kit_plan_gating(client: AsyncClient, db_session: AsyncSessi
 
     # Override current user to free user
     from api.dependencies import get_current_user
-    from clip_shared.schemas.auth import AuthenticatedUser
     from api.main import app
+    from clip_shared.schemas.auth import AuthenticatedUser
 
     app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(
         id=free_user_id, clerk_user_id="clerk_free", email="free@example.com"
@@ -100,8 +99,8 @@ async def test_brand_kit_crud_and_default(client: AsyncClient, db_session: Async
     await _create_user_with_plan(db_session, paid_user_id, "creator@example.com", plan_key="creator")
 
     from api.dependencies import get_current_user
-    from clip_shared.schemas.auth import AuthenticatedUser
     from api.main import app
+    from clip_shared.schemas.auth import AuthenticatedUser
 
     app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(
         id=paid_user_id, clerk_user_id="clerk_creator", email="creator@example.com"
@@ -172,8 +171,8 @@ async def test_brand_asset_upload_and_validation(client: AsyncClient, db_session
     await _create_user_with_plan(db_session, user_id, "pro@example.com", plan_key="pro")
 
     from api.dependencies import get_current_user
-    from clip_shared.schemas.auth import AuthenticatedUser
     from api.main import app
+    from clip_shared.schemas.auth import AuthenticatedUser
 
     app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(
         id=user_id, clerk_user_id="clerk_pro", email="pro@example.com"
@@ -228,8 +227,8 @@ async def test_brand_ownership_isolation(client: AsyncClient, db_session: AsyncS
     await _create_user_with_plan(db_session, user_b, "user_b@example.com", plan_key="creator")
 
     from api.dependencies import get_current_user
-    from clip_shared.schemas.auth import AuthenticatedUser
     from api.main import app
+    from clip_shared.schemas.auth import AuthenticatedUser
 
     # Act as User A to create kit
     app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(

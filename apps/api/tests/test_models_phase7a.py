@@ -1,10 +1,10 @@
 """Tests for Phase 7a database models, relationships, and bidirectional mappings."""
 import uuid
+
 import pytest
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from clip_shared.db.base import utc_now
 from clip_shared.db.models import (
     BrandAsset,
     BrandKit,

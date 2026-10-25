@@ -15,7 +15,6 @@ from clip_shared.db.models import (
     Clip,
     ClipMoment,
     ClipVariant,
-    Export,
     Plan,
     Transcript,
     User,
@@ -132,8 +131,8 @@ async def test_variants_plan_gating_and_limits(client: AsyncClient, db_session: 
     _, _, clip = await _setup_clip_for_user(db_session, free_user_id, "free@example.com", plan_key="free")
 
     from api.dependencies import get_current_user
-    from clip_shared.schemas.auth import AuthenticatedUser
     from api.main import app
+    from clip_shared.schemas.auth import AuthenticatedUser
 
     app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(
         id=free_user_id, clerk_user_id="clerk_free", email="free@example.com"
@@ -156,8 +155,8 @@ async def test_variants_generation_crud_and_export(client: AsyncClient, db_sessi
     _, _, clip = await _setup_clip_for_user(db_session, paid_user_id, "paid@example.com", plan_key="creator")
 
     from api.dependencies import get_current_user
-    from clip_shared.schemas.auth import AuthenticatedUser
     from api.main import app
+    from clip_shared.schemas.auth import AuthenticatedUser
 
     app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(
         id=paid_user_id, clerk_user_id="clerk_paid", email="paid@example.com"
@@ -309,6 +308,7 @@ async def test_supervisor_account_deletion_purges_brand_and_variants(db_session:
 
     # Execute deletion purge
     from unittest.mock import MagicMock
+
     from clip_shared.storage.s3 import get_s3_client
     s3 = get_s3_client()
     s3.delete_object = MagicMock()

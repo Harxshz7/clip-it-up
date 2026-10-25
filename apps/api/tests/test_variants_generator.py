@@ -1,5 +1,4 @@
 """Tests for Auto-Variants generator: baseline inclusion, deduplication, dimensions, caching."""
-import pytest
 
 from clip_shared.variants.generator import generate_clip_variants
 

@@ -1,10 +1,9 @@
 """Tests for Step 2 Render Integration: Brand logo overlay, intro/outro concat, custom fonts, and EDL offsets."""
-import os
 import shutil
-import subprocess
+
 import pytest
 
-from clip_shared.media.captions import generate_ass_subtitles, hex_to_ass_color
+from clip_shared.media.captions import hex_to_ass_color
 from clip_shared.media.edl import EditDecisionList
 from clip_shared.media.render import (
     build_render_ffmpeg_cmd,
