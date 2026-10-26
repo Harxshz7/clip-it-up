@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 from sqlalchemy.pool import StaticPool
 
 # Set test environment
+os.environ["DISABLE_SQLALCHEMY_CEXT"] = "1"
 os.environ["ENVIRONMENT"] = "development"
 os.environ["DEV_AUTH_BYPASS"] = "true"
 os.environ["DATABASE_URL"] = "sqlite+aiosqlite:///:memory:"

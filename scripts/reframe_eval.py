@@ -1,7 +1,8 @@
-"""Reframe evaluation script computing face_inside_crop_rate, jitter score, and contact sheets."""
 import json
 import os
 import sys
+
+os.environ["DISABLE_SQLALCHEMY_CEXT"] = "1"
 from datetime import UTC, datetime
 from typing import Any
 import numpy as np
