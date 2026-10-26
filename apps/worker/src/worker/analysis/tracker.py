@@ -1,4 +1,4 @@
-"""Face tracking engine with IoU + Centroid matching, gap bridging, and trajectory statistics."""
+"""Face tracking engine with IoU + Centroid matching, velocity continuity, conservative merging, and trajectory statistics."""
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -85,19 +85,31 @@ def compute_iou(boxA: tuple[float, float, float, float], boxB: tuple[float, floa
 
 
 class FaceTracker:
-    """Kalman/Centroid and IoU tracker with gap bridging (< 500ms)."""
+    """
+    Robust Kalman/Centroid and IoU tracker with position+size+velocity continuity,
+    conservative track merging across brief occlusions, and multi-face ID stability (3-6 faces).
+    """
 
     def __init__(
         self,
-        min_iou_threshold: float = 0.25,
-        max_centroid_dist: float = 0.25,
-        max_gap_ms: int = 600,
-        min_track_duration_ms: int = 500,
+        min_iou_threshold: float = 0.20,
+        max_centroid_dist: float = 0.28,
+        max_gap_ms: int = 800,
+        max_merge_gap_ms: int = 1500,
+        min_track_duration_ms: int = 400,
+        scene_type: str = "talking_head",
     ):
         self.min_iou_threshold = min_iou_threshold
         self.max_centroid_dist = max_centroid_dist
         self.max_gap_ms = max_gap_ms
-        self.min_track_duration_ms = min_track_duration_ms
+        self.max_merge_gap_ms = max_merge_gap_ms
+        self.scene_type = scene_type
+        # In group scenes, allow shorter tracks and smaller faces
+        if scene_type == "group":
+            self.min_track_duration_ms = max(200, min_track_duration_ms - 200)
+        else:
+            self.min_track_duration_ms = min_track_duration_ms
+
         self.next_track_id = 0
         self._active_tracks: dict[int, list[TrackedDetection]] = {}
         self._completed_tracks: list[FaceTrackData] = []
@@ -114,30 +126,50 @@ class FaceTracker:
                 self._active_tracks[tid] = [TrackedDetection(t_ms=t_ms, frame_idx=frame_idx, detection=det)]
             return
 
-        # Compute cost matrix between active tracks and current detections
+        # Compute cost matrix between active tracks and current detections with velocity continuity
         cost_matrix = np.zeros((len(active_ids), len(detections)), dtype=np.float32)
+
         for r, tid in enumerate(active_ids):
-            last_det = self._active_tracks[tid][-1].detection
+            track_dets = self._active_tracks[tid]
+            last_det = track_dets[-1].detection
+            last_t = track_dets[-1].t_ms
             last_cx, last_cy = last_det.cx, last_det.cy
+
+            # Velocity estimation from last 2 points
+            vx, vy = 0.0, 0.0
+            if len(track_dets) >= 2:
+                prev_det = track_dets[-2].detection
+                dt_s = max(0.01, (last_t - track_dets[-2].t_ms) / 1000.0)
+                vx = (last_det.cx - prev_det.cx) / dt_s
+                vy = (last_det.cy - prev_det.cy) / dt_s
+
+            dt_curr = max(0.001, (t_ms - last_t) / 1000.0)
+            pred_cx = last_cx + (vx * dt_curr * 0.5)  # damped velocity projection
+            pred_cy = last_cy + (vy * dt_curr * 0.5)
+
             for c, det in enumerate(detections):
                 iou = compute_iou(last_det.bbox, det.bbox)
-                dist = np.hypot(last_cx - det.cx, last_cy - det.cy)
+                dist = np.hypot(pred_cx - det.cx, pred_cy - det.cy)
+                # Size continuity penalty
+                size_ratio = (det.width * det.height) / float(max(1e-5, last_det.width * last_det.height))
+                size_penalty = 1.0 if (0.5 <= size_ratio <= 2.0) else 0.5
+
                 # Score: higher IoU and lower distance is better
-                score = (iou * 0.7) + (max(0.0, 1.0 - (dist / self.max_centroid_dist)) * 0.3)
+                score = ((iou * 0.6) + (max(0.0, 1.0 - (dist / self.max_centroid_dist)) * 0.4)) * size_penalty
                 cost_matrix[r, c] = score
 
         assigned_tracks: set[int] = set()
         assigned_dets: set[int] = set()
 
         if detections:
-            # Greedy matching
+            # Greedy matching for highest affinity
             while True:
                 if cost_matrix.size == 0:
                     break
                 max_idx = np.unravel_index(np.argmax(cost_matrix), cost_matrix.shape)
                 best_score = cost_matrix[max_idx]
 
-                if best_score < self.min_iou_threshold and best_score < 0.35:
+                if best_score < self.min_iou_threshold and best_score < 0.30:
                     break
 
                 r, c = max_idx
@@ -179,7 +211,7 @@ class FaceTracker:
         duration = end_ms - start_ms
 
         if duration < self.min_track_duration_ms and len(track_dets) < 3:
-            # Filter noise tracks
+            # Filter momentary noise detections
             return
 
         confs = [d.detection.confidence for d in track_dets]
@@ -213,8 +245,67 @@ class FaceTracker:
             summary=summary,
         ))
 
+    def _merge_fragmented_tracks(self, tracks: list[FaceTrackData]) -> list[FaceTrackData]:
+        """
+        Conservative track merging:
+        If track T2 starts shortly after track T1 ends (gap <= max_merge_gap_ms),
+        and their spatial locations and sizes match closely, merge T2 into T1.
+        """
+        if len(tracks) <= 1:
+            return tracks
+
+        sorted_tracks = sorted(tracks, key=lambda t: t.start_ms)
+        merged: list[FaceTrackData] = []
+
+        for trk in sorted_tracks:
+            if not merged:
+                merged.append(trk)
+                continue
+
+            last = merged[-1]
+            gap_ms = trk.start_ms - last.end_ms
+
+            if 0 <= gap_ms <= self.max_merge_gap_ms:
+                # Check spatial continuity between last detection of `last` and first detection of `trk`
+                end_det = last.detections[-1].detection
+                start_det = trk.detections[0].detection
+                dist = np.hypot(end_det.cx - start_det.cx, end_det.cy - start_det.cy)
+                size_ratio = (start_det.width * start_det.height) / float(max(1e-5, end_det.width * end_det.height))
+
+                if dist <= 0.10 and (0.70 <= size_ratio <= 1.40):
+                    # Merge trk into last
+                    all_dets = last.detections + trk.detections
+                    confs = [d.detection.confidence for d in all_dets]
+                    cxs = [d.detection.cx for d in all_dets]
+                    cys = [d.detection.cy for d in all_dets]
+                    widths = [d.detection.width for d in all_dets]
+                    heights = [d.detection.height for d in all_dets]
+                    mouths = [d.detection.mouth_openness for d in all_dets if d.detection.mouth_openness > 0]
+
+                    last.end_ms = trk.end_ms
+                    last.avg_conf = float(np.mean(confs))
+                    last.detections = all_dets
+                    last.summary = {
+                        "detection_count": len(all_dets),
+                        "duration_ms": last.end_ms - last.start_ms,
+                        "mean_cx": float(np.mean(cxs)),
+                        "mean_cy": float(np.mean(cys)),
+                        "mean_w": float(np.mean(widths)),
+                        "mean_h": float(np.mean(heights)),
+                        "min_cx": float(np.min(cxs)),
+                        "max_cx": float(np.max(cxs)),
+                        "mouth_variance": float(np.var(mouths)) if mouths else 0.0,
+                        "mouth_mean": float(np.mean(mouths)) if mouths else 0.0,
+                    }
+                    continue
+
+            merged.append(trk)
+
+        return merged
+
     def finalize(self) -> list[FaceTrackData]:
-        """Finish all remaining active tracks and return sorted track data list."""
+        """Finish all remaining active tracks, apply conservative merging, and return sorted track data list."""
         for tid in list(self._active_tracks.keys()):
             self._finalize_track(tid)
-        return sorted(self._completed_tracks, key=lambda t: t.start_ms)
+        merged = self._merge_fragmented_tracks(self._completed_tracks)
+        return sorted(merged, key=lambda t: t.start_ms)

@@ -246,6 +246,7 @@ async def get_clip_reframe(
             active_mode = latest_edit.mode
 
     flags_dict = reframe.flags if isinstance(reframe.flags, dict) else {}
+    layout_obj = getattr(reframe, "layout", None) or crop_path_dict.get("layout")
 
     return ReframeResponse(
         id=reframe.id,
@@ -253,6 +254,7 @@ async def get_clip_reframe(
         analysis_version=reframe.analysis_version,
         mode=active_mode,
         crop_path=ReframeCropPath(**crop_path_dict) if crop_path_dict else ReframeCropPath(keyframes=active_keyframes),
+        layout=layout_obj,
         confidence=reframe.confidence,
         flags=ReframeFlags(**flags_dict) if flags_dict else ReframeFlags(),
         source=reframe.source,
@@ -301,6 +303,7 @@ async def regenerate_clip_reframe(
         for k in crop_path_dict.get("keyframes", [])
     ]
     flags_dict = reframe.flags if isinstance(reframe.flags, dict) else {}
+    layout_obj = getattr(reframe, "layout", None) or crop_path_dict.get("layout")
 
     return ReframeResponse(
         id=reframe.id,
@@ -308,6 +311,7 @@ async def regenerate_clip_reframe(
         analysis_version=reframe.analysis_version,
         mode=reframe.mode,
         crop_path=ReframeCropPath(**crop_path_dict),
+        layout=layout_obj,
         confidence=reframe.confidence,
         flags=ReframeFlags(**flags_dict),
         source=reframe.source,
@@ -356,7 +360,20 @@ async def update_clip_reframe(
                 detail={"error": {"code": "INVALID_KEYFRAME_BOUNDS", "message": "Keyframe coordinates must be between 0.0 and 1.0."}},
             )
 
-    # 4. Insert new edit
+    # 4. Validate layout if provided
+    layout_obj = None
+    if payload.layout:
+        layout_dict = payload.layout.model_dump() if hasattr(payload.layout, "model_dump") else payload.layout
+        for r in layout_dict.get("regions", []):
+            if not (0.0 <= r.get("src_x", 0) <= 1.0 and 0.0 <= r.get("src_y", 0) <= 1.0 and 0.0 < r.get("src_w", 1) <= 1.0 and 0.0 < r.get("src_h", 1) <= 1.0):
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail={"error": {"code": "INVALID_LAYOUT_REGION", "message": "Layout region coordinates must be within [0.0, 1.0]."}},
+                )
+        layout_obj = layout_dict
+        reframe.layout = layout_dict
+
+    # 5. Insert new edit
     edit = ClipReframeEdit(
         id=uuid.uuid4(),
         clip_reframe_id=reframe.id,
@@ -370,6 +387,8 @@ async def update_clip_reframe(
 
     crop_path_dict = reframe.crop_path if isinstance(reframe.crop_path, dict) else {}
     flags_dict = reframe.flags if isinstance(reframe.flags, dict) else {}
+    if not layout_obj:
+        layout_obj = getattr(reframe, "layout", None) or crop_path_dict.get("layout")
 
     return ReframeResponse(
         id=reframe.id,
@@ -377,6 +396,7 @@ async def update_clip_reframe(
         analysis_version=reframe.analysis_version,
         mode=edit.mode or reframe.mode,
         crop_path=ReframeCropPath(**crop_path_dict),
+        layout=layout_obj,
         confidence=reframe.confidence,
         flags=ReframeFlags(**flags_dict),
         source=reframe.source,
@@ -426,6 +446,7 @@ async def revert_clip_reframe_edits(
         for k in crop_path_dict.get("keyframes", [])
     ]
     flags_dict = reframe.flags if isinstance(reframe.flags, dict) else {}
+    layout_obj = getattr(reframe, "layout", None) or crop_path_dict.get("layout")
 
     return ReframeResponse(
         id=reframe.id,
@@ -433,6 +454,7 @@ async def revert_clip_reframe_edits(
         analysis_version=reframe.analysis_version,
         mode=reframe.mode,
         crop_path=ReframeCropPath(**crop_path_dict),
+        layout=layout_obj,
         confidence=reframe.confidence,
         flags=ReframeFlags(**flags_dict),
         source=reframe.source,

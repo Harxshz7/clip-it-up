@@ -16,7 +16,7 @@ import structlog
 from clip_shared.media.captions import generate_ass_subtitles
 from clip_shared.media.edl import EditDecisionList
 from clip_shared.media.ffmpeg import MediaValidationError, _monitor_ffmpeg_progress, probe_video
-from clip_shared.media.reframe_filter import reframe_crop_to_filter
+from clip_shared.media.reframe_filter import compile_layout_reframe_filter, reframe_crop_to_filter
 
 logger = structlog.get_logger()
 
@@ -119,18 +119,23 @@ def build_render_filtergraph(
     else:
         v_cur = "[v_seg0]"
 
-    # 3. Video Reframing (Crop + Scale or Fit Blur)
+    # 3. Video Reframing (Crop + Scale or Phase 7b Layouts: split_stack, stack, pip, content_fit)
     segments_spec = crop_path.get("segments", [])
-    is_fit_blur = any(s.get("mode") == "fit_blur" for s in segments_spec)
+    layout_spec = crop_path.get("layout")
+    first_mode = segments_spec[0].get("mode") if segments_spec else "speaker_track"
+    is_complex_layout = bool(layout_spec) or first_mode in ("split_stack", "stack", "pip", "content_fit", "fit_blur")
 
-    if is_fit_blur:
-        filter_parts.append(
-            f"{v_cur}split=2[bg][fg];"
-            f"[bg]scale={out_w}:{out_h}:force_original_aspect_ratio=increase,"
-            f"crop={out_w}:{out_h},boxblur=20:2[bg_blur];"
-            f"[fg]scale={out_w}:-2[fg_scaled];"
-            f"[bg_blur][fg_scaled]overlay=(W-w)/2:(H-h)/2[v_reframe];"
+    if is_complex_layout:
+        layout_filter = compile_layout_reframe_filter(
+            crop_path=crop_path,
+            src_w=src_w,
+            src_h=src_h,
+            out_w=out_w,
+            out_h=out_h,
+            in_label=v_cur.strip("[]"),
+            out_label="v_reframe",
         )
+        filter_parts.append(layout_filter)
         v_cur = "[v_reframe]"
     else:
         crop_filter = reframe_crop_to_filter(

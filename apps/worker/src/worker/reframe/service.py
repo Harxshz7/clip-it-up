@@ -84,11 +84,13 @@ def generate_clip_reframe(
 
     crop_path_dict = plan.crop_path.model_dump()
     flags_dict = plan.flags.model_dump()
+    layout_dict = plan.crop_path.layout.model_dump() if plan.crop_path.layout else None
 
     # 6. Upsert ClipReframe record
     if existing_reframe:
         existing_reframe.mode = plan.mode
         existing_reframe.crop_path = crop_path_dict
+        existing_reframe.layout = layout_dict
         existing_reframe.confidence = plan.confidence
         existing_reframe.flags = flags_dict
         reframe_record = existing_reframe
@@ -99,6 +101,7 @@ def generate_clip_reframe(
             analysis_version=analysis_version,
             mode=plan.mode,
             crop_path=crop_path_dict,
+            layout=layout_dict,
             confidence=plan.confidence,
             flags=flags_dict,
             source="auto",
