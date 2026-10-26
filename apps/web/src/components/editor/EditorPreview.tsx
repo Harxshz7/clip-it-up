@@ -391,28 +391,162 @@ export const EditorPreview: React.FC<EditorPreviewProps> = ({
           className="relative rounded-2xl overflow-hidden border-2 border-zinc-700 shadow-2xl bg-black"
           style={{ width: "260px", height: "462px" }} // Standard 9:16 container
         >
-          {/* Proxy Video with Real-Time Crop Path Transformation */}
+          {/* Proxy Video with Real-Time Layout Rendering */}
           {proxyUrl ? (
             <div className="w-full h-full relative overflow-hidden bg-black">
-              <div
-                className="absolute pointer-events-none transition-transform duration-75 origin-top-left"
-                style={{
-                  width: `${(1.0 / activeCrop.w) * 100}%`,
-                  height: "100%",
-                  left: `${-((activeCrop.cx - activeCrop.w / 2) / activeCrop.w) * 100}%`,
-                  top: `${-((activeCrop.cy - activeCrop.h / 2) / activeCrop.h) * 100}%`,
-                }}
-              >
-                <video
-                  ref={videoRef}
-                  src={proxyUrl}
-                  className="w-full h-full object-cover"
-                  onTimeUpdate={handleTimeUpdate}
-                  muted={isMuted}
-                  playsInline
-                  preload="metadata"
-                />
-              </div>
+              {/* Layout 1: Split Stack (50/50 vertical split) */}
+              {doc?.reframe?.mode_overrides?.default === "split_stack" ? (
+                <div className="w-full h-full flex flex-col">
+                  <div className="w-full h-1/2 relative overflow-hidden border-b border-zinc-800">
+                    <div
+                      className="absolute pointer-events-none origin-top-left"
+                      style={{
+                        width: "250%",
+                        height: "100%",
+                        left: "-35%",
+                        top: "0",
+                      }}
+                    >
+                      <video
+                        src={proxyUrl}
+                        className="w-full h-full object-cover"
+                        muted={isMuted}
+                        playsInline
+                        preload="metadata"
+                      />
+                    </div>
+                  </div>
+                  <div className="w-full h-1/2 relative overflow-hidden">
+                    <div
+                      className="absolute pointer-events-none origin-top-left"
+                      style={{
+                        width: "250%",
+                        height: "100%",
+                        left: "-110%",
+                        top: "0",
+                      }}
+                    >
+                      <video
+                        src={proxyUrl}
+                        className="w-full h-full object-cover"
+                        muted={isMuted}
+                        playsInline
+                        preload="metadata"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ) : doc?.reframe?.mode_overrides?.default === "stack" ? (
+                /* Layout 2: Stack (60% content on top, 40% speaker below) */
+                <div className="w-full h-full flex flex-col">
+                  <div className="w-full h-[60%] relative overflow-hidden border-b border-zinc-800 bg-zinc-950">
+                    <video
+                      src={proxyUrl}
+                      className="w-full h-full object-contain"
+                      muted={isMuted}
+                      playsInline
+                      preload="metadata"
+                    />
+                  </div>
+                  <div className="w-full h-[40%] relative overflow-hidden bg-black">
+                    <div
+                      className="absolute pointer-events-none origin-top-left"
+                      style={{
+                        width: "220%",
+                        height: "100%",
+                        left: "-60%",
+                        top: "0",
+                      }}
+                    >
+                      <video
+                        src={proxyUrl}
+                        className="w-full h-full object-cover"
+                        muted={isMuted}
+                        playsInline
+                        preload="metadata"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ) : doc?.reframe?.mode_overrides?.default === "pip" ? (
+                /* Layout 3: PIP (Full content + rounded PIP thumbnail) */
+                <div className="w-full h-full relative overflow-hidden bg-black">
+                  <div className="w-full h-full flex items-center justify-center">
+                    <video
+                      src={proxyUrl}
+                      className="w-full h-auto object-contain"
+                      muted={isMuted}
+                      playsInline
+                      preload="metadata"
+                    />
+                  </div>
+                  {/* PIP Speaker Thumbnail */}
+                  <div className="absolute top-10 right-3 w-20 h-24 rounded-xl overflow-hidden border-2 border-purple-500 shadow-xl bg-black z-10">
+                    <div
+                      className="absolute pointer-events-none origin-top-left"
+                      style={{
+                        width: "350%",
+                        height: "100%",
+                        left: "-220%",
+                        top: "0",
+                      }}
+                    >
+                      <video
+                        src={proxyUrl}
+                        className="w-full h-full object-cover"
+                        muted={isMuted}
+                        playsInline
+                        preload="metadata"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ) : (doc?.reframe?.mode_overrides?.default === "fit_blur" || doc?.reframe?.mode_overrides?.default === "content_fit") ? (
+                /* Layout 4: Fit Blur / Content Fit */
+                <div className="w-full h-full relative overflow-hidden bg-black flex items-center justify-center">
+                  {/* Blurred background copy */}
+                  <video
+                    src={proxyUrl}
+                    className="absolute inset-0 w-full h-full object-cover blur-md scale-125 opacity-60"
+                    muted={isMuted}
+                    playsInline
+                    preload="metadata"
+                  />
+                  {/* Clean foreground copy */}
+                  <div className="relative w-full z-10 shadow-lg">
+                    <video
+                      ref={videoRef}
+                      src={proxyUrl}
+                      className="w-full h-auto object-contain"
+                      onTimeUpdate={handleTimeUpdate}
+                      muted={isMuted}
+                      playsInline
+                      preload="metadata"
+                    />
+                  </div>
+                </div>
+              ) : (
+                /* Standard dynamic crop path (Track, Balanced, Zoom, Center) */
+                <div
+                  className="absolute pointer-events-none transition-transform duration-75 origin-top-left"
+                  style={{
+                    width: `${(1.0 / activeCrop.w) * 100}%`,
+                    height: "100%",
+                    left: `${-((activeCrop.cx - activeCrop.w / 2) / activeCrop.w) * 100}%`,
+                    top: `${-((activeCrop.cy - activeCrop.h / 2) / activeCrop.h) * 100}%`,
+                  }}
+                >
+                  <video
+                    ref={videoRef}
+                    src={proxyUrl}
+                    className="w-full h-full object-cover"
+                    onTimeUpdate={handleTimeUpdate}
+                    muted={isMuted}
+                    playsInline
+                    preload="metadata"
+                  />
+                </div>
+              )}
 
               {/* Dynamic Styled Captions Overlay */}
               {doc?.captions.enabled && activeCaption && (

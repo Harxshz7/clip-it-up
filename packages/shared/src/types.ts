@@ -846,6 +846,42 @@ export interface ClipEditCaptions {
   enabled: boolean;
 }
 
+export type ReframeMode =
+  | 'speaker_track'
+  | 'balanced'
+  | 'center'
+  | 'fit_blur'
+  | 'split_stack'
+  | 'content_fit'
+  | 'content_zoom'
+  | 'stack'
+  | 'pip';
+
+export interface LayoutRegion {
+  src_x: number;
+  src_y: number;
+  src_w: number;
+  src_h: number;
+  dst_x: number;
+  dst_y: number;
+  dst_w: number;
+  dst_h: number;
+  shape?: 'rect' | 'circle' | 'rounded_rect';
+  corner_radius?: number;
+  border_width?: number;
+  border_color?: string;
+  track_id?: number | null;
+  label?: string | null;
+}
+
+export interface ReframeLayout {
+  type: 'content_fit' | 'content_zoom' | 'split_stack' | 'stack' | 'pip' | 'crop';
+  regions: LayoutRegion[];
+  background?: 'blur' | 'color' | 'brand';
+  background_color?: string;
+  safe_zones?: Record<string, any>;
+}
+
 export interface ClipEditReframeKeyframe {
   t_ms: number;
   x: number;
@@ -858,6 +894,9 @@ export interface ClipEditReframeKeyframe {
 export interface ClipEditReframe {
   mode_overrides?: Record<string, string>;
   keyframes?: ClipEditReframeKeyframe[];
+  layout?: ReframeLayout | null;
+  target_speaker?: string | null;
+  roi_box?: [number, number, number, number] | null;
 }
 
 export interface ClipEditHook {

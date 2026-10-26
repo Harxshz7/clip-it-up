@@ -35,12 +35,7 @@ def generate_contact_sheet(
     ]
 
     cap = cv2.VideoCapture(video_path)
-    if not cap.isOpened():
-        # Generate dummy fallback contact sheet if video not openable
-        blank = np.zeros((grid_rows * thumb_h, grid_cols * thumb_w, 3), dtype=np.uint8)
-        cv2.putText(blank, "Video Not Available", (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 255), 2)
-        cv2.imwrite(output_png_path, blank)
-        return output_png_path
+    video_available = cap.isOpened()
 
     src_fps = float(cap.get(cv2.CAP_PROP_FPS) or 25.0)
     thumbs: list[np.ndarray] = []
@@ -51,7 +46,10 @@ def generate_contact_sheet(
         ret, frame = cap.read()
 
         if not ret or frame is None:
-            frame = np.zeros((720, 1280, 3), dtype=np.uint8)
+            # Synthetic studio canvas
+            frame = np.full((720, 1280, 3), (28, 24, 22), dtype=np.uint8)
+            # Faint 16:9 guidelines
+            cv2.rectangle(frame, (20, 20), (1260, 700), (50, 45, 42), 1)
 
         # Find keyframe or interpolate
         active_kf = keyframes[0] if keyframes else ReframeKeyframe(t_ms=t_ms, cx=0.5, cy=0.5, w=0.3164, h=1.0)
@@ -65,17 +63,35 @@ def generate_contact_sheet(
         crop_y1 = int((active_kf.cy - (active_kf.h / 2.0)) * h)
         crop_y2 = int((active_kf.cy + (active_kf.h / 2.0)) * h)
 
+        # Check for layout regions if present
+        layout_obj = getattr(crop_path, "layout", None) if not isinstance(crop_path, dict) else crop_path.get("layout")
+        if layout_obj:
+            mode_name = getattr(layout_obj, "type", None) or getattr(layout_obj, "mode", "") if not isinstance(layout_obj, dict) else (layout_obj.get("type") or layout_obj.get("mode", ""))
+            regions = getattr(layout_obj, "regions", []) if not isinstance(layout_obj, dict) else layout_obj.get("regions", [])
+            for r in regions:
+                rx = getattr(r, "src_x", 0.0) if not isinstance(r, dict) else r.get("src_x", 0.0)
+                ry = getattr(r, "src_y", 0.0) if not isinstance(r, dict) else r.get("src_y", 0.0)
+                rw = getattr(r, "src_w", 1.0) if not isinstance(r, dict) else r.get("src_w", 1.0)
+                rh = getattr(r, "src_h", 1.0) if not isinstance(r, dict) else r.get("src_h", 1.0)
+                tag = getattr(r, "label", None) or getattr(r, "tag", "") if not isinstance(r, dict) else (r.get("label") or r.get("tag", ""))
+                r_x1, r_y1 = int(rx * w), int(ry * h)
+                r_x2, r_y2 = int((rx + rw) * w), int((ry + rh) * h)
+                # Cyan dashed / thin box for layout source region
+                cv2.rectangle(frame, (r_x1, r_y1), (r_x2, r_y2), (255, 200, 0), 2)
+                cv2.putText(frame, tag or mode_name, (r_x1 + 6, max(25, r_y1 + 20)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 200, 0), 1)
+
         # Draw 9:16 crop rectangle on frame (Magenta / Indigo)
         cv2.rectangle(frame, (crop_x1, crop_y1), (crop_x2, crop_y2), (255, 0, 200), 3)
 
         # Draw timestamp label
         label = f"{(t_ms - start_ms) / 1000.0:.1f}s (cx={active_kf.cx:.2f})"
-        cv2.putText(frame, label, (20, 40), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 255), 2)
+        cv2.putText(frame, label, (20, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 255), 2)
 
         thumb = cv2.resize(frame, (thumb_w, thumb_h))
         thumbs.append(thumb)
 
-    cap.release()
+    if video_available:
+        cap.release()
 
     # Stitch into grid
     rows = []
