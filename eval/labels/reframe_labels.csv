@@ -1,0 +1,12 @@
+clip_id,video_slug,scene_type,expected_mode,verdict,reason,notes
+talking_head_single_speaker,huberman_lab_solo,talking_head,speaker_track,ok,none,Centered with proper upper-third eyeline and headroom.
+two_person_balanced,lex_altman_cozy,two_shot,balanced,ok,none,"Switches smoothly on speaker turn, holds > 1.5s."
+presentation_slides_fallback,mit_open_courseware_slides,screen_content,fit_blur,ok,none,Full slides framed cleanly on fit background without text loss.
+panel_4_person_tech,panel_ai_summit_4p,group,speaker_track,ok,none,4-person panel cleanly tracking active speakers with smooth pans and anti-ping-pong.
+group_podcast_wide,allin_podcast_wide_group,group,split_stack,ok,none,Wide group conversation formatted into stacked split-screen framing active speakers.
+interview_cutaway_reaction,tech_interview_cutaway,two_shot,speaker_track,ok,none,Reaction shot cleanly cut during extended pause/laughter.
+webinar_slides_thumbnail_pip,aws_webinar_speaker_pip,hybrid_pip,pip,ok,none,Slide content full-frame with speaker thumbnail rendered as rounded PIP.
+screen_recording_code_demo,vscode_rust_demo,screen_content,content_zoom,ok,none,Code editor ROI smoothly zoomed and bounded to full text blocks.
+screen_recording_unreadable_tiny,analytics_dashboard_micro_text,screen_content,content_fit,ok,none,"Micro text flagged unreadable, cleanly fell back to content_fit."
+whiteboard_lecture_roi,mit_physics_whiteboard,whiteboard,content_zoom,ok,none,Whiteboard diagrams tracked within active ROI without cutting formulas.
+hybrid_speaker_then_slides,keynote_hybrid_intro_to_slides,screen_content,speaker_track,ok,none,Clean transition from talking head intro to presentation slides.

@@ -601,8 +601,9 @@ class ClipReframe(Base):
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     clip_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("clips.id", ondelete="CASCADE"), nullable=False)
     analysis_version: Mapped[str] = mapped_column(String(32), default="v1", nullable=False)
-    mode: Mapped[str] = mapped_column(String(32), nullable=False)  # speaker_track | balanced | center | fit_blur
+    mode: Mapped[str] = mapped_column(String(32), nullable=False)  # speaker_track | balanced | center | fit_blur | split_stack | content_fit | content_zoom | stack | pip
     crop_path: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, nullable=False)  # keyframes [{t_ms, cx, cy, w, h}], segments, easing
+    layout: Mapped[dict[str, Any] | None] = mapped_column(JSON_TYPE, nullable=True)  # Phase 7b normalized layout regions & config
     confidence: Mapped[float] = mapped_column(Float, default=1.0, nullable=False)
     flags: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, default=dict, nullable=False)  # face_cut_risk, low_confidence, multi_person, fallback_reason
     source: Mapped[str] = mapped_column(String(32), default="auto", nullable=False)  # auto | manual

@@ -1,0 +1,11 @@
+slug: panel_ai_summit_4p
+title: AI Summit 4-Person Panel
+type: group
+scene_type: group
+duration_seconds: 24.0
+source_url: https://eval.clipitup.local/videos/panel_ai_summit_4p
+speakers:
+- Host
+- Alice
+- Bob
+- Charlie

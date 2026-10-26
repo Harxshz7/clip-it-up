@@ -2,24 +2,96 @@
 # schema:
 #   clip_id: string
 #   video_slug: string
+#   scene_type: talking_head | two_shot | group | screen_content | whiteboard | hybrid_pip | b_roll_other
+#   expected_mode: speaker_track | balanced | split_stack | content_fit | content_zoom | stack | pip | center | fit_blur
 #   verdict: ok | bad
-#   reason: face_cut | wrong_speaker | jitter | bad_zoom | wrong_mode | none
+#   reason: none | face_cut | wrong_speaker | jitter | bad_zoom | wrong_mode | text_cut | unreadable
 #   notes: string
 
-- clip_id: "synthetic_talking_head_01"
-  video_slug: "alex_huberman_clip1"
+- clip_id: "talking_head_single_speaker"
+  video_slug: "huberman_lab_solo"
+  scene_type: "talking_head"
+  expected_mode: "speaker_track"
   verdict: "ok"
   reason: "none"
   notes: "Centered with proper upper-third eyeline and headroom."
 
-- clip_id: "synthetic_two_shot_01"
-  video_slug: "lex_sam_clip1"
+- clip_id: "two_person_balanced"
+  video_slug: "lex_altman_cozy"
+  scene_type: "two_shot"
+  expected_mode: "balanced"
   verdict: "ok"
   reason: "none"
   notes: "Switches smoothly on speaker turn, holds > 1.5s."
 
-- clip_id: "synthetic_slides_01"
-  video_slug: "stanford_cs229_clip1"
+- clip_id: "presentation_slides_fallback"
+  video_slug: "mit_open_courseware_slides"
+  scene_type: "screen_content"
+  expected_mode: "fit_blur"
   verdict: "ok"
   reason: "none"
-  notes: "Triggers fit_blur fallback without cropping code/slides."
+  notes: "Full slides framed cleanly on fit background without text loss."
+
+- clip_id: "panel_4_person_tech"
+  video_slug: "panel_ai_summit_4p"
+  scene_type: "group"
+  expected_mode: "speaker_track"
+  verdict: "ok"
+  reason: "none"
+  notes: "4-person panel cleanly tracking active speakers with smooth pans and anti-ping-pong."
+
+- clip_id: "group_podcast_wide"
+  video_slug: "allin_podcast_wide_group"
+  scene_type: "group"
+  expected_mode: "split_stack"
+  verdict: "ok"
+  reason: "none"
+  notes: "Wide group conversation formatted into stacked split-screen framing active speakers."
+
+- clip_id: "interview_cutaway_reaction"
+  video_slug: "tech_interview_cutaway"
+  scene_type: "two_shot"
+  expected_mode: "speaker_track"
+  verdict: "ok"
+  reason: "none"
+  notes: "Reaction shot cleanly cut during extended pause/laughter."
+
+- clip_id: "webinar_slides_thumbnail_pip"
+  video_slug: "aws_webinar_speaker_pip"
+  scene_type: "hybrid_pip"
+  expected_mode: "pip"
+  verdict: "ok"
+  reason: "none"
+  notes: "Slide content full-frame with speaker thumbnail rendered as rounded PIP."
+
+- clip_id: "screen_recording_code_demo"
+  video_slug: "vscode_rust_demo"
+  scene_type: "screen_content"
+  expected_mode: "content_zoom"
+  verdict: "ok"
+  reason: "none"
+  notes: "Code editor ROI smoothly zoomed and bounded to full text blocks."
+
+- clip_id: "screen_recording_unreadable_tiny"
+  video_slug: "analytics_dashboard_micro_text"
+  scene_type: "screen_content"
+  expected_mode: "content_fit"
+  verdict: "ok"
+  reason: "none"
+  notes: "Micro text flagged unreadable, cleanly fell back to content_fit."
+
+- clip_id: "whiteboard_lecture_roi"
+  video_slug: "mit_physics_whiteboard"
+  scene_type: "whiteboard"
+  expected_mode: "content_zoom"
+  verdict: "ok"
+  reason: "none"
+  notes: "Whiteboard diagrams tracked within active ROI without cutting formulas."
+
+- clip_id: "hybrid_speaker_then_slides"
+  video_slug: "keynote_hybrid_intro_to_slides"
+  scene_type: "screen_content"
+  expected_mode: "speaker_track"
+  verdict: "ok"
+  reason: "none"
+  notes: "Clean transition from talking head intro to presentation slides."
