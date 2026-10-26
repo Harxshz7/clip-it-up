@@ -18,6 +18,8 @@ dependencies = [
     "structlog>=24.1.0",
     "pytest>=8.2.0",
     "pytest-asyncio>=0.23.6",
+    "greenlet>=3.0.0",
+    "aiosqlite>=0.20.0",
 ]
 
 [build-system]
