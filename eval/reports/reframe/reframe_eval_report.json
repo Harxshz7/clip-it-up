@@ -1,70 +1,547 @@
 {
-  "timestamp": "2026-10-26T04:31:21.245096+00:00",
+  "timestamp": "2026-10-26T05:06:52.496282+00:00",
+  "phase": "7b",
+  "quality_gates": {
+    "status": "FAIL",
+    "checks": {
+      "face_inside_crop": {
+        "value": 0.6487,
+        "target": ">= 0.990",
+        "passed": false
+      },
+      "ping_pong_rate": {
+        "value": 0.56,
+        "target": "<= 1.0 / min",
+        "passed": true
+      },
+      "human_ok_group": {
+        "value": 1.0,
+        "target": ">= 0.850",
+        "passed": true
+      },
+      "human_ok_screen_content": {
+        "value": 1.0,
+        "target": ">= 0.850",
+        "passed": true
+      },
+      "v1_modes_regression": {
+        "value": 0.0,
+        "target": "<= 0.010",
+        "passed": true
+      },
+      "classifier_macro_f1": {
+        "value": 0.3889,
+        "target": ">= 0.850",
+        "passed": false
+      }
+    }
+  },
   "summary": {
-    "total_eval_clips": 3,
-    "face_inside_crop_rate": 1.0,
-    "target_face_inside_rate": 0.99,
-    "mean_jitter_score": 0.0,
-    "target_jitter_score": 0.005,
-    "mean_pan_speed_p95": 0.0,
-    "human_ok_rate": 1.0,
-    "target_human_ok_rate": 0.9,
-    "fallback_rate": 0.3333,
-    "low_confidence_rate": 0.0,
+    "total_eval_clips": 11,
+    "face_inside_crop_rate": 0.6487,
+    "mean_jitter_score": 0.00057,
+    "mean_pan_speed_p95": 0.001,
+    "switches_per_min": 0.56,
+    "ping_pongs_per_min": 0.56,
+    "overall_human_ok_rate": 1.0,
+    "group_human_ok_rate": 1.0,
+    "screen_human_ok_rate": 1.0,
+    "fallback_rate": 0.1818,
     "mode_distribution": {
-      "speaker_track": 1,
+      "speaker_track": 4,
       "balanced": 1,
-      "fit_blur": 1
+      "content_fit": 2,
+      "split_stack": 1,
+      "pip": 1,
+      "content_zoom": 2
+    }
+  },
+  "classifier_eval": {
+    "accuracy": 0.5455,
+    "macro_f1": 0.3889,
+    "target_macro_f1": 0.85,
+    "per_class": {
+      "talking_head": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6667,
+        "support": 1
+      },
+      "two_shot": {
+        "precision": 1.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 2
+      },
+      "group": {
+        "precision": 1.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 2
+      },
+      "screen_content": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6667,
+        "support": 4
+      },
+      "whiteboard": {
+        "precision": 1.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 1
+      },
+      "hybrid_pip": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 1
+      },
+      "b_roll_other": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 0
+      }
+    },
+    "confusion_matrix": {
+      "talking_head": {
+        "talking_head": 1,
+        "two_shot": 0,
+        "group": 0,
+        "screen_content": 0,
+        "whiteboard": 0,
+        "hybrid_pip": 0,
+        "b_roll_other": 0
+      },
+      "two_shot": {
+        "talking_head": 1,
+        "two_shot": 0,
+        "group": 0,
+        "screen_content": 1,
+        "whiteboard": 0,
+        "hybrid_pip": 0,
+        "b_roll_other": 0
+      },
+      "group": {
+        "talking_head": 0,
+        "two_shot": 0,
+        "group": 0,
+        "screen_content": 2,
+        "whiteboard": 0,
+        "hybrid_pip": 0,
+        "b_roll_other": 0
+      },
+      "screen_content": {
+        "talking_head": 0,
+        "two_shot": 0,
+        "group": 0,
+        "screen_content": 4,
+        "whiteboard": 0,
+        "hybrid_pip": 0,
+        "b_roll_other": 0
+      },
+      "whiteboard": {
+        "talking_head": 0,
+        "two_shot": 0,
+        "group": 0,
+        "screen_content": 1,
+        "whiteboard": 0,
+        "hybrid_pip": 0,
+        "b_roll_other": 0
+      },
+      "hybrid_pip": {
+        "talking_head": 0,
+        "two_shot": 0,
+        "group": 0,
+        "screen_content": 0,
+        "whiteboard": 0,
+        "hybrid_pip": 1,
+        "b_roll_other": 0
+      },
+      "b_roll_other": {
+        "talking_head": 0,
+        "two_shot": 0,
+        "group": 0,
+        "screen_content": 0,
+        "whiteboard": 0,
+        "hybrid_pip": 0,
+        "b_roll_other": 0
+      }
+    }
+  },
+  "scene_type_breakdown": {
+    "talking_head": {
+      "total_clips": 1,
+      "human_ok_rate": 1.0,
+      "fallback_rate": 0.0,
+      "face_inside_rate": 1.0
+    },
+    "two_shot": {
+      "total_clips": 2,
+      "human_ok_rate": 1.0,
+      "fallback_rate": 0.0,
+      "face_inside_rate": 0.8456
+    },
+    "screen_content": {
+      "total_clips": 4,
+      "human_ok_rate": 1.0,
+      "fallback_rate": 0.5,
+      "face_inside_rate": 1.0
+    },
+    "group": {
+      "total_clips": 2,
+      "human_ok_rate": 1.0,
+      "fallback_rate": 0.0,
+      "face_inside_rate": 0.6137
+    },
+    "hybrid_pip": {
+      "total_clips": 1,
+      "human_ok_rate": 1.0,
+      "fallback_rate": 0.0,
+      "face_inside_rate": 0.0
+    },
+    "whiteboard": {
+      "total_clips": 1,
+      "human_ok_rate": 1.0,
+      "fallback_rate": 0.0,
+      "face_inside_rate": 0.0
     }
   },
   "clip_results": [
     {
       "id": "talking_head_single_speaker",
       "video_slug": "huberman_lab_solo",
+      "scene_type": "talking_head",
       "mode": "speaker_track",
+      "expected_mode": "speaker_track",
       "confidence": 0.98,
       "jitter_score": 0.0,
       "pan_speed_p95": 0.0,
       "face_inside_rate": 1.0,
+      "speaker_switches": 0,
+      "ping_pongs": 0,
+      "text_readability_pass": true,
+      "human_verdict": "ok",
+      "layout_mode": "crop",
       "flags": {
         "face_cut_risk": false,
         "low_confidence": false,
         "multi_person": false,
+        "unreadable_text": false,
+        "multi_speaker_conflict": false,
+        "low_roi_confidence": false,
+        "reaction_cutaway": false,
+        "ping_pong_prevented": false,
         "fallback_reason": null,
         "suggested_fix": null
+      },
+      "contact_sheet": "contact_sheets/talking_head_single_speaker.png",
+      "baseline_diff": {
+        "face_inside_delta": 0.0,
+        "jitter_delta": 0.0,
+        "mode_preserved": true
       }
     },
     {
       "id": "two_person_balanced",
       "video_slug": "lex_altman_cozy",
+      "scene_type": "two_shot",
       "mode": "balanced",
+      "expected_mode": "balanced",
       "confidence": 0.94,
       "jitter_score": 0.0,
       "pan_speed_p95": 0.0,
       "face_inside_rate": 1.0,
+      "speaker_switches": 0,
+      "ping_pongs": 0,
+      "text_readability_pass": true,
+      "human_verdict": "ok",
+      "layout_mode": "crop",
       "flags": {
         "face_cut_risk": false,
         "low_confidence": false,
         "multi_person": true,
+        "unreadable_text": false,
+        "multi_speaker_conflict": false,
+        "low_roi_confidence": false,
+        "reaction_cutaway": false,
+        "ping_pong_prevented": false,
         "fallback_reason": null,
         "suggested_fix": null
+      },
+      "contact_sheet": "contact_sheets/two_person_balanced.png",
+      "baseline_diff": {
+        "face_inside_delta": 0.0,
+        "jitter_delta": 0.0,
+        "mode_preserved": true
       }
     },
     {
       "id": "presentation_slides_fallback",
       "video_slug": "mit_open_courseware_slides",
-      "mode": "fit_blur",
-      "confidence": 0.9,
+      "scene_type": "screen_content",
+      "mode": "content_fit",
+      "expected_mode": "content_fit",
+      "confidence": 0.92,
       "jitter_score": 0.0,
       "pan_speed_p95": 0.0,
       "face_inside_rate": 1.0,
+      "speaker_switches": 0,
+      "ping_pongs": 0,
+      "text_readability_pass": true,
+      "human_verdict": "ok",
+      "layout_mode": "content_fit",
       "flags": {
         "face_cut_risk": false,
         "low_confidence": false,
         "multi_person": false,
-        "fallback_reason": "screen_share_detected",
+        "unreadable_text": false,
+        "multi_speaker_conflict": false,
+        "low_roi_confidence": false,
+        "reaction_cutaway": false,
+        "ping_pong_prevented": false,
+        "fallback_reason": "screen_content_full_fit",
         "suggested_fix": null
+      },
+      "contact_sheet": "contact_sheets/presentation_slides_fallback.png",
+      "baseline_diff": {
+        "face_inside_delta": 0.0,
+        "jitter_delta": 0.0,
+        "mode_preserved": true
       }
+    },
+    {
+      "id": "panel_4_person_tech",
+      "video_slug": "panel_ai_summit_4p",
+      "scene_type": "group",
+      "mode": "speaker_track",
+      "expected_mode": "speaker_track",
+      "confidence": 0.95,
+      "jitter_score": 0.00628,
+      "pan_speed_p95": 0.009,
+      "face_inside_rate": 0.2521,
+      "speaker_switches": 3,
+      "ping_pongs": 3,
+      "text_readability_pass": true,
+      "human_verdict": "ok",
+      "layout_mode": "crop",
+      "flags": {
+        "face_cut_risk": false,
+        "low_confidence": false,
+        "multi_person": true,
+        "unreadable_text": false,
+        "multi_speaker_conflict": false,
+        "low_roi_confidence": false,
+        "reaction_cutaway": false,
+        "ping_pong_prevented": false,
+        "fallback_reason": null,
+        "suggested_fix": null
+      },
+      "contact_sheet": "contact_sheets/panel_4_person_tech.png"
+    },
+    {
+      "id": "group_podcast_wide",
+      "video_slug": "allin_podcast_wide_group",
+      "scene_type": "group",
+      "mode": "split_stack",
+      "expected_mode": "split_stack",
+      "confidence": 0.93,
+      "jitter_score": 0.0,
+      "pan_speed_p95": 0.0,
+      "face_inside_rate": 1.0,
+      "speaker_switches": 0,
+      "ping_pongs": 0,
+      "text_readability_pass": true,
+      "human_verdict": "ok",
+      "layout_mode": "split_stack",
+      "flags": {
+        "face_cut_risk": false,
+        "low_confidence": false,
+        "multi_person": true,
+        "unreadable_text": false,
+        "multi_speaker_conflict": false,
+        "low_roi_confidence": false,
+        "reaction_cutaway": false,
+        "ping_pong_prevented": false,
+        "fallback_reason": null,
+        "suggested_fix": null
+      },
+      "contact_sheet": "contact_sheets/group_podcast_wide.png"
+    },
+    {
+      "id": "interview_cutaway_reaction",
+      "video_slug": "tech_interview_cutaway",
+      "scene_type": "two_shot",
+      "mode": "speaker_track",
+      "expected_mode": "speaker_track",
+      "confidence": 0.92,
+      "jitter_score": 0.0,
+      "pan_speed_p95": 0.0,
+      "face_inside_rate": 0.5,
+      "speaker_switches": 0,
+      "ping_pongs": 0,
+      "text_readability_pass": true,
+      "human_verdict": "ok",
+      "layout_mode": "crop",
+      "flags": {
+        "face_cut_risk": false,
+        "low_confidence": false,
+        "multi_person": true,
+        "unreadable_text": false,
+        "multi_speaker_conflict": false,
+        "low_roi_confidence": false,
+        "reaction_cutaway": false,
+        "ping_pong_prevented": true,
+        "fallback_reason": null,
+        "suggested_fix": null
+      },
+      "contact_sheet": "contact_sheets/interview_cutaway_reaction.png"
+    },
+    {
+      "id": "webinar_slides_thumbnail_pip",
+      "video_slug": "aws_webinar_speaker_pip",
+      "scene_type": "hybrid_pip",
+      "mode": "pip",
+      "expected_mode": "pip",
+      "confidence": 0.94,
+      "jitter_score": 0.0,
+      "pan_speed_p95": 0.0,
+      "face_inside_rate": 0.0,
+      "speaker_switches": 0,
+      "ping_pongs": 0,
+      "text_readability_pass": true,
+      "human_verdict": "ok",
+      "layout_mode": "pip",
+      "flags": {
+        "face_cut_risk": false,
+        "low_confidence": false,
+        "multi_person": false,
+        "unreadable_text": false,
+        "multi_speaker_conflict": false,
+        "low_roi_confidence": false,
+        "reaction_cutaway": false,
+        "ping_pong_prevented": false,
+        "fallback_reason": null,
+        "suggested_fix": null
+      },
+      "contact_sheet": "contact_sheets/webinar_slides_thumbnail_pip.png"
+    },
+    {
+      "id": "screen_recording_code_demo",
+      "video_slug": "vscode_rust_demo",
+      "scene_type": "screen_content",
+      "mode": "content_zoom",
+      "expected_mode": "content_zoom",
+      "confidence": 0.96,
+      "jitter_score": 0.0,
+      "pan_speed_p95": 0.0,
+      "face_inside_rate": 1.0,
+      "speaker_switches": 0,
+      "ping_pongs": 0,
+      "text_readability_pass": true,
+      "human_verdict": "ok",
+      "layout_mode": "content_zoom",
+      "flags": {
+        "face_cut_risk": false,
+        "low_confidence": false,
+        "multi_person": false,
+        "unreadable_text": false,
+        "multi_speaker_conflict": false,
+        "low_roi_confidence": false,
+        "reaction_cutaway": false,
+        "ping_pong_prevented": false,
+        "fallback_reason": null,
+        "suggested_fix": null
+      },
+      "contact_sheet": "contact_sheets/screen_recording_code_demo.png"
+    },
+    {
+      "id": "screen_recording_unreadable_tiny",
+      "video_slug": "analytics_dashboard_micro_text",
+      "scene_type": "screen_content",
+      "mode": "content_fit",
+      "expected_mode": "content_fit",
+      "confidence": 0.93,
+      "jitter_score": 0.0,
+      "pan_speed_p95": 0.0,
+      "face_inside_rate": 1.0,
+      "speaker_switches": 0,
+      "ping_pongs": 0,
+      "text_readability_pass": true,
+      "human_verdict": "ok",
+      "layout_mode": "content_fit",
+      "flags": {
+        "face_cut_risk": false,
+        "low_confidence": false,
+        "multi_person": false,
+        "unreadable_text": true,
+        "multi_speaker_conflict": false,
+        "low_roi_confidence": false,
+        "reaction_cutaway": false,
+        "ping_pong_prevented": false,
+        "fallback_reason": "unreadable_text_micro_font",
+        "suggested_fix": "Switch to Fit (content_fit)"
+      },
+      "contact_sheet": "contact_sheets/screen_recording_unreadable_tiny.png"
+    },
+    {
+      "id": "whiteboard_lecture_roi",
+      "video_slug": "mit_physics_whiteboard",
+      "scene_type": "whiteboard",
+      "mode": "content_zoom",
+      "expected_mode": "content_zoom",
+      "confidence": 0.91,
+      "jitter_score": 0.0,
+      "pan_speed_p95": 0.0,
+      "face_inside_rate": 0.0,
+      "speaker_switches": 0,
+      "ping_pongs": 0,
+      "text_readability_pass": true,
+      "human_verdict": "ok",
+      "layout_mode": "content_zoom",
+      "flags": {
+        "face_cut_risk": false,
+        "low_confidence": false,
+        "multi_person": false,
+        "unreadable_text": false,
+        "multi_speaker_conflict": false,
+        "low_roi_confidence": false,
+        "reaction_cutaway": false,
+        "ping_pong_prevented": false,
+        "fallback_reason": null,
+        "suggested_fix": null
+      },
+      "contact_sheet": "contact_sheets/whiteboard_lecture_roi.png"
+    },
+    {
+      "id": "hybrid_speaker_then_slides",
+      "video_slug": "keynote_hybrid_intro_to_slides",
+      "scene_type": "screen_content",
+      "mode": "speaker_track",
+      "expected_mode": "speaker_track",
+      "confidence": 0.95,
+      "jitter_score": 2e-05,
+      "pan_speed_p95": 0.002,
+      "face_inside_rate": 1.0,
+      "speaker_switches": 0,
+      "ping_pongs": 0,
+      "text_readability_pass": true,
+      "human_verdict": "ok",
+      "layout_mode": "crop",
+      "flags": {
+        "face_cut_risk": false,
+        "low_confidence": false,
+        "multi_person": false,
+        "unreadable_text": false,
+        "multi_speaker_conflict": false,
+        "low_roi_confidence": false,
+        "reaction_cutaway": false,
+        "ping_pong_prevented": false,
+        "fallback_reason": null,
+        "suggested_fix": null
+      },
+      "contact_sheet": "contact_sheets/hybrid_speaker_then_slides.png"
     }
   ]
 }

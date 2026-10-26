@@ -315,6 +315,10 @@ class EnhancedSceneClassifier(BaseSceneClassifier):
             features=features_dict,
         )
 
+    def reset(self) -> None:
+        """Reset hysteresis state between independent videos or clips."""
+        self._prev_classification = None
+
     def _score_classes(
         self,
         num_tracks: int,
@@ -339,37 +343,39 @@ class EnhancedSceneClassifier(BaseSceneClassifier):
 
         # 1. Whiteboard evidence
         if has_whiteboard:
-            scores["whiteboard"] += 4.5
+            scores["whiteboard"] += 6.0
         elif text_density > 0.20 and static_ratio > 0.60 and num_tracks <= 1:
-            scores["whiteboard"] += 0.8
+            scores["whiteboard"] += 1.5
 
         # 2. Hybrid PIP evidence (screen content + small thumbnail face)
         if has_thumbnail and (has_screen_share or text_density > 0.25 or static_ratio > 0.60):
-            scores["hybrid_pip"] += 5.0
+            scores["hybrid_pip"] += 6.0
         elif has_thumbnail:
-            scores["hybrid_pip"] += 3.0
+            scores["hybrid_pip"] += 3.5
 
-        # 3. Screen content evidence (slides, code, UI)
-        if (has_screen_share or text_density > 0.30 or static_ratio > 0.70) and not has_thumbnail:
-            if num_tracks == 0:
-                scores["screen_content"] += 5.0
-            else:
-                scores["screen_content"] += 2.5
-
-        # 4. Multi-face geometry evidence
+        # 3. Multi-face geometry evidence (takes precedence when camera captures real people)
         if num_tracks >= 3:
-            scores["group"] += 4.5
+            scores["group"] += 6.0
         elif num_tracks == 2:
-            scores["two_shot"] += 4.5
-        elif num_tracks == 1 and not has_thumbnail:
-            primary_h = tracks[0].summary.get("mean_h", 0.2)
+            scores["two_shot"] += 6.0
+        elif num_tracks == 1 and not has_thumbnail and not has_whiteboard:
+            primary_h = tracks[0].summary.get("mean_h", 0.2) if tracks else 0.2
             if primary_h >= self.min_talking_head_height:
-                scores["talking_head"] += 4.0
+                scores["talking_head"] += 5.5
             else:
-                scores["talking_head"] += 2.0
-                scores["b_roll_other"] += 1.0
-        elif num_tracks == 0 and not (has_screen_share or text_density > 0.20 or static_ratio > 0.60):
-            scores["b_roll_other"] += 3.5
+                scores["talking_head"] += 3.0
+                scores["b_roll_other"] += 1.5
+
+        # 4. Screen content evidence (slides, code, UI) when no multi-face conversation
+        if not has_whiteboard and not has_thumbnail and (has_screen_share or text_density > 0.25 or static_ratio > 0.70):
+            if num_tracks == 0:
+                scores["screen_content"] += 6.0
+            elif num_tracks == 1:
+                # Could be talking head presenting or slide with presenter
+                scores["screen_content"] += 2.0
+
+        if num_tracks == 0 and not (has_screen_share or text_density > 0.20 or static_ratio > 0.60 or has_whiteboard):
+            scores["b_roll_other"] += 4.0
 
         # Compute softmax over scores
         max_s = max(scores.values())
