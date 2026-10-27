@@ -1,0 +1,98 @@
+# ==========================================
+# Version Control & IDEs
+# ==========================================
+.git
+.gitignore
+.gitattributes
+.github
+.vscode
+.idea
+.fleet
+.agents
+.gemini
+.agent
+.freebuff
+.gsd
+
+# ==========================================
+# Dependencies & Package Managers
+# ==========================================
+node_modules
+.pnpm-store
+.pnpm-debug.log*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+
+# ==========================================
+# Python Environments & Cache
+# ==========================================
+.venv
+venv
+env
+ENV
+__pycache__
+__pypackages__
+*.pyc
+*.pyo
+*.pyd
+*.egg-info
+dist
+build
+.eggs
+.uv
+.uv-cache
+.pytest_cache
+.mypy_cache
+.ruff_cache
+.coverage
+.coverage.*
+htmlcov
+.tox
+.nox
+
+# ==========================================
+# Next.js & Frontend Build Outputs
+# ==========================================
+.next
+out
+.turbo
+*.tsbuildinfo
+coverage
+test-results
+playwright-report
+blob-report
+
+# ==========================================
+# Secrets & Environment Files
+# ==========================================
+.env
+.env.*
+!.env.example
+infra/.env
+!.infra/.env.example
+
+# ==========================================
+# Local Storage, Database & Media Dumps
+# ==========================================
+infra/data
+infra/postgres/data
+infra/minio/data
+infra/redis/data
+*.sqlite
+*.sqlite3
+*.db
+scratch
+tmp
+temp
+.cache
+logs
+*.log
+*.pid
+celerybeat-schedule*
+
+# Heavy evaluation media assets (downloaded on demand in worker)
+eval/videos/**/*.mp4
+eval/videos/**/*.wav
+eval/reports/reframe/contact_sheets/*.png

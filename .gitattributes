@@ -1,0 +1,60 @@
+# Auto detect text files and perform LF normalization on checkin
+* text=auto eol=lf
+
+# Explicit LF for shell scripts (prevents \r errors in Linux containers)
+*.sh text eol=lf
+
+# Windows PowerShell scripts
+*.ps1 text eol=crlf
+
+# Source Code
+*.py text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.js text eol=lf
+*.jsx text eol=lf
+*.json text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.toml text eol=lf
+*.md text eol=lf
+*.css text eol=lf
+*.html text eol=lf
+*.sql text eol=lf
+*.ini text eol=lf
+Makefile text eol=lf
+
+# Binary Media & Font Files
+*.mp4 binary
+*.mov binary
+*.mkv binary
+*.webm binary
+*.avi binary
+*.wav binary
+*.mp3 binary
+*.m4a binary
+*.aac binary
+*.flac binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.svg text eol=lf
+*.ttf binary
+*.otf binary
+*.woff binary
+*.woff2 binary
+
+# Binary Weights & Data
+*.pt binary
+*.bin binary
+*.onnx binary
+*.npz binary
+*.npy binary
+*.sqlite binary
+*.sqlite3 binary
+*.db binary
+*.zip binary
+*.tar.gz binary
