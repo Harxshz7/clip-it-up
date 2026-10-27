@@ -152,3 +152,63 @@ def test_validate_rendered_output_duration_mismatch(mock_probe, mock_getsize, mo
             expected_duration_ms=20000,  # 5000ms difference > 150ms
         )
     assert exc.value.code == "DURATION_MISMATCH"
+
+
+def test_build_render_filtergraph_with_phase7b_split_stack_layout():
+    """Verify single filter-graph builder integrates split_stack layout seamlessly into EDL."""
+    edl = EditDecisionList.create(clip_start_ms=0, clip_end_ms=10000)
+    crop_path = {
+        "keyframes": [{"t_ms": 0, "cx": 0.5, "cy": 0.5, "w": 0.3164, "h": 1.0}],
+        "segments": [{"start_ms": 0, "end_ms": 10000, "mode": "split_stack", "confidence": 0.95}],
+        "layout": {
+            "type": "split_stack",
+            "regions": [
+                {"src_x": 0.1, "src_y": 0.2, "src_w": 0.3, "src_h": 0.4, "dst_x": 0.0, "dst_y": 0.0, "dst_w": 1.0, "dst_h": 0.5},
+                {"src_x": 0.6, "src_y": 0.2, "src_w": 0.3, "src_h": 0.4, "dst_x": 0.0, "dst_y": 0.5, "dst_w": 1.0, "dst_h": 0.5},
+            ],
+        },
+    }
+
+    filter_str, v_out, a_out = build_render_filtergraph(
+        edl=edl,
+        crop_path=crop_path,
+        src_w=1280,
+        src_h=720,
+        out_w=1080,
+        out_h=1920,
+        has_audio=True,
+    )
+
+    assert "vstack=inputs=2" in filter_str
+    assert "scale=1080:960" in filter_str
+    assert v_out == "[v_out]"
+    assert a_out == "[a_out]"
+
+
+def test_build_render_filtergraph_with_phase7b_pip_layout():
+    """Verify single filter-graph builder compiles PIP overlay layout correctly."""
+    edl = EditDecisionList.create(clip_start_ms=0, clip_end_ms=15000)
+    crop_path = {
+        "keyframes": [{"t_ms": 0, "cx": 0.5, "cy": 0.5, "w": 0.3164, "h": 1.0}],
+        "segments": [{"start_ms": 0, "end_ms": 15000, "mode": "pip", "confidence": 0.95}],
+        "layout": {
+            "type": "pip",
+            "regions": [
+                {"src_x": 0.0, "src_y": 0.0, "src_w": 1.0, "src_h": 1.0, "dst_x": 0.0, "dst_y": 0.21875, "dst_w": 1.0, "dst_h": 0.5625},
+                {"src_x": 0.8, "src_y": 0.1, "src_w": 0.15, "src_h": 0.15, "dst_x": 0.68, "dst_y": 0.12, "dst_w": 0.28, "dst_h": 0.16, "shape": "rounded_rect"},
+            ],
+        },
+    }
+
+    filter_str, v_out, a_out = build_render_filtergraph(
+        edl=edl,
+        crop_path=crop_path,
+        src_w=1280,
+        src_h=720,
+        out_w=1080,
+        out_h=1920,
+        has_audio=True,
+    )
+
+    assert "overlay=" in filter_str
+    assert v_out == "[v_out]"

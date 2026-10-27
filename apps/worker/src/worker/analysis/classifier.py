@@ -30,15 +30,14 @@ def detect_text_regions_lite(frame: np.ndarray) -> list[tuple[float, float, floa
     # Convert to grayscale
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY) if len(frame.shape) == 3 and frame.shape[2] == 3 else frame
 
-    # Morphological gradient with horizontal structuring element to connect text characters into lines
-    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (9, 1))
-    grad = cv2.morphologyEx(gray, cv2.MORPH_GRADIENT, kernel)
+    # Use Sobel horizontal gradients and binary thresholding to find character stroke lines
+    sobel_x = cv2.Sobel(gray, cv2.CV_8U, 1, 0, ksize=3)
+    _, thresh_sobel = cv2.threshold(sobel_x, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+    _, thresh_binary = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+    thresh = cv2.bitwise_or(thresh_sobel, thresh_binary)
 
-    # Otsu thresholding
-    _, thresh = cv2.threshold(grad, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
-
-    # Close horizontal gaps between word fragments
-    close_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (15, 3))
+    # Close horizontal gaps between word fragments and characters into text lines
+    close_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (17, 3))
     connected = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, close_kernel)
 
     # Find contours

@@ -560,7 +560,16 @@ export interface GateReport {
 
 // Phase 3 Reframe Types
 
-export type ReframeMode = 'speaker_track' | 'balanced' | 'center' | 'fit_blur';
+export type ReframeMode =
+  | 'speaker_track'
+  | 'balanced'
+  | 'center'
+  | 'fit_blur'
+  | 'split_stack'
+  | 'content_fit'
+  | 'content_zoom'
+  | 'stack'
+  | 'pip';
 export type ReframeSource = 'auto' | 'manual';
 export type SceneType = 'talking_head' | 'two_shot' | 'wide_multi' | 'screen_share_or_slides' | 'other';
 
@@ -846,16 +855,6 @@ export interface ClipEditCaptions {
   enabled: boolean;
 }
 
-export type ReframeMode =
-  | 'speaker_track'
-  | 'balanced'
-  | 'center'
-  | 'fit_blur'
-  | 'split_stack'
-  | 'content_fit'
-  | 'content_zoom'
-  | 'stack'
-  | 'pip';
 
 export interface LayoutRegion {
   src_x: number;
