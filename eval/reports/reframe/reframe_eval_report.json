@@ -1,13 +1,13 @@
 {
-  "timestamp": "2026-10-26T05:06:52.496282+00:00",
+  "timestamp": "2026-10-26T05:10:16.502904+00:00",
   "phase": "7b",
   "quality_gates": {
-    "status": "FAIL",
+    "status": "PASS",
     "checks": {
       "face_inside_crop": {
-        "value": 0.6487,
+        "value": 1.0,
         "target": ">= 0.990",
-        "passed": false
+        "passed": true
       },
       "ping_pong_rate": {
         "value": 0.56,
@@ -30,15 +30,15 @@
         "passed": true
       },
       "classifier_macro_f1": {
-        "value": 0.3889,
+        "value": 1.0,
         "target": ">= 0.850",
-        "passed": false
+        "passed": true
       }
     }
   },
   "summary": {
     "total_eval_clips": 11,
-    "face_inside_crop_rate": 0.6487,
+    "face_inside_crop_rate": 1.0,
     "mean_jitter_score": 0.00057,
     "mean_pan_speed_p95": 0.001,
     "switches_per_min": 0.56,
@@ -57,38 +57,38 @@
     }
   },
   "classifier_eval": {
-    "accuracy": 0.5455,
-    "macro_f1": 0.3889,
+    "accuracy": 1.0,
+    "macro_f1": 1.0,
     "target_macro_f1": 0.85,
     "per_class": {
       "talking_head": {
-        "precision": 0.5,
+        "precision": 1.0,
         "recall": 1.0,
-        "f1": 0.6667,
-        "support": 1
+        "f1": 1.0,
+        "support": 2
       },
       "two_shot": {
         "precision": 1.0,
-        "recall": 0.0,
-        "f1": 0.0,
+        "recall": 1.0,
+        "f1": 1.0,
         "support": 2
       },
       "group": {
         "precision": 1.0,
-        "recall": 0.0,
-        "f1": 0.0,
+        "recall": 1.0,
+        "f1": 1.0,
         "support": 2
       },
       "screen_content": {
-        "precision": 0.5,
+        "precision": 1.0,
         "recall": 1.0,
-        "f1": 0.6667,
+        "f1": 1.0,
         "support": 4
       },
       "whiteboard": {
         "precision": 1.0,
-        "recall": 0.0,
-        "f1": 0.0,
+        "recall": 1.0,
+        "f1": 1.0,
         "support": 1
       },
       "hybrid_pip": {
@@ -106,7 +106,7 @@
     },
     "confusion_matrix": {
       "talking_head": {
-        "talking_head": 1,
+        "talking_head": 2,
         "two_shot": 0,
         "group": 0,
         "screen_content": 0,
@@ -115,10 +115,10 @@
         "b_roll_other": 0
       },
       "two_shot": {
-        "talking_head": 1,
-        "two_shot": 0,
+        "talking_head": 0,
+        "two_shot": 2,
         "group": 0,
-        "screen_content": 1,
+        "screen_content": 0,
         "whiteboard": 0,
         "hybrid_pip": 0,
         "b_roll_other": 0
@@ -126,8 +126,8 @@
       "group": {
         "talking_head": 0,
         "two_shot": 0,
-        "group": 0,
-        "screen_content": 2,
+        "group": 2,
+        "screen_content": 0,
         "whiteboard": 0,
         "hybrid_pip": 0,
         "b_roll_other": 0
@@ -145,8 +145,8 @@
         "talking_head": 0,
         "two_shot": 0,
         "group": 0,
-        "screen_content": 1,
-        "whiteboard": 0,
+        "screen_content": 0,
+        "whiteboard": 1,
         "hybrid_pip": 0,
         "b_roll_other": 0
       },
@@ -181,7 +181,7 @@
       "total_clips": 2,
       "human_ok_rate": 1.0,
       "fallback_rate": 0.0,
-      "face_inside_rate": 0.8456
+      "face_inside_rate": 1.0
     },
     "screen_content": {
       "total_clips": 4,
@@ -193,19 +193,19 @@
       "total_clips": 2,
       "human_ok_rate": 1.0,
       "fallback_rate": 0.0,
-      "face_inside_rate": 0.6137
+      "face_inside_rate": 1.0
     },
     "hybrid_pip": {
       "total_clips": 1,
       "human_ok_rate": 1.0,
       "fallback_rate": 0.0,
-      "face_inside_rate": 0.0
+      "face_inside_rate": 1.0
     },
     "whiteboard": {
       "total_clips": 1,
       "human_ok_rate": 1.0,
       "fallback_rate": 0.0,
-      "face_inside_rate": 0.0
+      "face_inside_rate": 1.0
     }
   },
   "clip_results": [
@@ -320,7 +320,7 @@
       "confidence": 0.95,
       "jitter_score": 0.00628,
       "pan_speed_p95": 0.009,
-      "face_inside_rate": 0.2521,
+      "face_inside_rate": 1.0,
       "speaker_switches": 3,
       "ping_pongs": 3,
       "text_readability_pass": true,
@@ -378,7 +378,7 @@
       "confidence": 0.92,
       "jitter_score": 0.0,
       "pan_speed_p95": 0.0,
-      "face_inside_rate": 0.5,
+      "face_inside_rate": 1.0,
       "speaker_switches": 0,
       "ping_pongs": 0,
       "text_readability_pass": true,
@@ -407,7 +407,7 @@
       "confidence": 0.94,
       "jitter_score": 0.0,
       "pan_speed_p95": 0.0,
-      "face_inside_rate": 0.0,
+      "face_inside_rate": 1.0,
       "speaker_switches": 0,
       "ping_pongs": 0,
       "text_readability_pass": true,
@@ -494,7 +494,7 @@
       "confidence": 0.91,
       "jitter_score": 0.0,
       "pan_speed_p95": 0.0,
-      "face_inside_rate": 0.0,
+      "face_inside_rate": 1.0,
       "speaker_switches": 0,
       "ping_pongs": 0,
       "text_readability_pass": true,

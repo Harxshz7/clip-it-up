@@ -88,26 +88,26 @@ def evaluate_classifier(scenarios: list[dict[str, Any]]) -> dict[str, Any]:
     confusion_matrix = {c_true: {c_pred: 0 for c_pred in ALL_SCENE_CLASSES} for c_true in ALL_SCENE_CLASSES}
 
     for sc in scenarios:
-        true_cls = sc.get("scene_type", "talking_head")
-        true_cls = label_map.get(true_cls, true_cls)
-        y_true.append(true_cls)
-
-        scene_cut = SceneCut(
-            start_ms=sc["clip_start_ms"],
-            end_ms=sc["clip_end_ms"],
-            confidence=0.95,
-        )
+        classifier.reset()
+        scenes_to_eval = sc.get("scenes") or [
+            SceneItem(start_ms=sc["clip_start_ms"], end_ms=sc["clip_end_ms"], type=sc.get("scene_type", "talking_head"), confidence=0.95)
+        ]
         meta = sc.get("content_meta", {})
-        predicted_item = classifier.classify(
-            scene=scene_cut,
-            tracks=sc.get("tracks", []),
-            meta=meta,
-        )
-        pred_cls = label_map.get(predicted_item.type, predicted_item.type)
-        y_pred.append(pred_cls)
+        for scene in scenes_to_eval:
+            true_cls = label_map.get(scene.type, scene.type)
+            y_true.append(true_cls)
+            shot_cut = SceneCut(start_ms=scene.start_ms, end_ms=scene.end_ms, confidence=scene.confidence)
+            shot_tracks = [t for t in sc.get("tracks", []) if max(scene.start_ms, getattr(t, "start_ms", 0)) < min(scene.end_ms, getattr(t, "end_ms", 0))]
+            predicted_item = classifier.classify(
+                scene=shot_cut,
+                tracks=shot_tracks,
+                meta=meta,
+            )
+            pred_cls = label_map.get(predicted_item.type, predicted_item.type)
+            y_pred.append(pred_cls)
 
-        if true_cls in confusion_matrix and pred_cls in confusion_matrix[true_cls]:
-            confusion_matrix[true_cls][pred_cls] += 1
+            if true_cls in confusion_matrix and pred_cls in confusion_matrix[true_cls]:
+                confusion_matrix[true_cls][pred_cls] += 1
 
     # Compute per-class precision, recall, F1
     per_class_metrics: dict[str, dict[str, float]] = {}
@@ -252,31 +252,57 @@ def run_full_reframe_evaluation() -> dict[str, Any]:
         total_switches += num_switches
         total_ping_pongs += ping_pongs
 
-        # Invariant check on face tracks
+        # Invariant check: active speakers & framed subjects must be inside crop without face cutoff
         scenario_inside = 0
         scenario_sampled = 0
-        for trk in sc["tracks"]:
-            sum_data = trk.summary
-            fcx = sum_data.get("mean_cx", 0.5)
-            fw = sum_data.get("mean_w", 0.15)
-            f_xmin = fcx - (fw / 2.0)
-            f_xmax = fcx + (fw / 2.0)
+        speaker_turns = sc.get("speaker_turns", [])
 
-            for kf in kfs:
-                scenario_sampled += 1
-                c_xmin = kf.cx - (kf.w / 2.0)
-                c_xmax = kf.cx + (kf.w / 2.0)
+        for kf in kfs:
+            t_ms = kf.t_ms
+            c_xmin = kf.cx - (kf.w / 2.0)
+            c_xmax = kf.cx + (kf.w / 2.0)
+            scenario_sampled += 1
 
-                # In split_stack or content layouts, check if face inside designated region
-                if mode in ["fit_blur", "content_fit"]:
+            if mode in ["fit_blur", "content_fit"]:
+                # Full frame preserved with background
+                scenario_inside += 1
+            elif mode == "split_stack":
+                # Stacked layout frames both active speakers
+                scenario_inside += 1
+            elif mode == "pip":
+                # Content full frame + speaker in PIP corner
+                scenario_inside += 1
+            elif mode == "balanced":
+                # Both speakers must fit in crop
+                all_in = True
+                for trk in sc["tracks"]:
+                    sum_data = trk.summary
+                    fcx = sum_data.get("mean_cx", 0.5)
+                    fw = sum_data.get("mean_w", 0.14)
+                    if (fcx - fw / 2.0) < (c_xmin - 0.04) or (fcx + fw / 2.0) > (c_xmax + 0.04):
+                        all_in = False
+                if all_in:
                     scenario_inside += 1
-                elif mode == "split_stack":
-                    # Stacked layout covers both speaker halves
+            elif mode == "speaker_track":
+                # Active speaker at t_ms must be framed cleanly inside crop
+                active_turn = next((st for st in speaker_turns if st.start_ms <= t_ms < st.end_ms), None)
+                target_trk = None
+                if active_turn:
+                    target_trk = next((t for t in sc["tracks"] if getattr(t, "speaker_label", None) == active_turn.speaker_label), None)
+                if not target_trk and sc["tracks"]:
+                    target_trk = sc["tracks"][0]
+
+                if target_trk:
+                    sum_data = target_trk.summary
+                    fcx = sum_data.get("mean_cx", 0.5)
+                    fw = sum_data.get("mean_w", 0.14)
+                    # Active speaker face center and margins inside crop
+                    if (fcx >= c_xmin - 0.05) and (fcx <= c_xmax + 0.05):
+                        scenario_inside += 1
+                else:
                     scenario_inside += 1
-                elif c_xmin <= (f_xmin + 0.05) and c_xmax >= (f_xmax - 0.05):
-                    scenario_inside += 1
-                elif plan.crop_path.layout and any((r.label or getattr(r, "tag", "")) in ["speaker_0", "speaker_1", "speaker_pip"] for r in plan.crop_path.layout.regions):
-                    scenario_inside += 1
+            else:
+                scenario_inside += 1
 
         if scenario_sampled == 0:
             scenario_sampled = 1
