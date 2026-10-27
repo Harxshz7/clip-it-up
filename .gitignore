@@ -7,6 +7,7 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+package-lock.json.bak
 
 # ==========================================
 # Python & Virtual Environments
@@ -16,6 +17,7 @@ venv/
 ENV/
 env/
 __pycache__/
+__pypackages__/
 *.py[cod]
 *$py.class
 *.egg-info/
@@ -24,14 +26,25 @@ build/
 *.egg
 .eggs/
 .uv/
+.uv-cache/
+.pdm-python
+.installed.cfg
 
 # Testing, Linting & Type Checking
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+.pytype/
+.hypothesis/
+.tox/
+.nox/
+.benchmarks/
 .coverage
-htmlcov/
 .coverage.*
+cover/
+htmlcov/
+coverage.xml
+junit*.xml
 
 # ==========================================
 # Next.js & Frontend Build Outputs
@@ -39,7 +52,10 @@ htmlcov/
 .next/
 out/
 .turbo/
+.parcel-cache/
+.swc/
 .eslintcache
+*.tsbuildinfo
 coverage/
 
 # Playwright Test Artifacts
@@ -47,16 +63,14 @@ test-results/
 playwright-report/
 blob-report/
 playwright/.cache/
+playwright/.auth/
 
 # ==========================================
 # Environment Variables & Secrets
 # ==========================================
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-.env.*.local
+.env.*
+.envrc
 infra/.env
 !.env.example
 !infra/.env.example
@@ -73,9 +87,11 @@ infra/redis/data/
 *.db
 
 # Local temporary media dumps & audio numpy arrays
+# NOTE: never ignore *.ts here - that is TypeScript source in this repo.
 *.mp4
 *.mov
 *.mkv
+*.m4v
 *.webm
 *.avi
 *.wav
@@ -90,26 +106,41 @@ infra/redis/data/
 # ==========================================
 *.log
 logs/
+*.pid
 celerybeat-schedule
+celerybeat-schedule.*
 celerybeat.pid
 .freebuff/
+.sentry-native/
 scratch/
 tmp/
 temp/
 .cache/
 
+# Merge / patch leftovers
+*.orig
+*.rej
+*.bak
+*.tmp
+
 # OS generated files
 .DS_Store
 .DS_Store?
 ._*
+.AppleDouble
+.LSOverride
 .Spotlight-V100
 .Trashes
+Icon
+$RECYCLE.BIN/
 ehthumbs.db
 Thumbs.db
 Desktop.ini
+*.stackdump
 
 # IDE & Editor Configurations
 .idea/
+.fleet/
 *.sublime-project
 *.sublime-workspace
 .vscode/*
