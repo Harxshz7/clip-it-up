@@ -109,17 +109,19 @@ async def export_eval_ratings_csv(
     writer = csv.writer(output)
     writer.writerow(["id", "video_slug", "start_ms", "end_ms", "clip_id", "rater_id", "score", "comment", "created_at"])
     for r in ratings:
-        writer.writerow([
-            str(r.id),
-            r.video_slug,
-            r.start_ms,
-            r.end_ms,
-            str(r.clip_id) if r.clip_id else "",
-            r.rater_id,
-            r.score,
-            r.comment or "",
-            r.created_at.isoformat() if r.created_at else "",
-        ])
+        writer.writerow(
+            [
+                str(r.id),
+                r.video_slug,
+                r.start_ms,
+                r.end_ms,
+                str(r.clip_id) if r.clip_id else "",
+                r.rater_id,
+                r.score,
+                r.comment or "",
+                r.created_at.isoformat() if r.created_at else "",
+            ]
+        )
 
     csv_content = output.getvalue()
     return Response(

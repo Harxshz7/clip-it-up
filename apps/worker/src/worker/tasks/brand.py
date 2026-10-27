@@ -1,4 +1,5 @@
 """Celery background tasks for brand asset validation and preprocessing."""
+
 import os
 import shutil
 import tempfile

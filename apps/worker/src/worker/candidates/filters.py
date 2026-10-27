@@ -6,8 +6,21 @@ from typing import Any
 from worker.candidates.window_generator import CandidateWindow
 
 COMMON_FILLERS = {
-    "um", "uh", "er", "ah", "like", "you know", "i mean", "sort of",
-    "kind of", "basically", "actually", "literally", "right", "yeah", "okay"
+    "um",
+    "uh",
+    "er",
+    "ah",
+    "like",
+    "you know",
+    "i mean",
+    "sort of",
+    "kind of",
+    "basically",
+    "actually",
+    "literally",
+    "right",
+    "yeah",
+    "okay",
 }
 
 
@@ -80,10 +93,7 @@ def is_excessive_silence(
     max_silence_ratio: float = 0.30,
 ) -> bool:
     """Check if the window contains >30% silence (based on timed words)."""
-    window_words = [
-        w for w in words
-        if w["start_ms"] >= window.start_ms and w["end_ms"] <= window.end_ms
-    ]
+    window_words = [w for w in words if w["start_ms"] >= window.start_ms and w["end_ms"] <= window.end_ms]
     if not window_words:
         return True
 
@@ -101,10 +111,7 @@ def is_single_speaker_compliant(
     """
     In single speaker contexts, ensures that at least 90% of speech is from the primary speaker.
     """
-    window_segs = [
-        s for s in segments
-        if s["start_ms"] >= window.start_ms and s["end_ms"] <= window.end_ms
-    ]
+    window_segs = [s for s in segments if s["start_ms"] >= window.start_ms and s["end_ms"] <= window.end_ms]
     if not window_segs:
         return True
 

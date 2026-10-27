@@ -1,6 +1,7 @@
 """Cost and rate definitions for pipeline stages.
 Rates are defined in Indian Rupees (INR - ₹) per source-hour of video.
 """
+
 from decimal import Decimal
 
 
@@ -9,13 +10,13 @@ class StageRateConfig:
 
     # Placeholder rates in INR (₹) per source-hour
     RATES_PER_SOURCE_HOUR: dict[str, Decimal] = {
-        "ingest": Decimal("0.50"),       # ₹0.50 / hr (S3 download, validation, metadata extraction)
-        "proxy": Decimal("2.00"),        # ₹2.00 / hr (FFmpeg fast proxy generation)
-        "transcribe": Decimal("12.00"),   # ₹12.00 / hr (Whisper ASR inference)
-        "candidates": Decimal("8.50"),   # ₹8.50 / hr (LLM context analysis & clip proposal)
-        "score": Decimal("4.00"),        # ₹4.00 / hr (Virality / hook scoring model)
-        "analysis": Decimal("3.50"),     # ₹3.50 / hr (Video analysis, face tracking & scene detection)
-        "render": Decimal("15.00"),      # ₹15.00 / hr (GPU video encoding, cropping, burning subtitles)
+        "ingest": Decimal("0.50"),  # ₹0.50 / hr (S3 download, validation, metadata extraction)
+        "proxy": Decimal("2.00"),  # ₹2.00 / hr (FFmpeg fast proxy generation)
+        "transcribe": Decimal("12.00"),  # ₹12.00 / hr (Whisper ASR inference)
+        "candidates": Decimal("8.50"),  # ₹8.50 / hr (LLM context analysis & clip proposal)
+        "score": Decimal("4.00"),  # ₹4.00 / hr (Virality / hook scoring model)
+        "analysis": Decimal("3.50"),  # ₹3.50 / hr (Video analysis, face tracking & scene detection)
+        "render": Decimal("15.00"),  # ₹15.00 / hr (GPU video encoding, cropping, burning subtitles)
     }
 
     # Primary metric tracked per stage

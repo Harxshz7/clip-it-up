@@ -1,4 +1,5 @@
 """Scene boundary detection using PySceneDetect with OpenCV frame-diff fallback."""
+
 import os
 from dataclasses import dataclass
 
@@ -11,6 +12,7 @@ logger = structlog.get_logger()
 @dataclass
 class SceneCut:
     """Detected shot segment in milliseconds."""
+
     start_ms: int
     end_ms: int
     cut_type: str = "hard"  # hard | dissolve | default

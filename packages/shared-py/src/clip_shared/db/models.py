@@ -45,33 +45,51 @@ class User(Base):
     videos: Mapped[list["Video"]] = relationship("Video", back_populates="user", cascade="all, delete-orphan")
     jobs: Mapped[list["Job"]] = relationship("Job", back_populates="user", cascade="all, delete-orphan")
     usage_records: Mapped[list["Usage"]] = relationship("Usage", back_populates="user", cascade="all, delete-orphan")
-    review_sessions: Mapped[list["ReviewSession"]] = relationship("ReviewSession", back_populates="creator", cascade="all, delete-orphan")
-    reframe_edits: Mapped[list["ClipReframeEdit"]] = relationship("ClipReframeEdit", back_populates="user", cascade="all, delete-orphan")
+    review_sessions: Mapped[list["ReviewSession"]] = relationship(
+        "ReviewSession", back_populates="creator", cascade="all, delete-orphan"
+    )
+    reframe_edits: Mapped[list["ClipReframeEdit"]] = relationship(
+        "ClipReframeEdit", back_populates="user", cascade="all, delete-orphan"
+    )
     exports: Mapped[list["Export"]] = relationship("Export", back_populates="user", cascade="all, delete-orphan")
-    plan: Mapped[Optional["UserPlan"]] = relationship("UserPlan", back_populates="user", uselist=False, cascade="all, delete-orphan")
+    plan: Mapped[Optional["UserPlan"]] = relationship(
+        "UserPlan", back_populates="user", uselist=False, cascade="all, delete-orphan"
+    )
     edits: Mapped[list["ClipEdit"]] = relationship("ClipEdit", back_populates="user", cascade="all, delete-orphan")
-    editor_events: Mapped[list["EditorEvent"]] = relationship("EditorEvent", back_populates="user", cascade="all, delete-orphan")
+    editor_events: Mapped[list["EditorEvent"]] = relationship(
+        "EditorEvent", back_populates="user", cascade="all, delete-orphan"
+    )
     customers: Mapped[list["Customer"]] = relationship("Customer", back_populates="user", cascade="all, delete-orphan")
-    subscriptions: Mapped[list["Subscription"]] = relationship("Subscription", back_populates="user", cascade="all, delete-orphan")
+    subscriptions: Mapped[list["Subscription"]] = relationship(
+        "Subscription", back_populates="user", cascade="all, delete-orphan"
+    )
     payments: Mapped[list["Payment"]] = relationship("Payment", back_populates="user", cascade="all, delete-orphan")
     invoices: Mapped[list["Invoice"]] = relationship("Invoice", back_populates="user", cascade="all, delete-orphan")
     top_ups: Mapped[list["TopUp"]] = relationship("TopUp", back_populates="user", cascade="all, delete-orphan")
-    quota_ledger_entries: Mapped[list["QuotaLedger"]] = relationship("QuotaLedger", back_populates="user", cascade="all, delete-orphan")
-    terms_acceptances: Mapped[list["TermsAcceptance"]] = relationship("TermsAcceptance", back_populates="user", cascade="all, delete-orphan")
-    brand_kits: Mapped[list["BrandKit"]] = relationship("BrandKit", back_populates="user", cascade="all, delete-orphan")
-    brand_assets: Mapped[list["BrandAsset"]] = relationship("BrandAsset", back_populates="user", cascade="all, delete-orphan")
-    variant_sets: Mapped[list["VariantSet"]] = relationship("VariantSet", back_populates="user", cascade="all, delete-orphan")
-
-    __table_args__ = (
-        Index("ix_users_created_at", "created_at"),
+    quota_ledger_entries: Mapped[list["QuotaLedger"]] = relationship(
+        "QuotaLedger", back_populates="user", cascade="all, delete-orphan"
     )
+    terms_acceptances: Mapped[list["TermsAcceptance"]] = relationship(
+        "TermsAcceptance", back_populates="user", cascade="all, delete-orphan"
+    )
+    brand_kits: Mapped[list["BrandKit"]] = relationship("BrandKit", back_populates="user", cascade="all, delete-orphan")
+    brand_assets: Mapped[list["BrandAsset"]] = relationship(
+        "BrandAsset", back_populates="user", cascade="all, delete-orphan"
+    )
+    variant_sets: Mapped[list["VariantSet"]] = relationship(
+        "VariantSet", back_populates="user", cascade="all, delete-orphan"
+    )
+
+    __table_args__ = (Index("ix_users_created_at", "created_at"),)
 
 
 class Project(Base):
     __tablename__ = "projects"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
 
@@ -79,17 +97,19 @@ class Project(Base):
     user: Mapped["User"] = relationship("User", back_populates="projects")
     videos: Mapped[list["Video"]] = relationship("Video", back_populates="project")
 
-    __table_args__ = (
-        Index("ix_projects_user_created_at", "user_id", "created_at"),
-    )
+    __table_args__ = (Index("ix_projects_user_created_at", "user_id", "created_at"),)
 
 
 class Video(Base):
     __tablename__ = "videos"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    project_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("projects.id", ondelete="SET NULL"), nullable=True, index=True)
-    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    project_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("projects.id", ondelete="SET NULL"), nullable=True, index=True
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     original_filename: Mapped[str] = mapped_column(String(512), nullable=False)
     storage_key: Mapped[str] = mapped_column(String(1024), nullable=False)
     size_bytes: Mapped[int] = mapped_column(BigInteger, nullable=False)
@@ -101,21 +121,35 @@ class Video(Base):
     proxy_key: Mapped[str | None] = mapped_column(String(1024), nullable=True)
     audio_key: Mapped[str | None] = mapped_column(String(1024), nullable=True)
     content_type: Mapped[str] = mapped_column(String(128), nullable=False)
-    status: Mapped[str] = mapped_column(String(32), default="uploading", nullable=False)  # uploading | uploaded | processing | ready | failed
+    status: Mapped[str] = mapped_column(
+        String(32), default="uploading", nullable=False
+    )  # uploading | uploaded | processing | ready | failed
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
 
     # Relationships
     user: Mapped["User"] = relationship("User", back_populates="videos")
     project: Mapped[Optional["Project"]] = relationship("Project", back_populates="videos")
     jobs: Mapped[list["Job"]] = relationship("Job", back_populates="video", cascade="all, delete-orphan")
-    transcript: Mapped[Optional["Transcript"]] = relationship("Transcript", back_populates="video", uselist=False, cascade="all, delete-orphan")
+    transcript: Mapped[Optional["Transcript"]] = relationship(
+        "Transcript", back_populates="video", uselist=False, cascade="all, delete-orphan"
+    )
     usage_records: Mapped[list["Usage"]] = relationship("Usage", back_populates="video")
-    clip_moments: Mapped[list["ClipMoment"]] = relationship("ClipMoment", back_populates="video", cascade="all, delete-orphan")
+    clip_moments: Mapped[list["ClipMoment"]] = relationship(
+        "ClipMoment", back_populates="video", cascade="all, delete-orphan"
+    )
     clips: Mapped[list["Clip"]] = relationship("Clip", back_populates="video", cascade="all, delete-orphan")
-    scoring_runs: Mapped[list["ScoringRun"]] = relationship("ScoringRun", back_populates="video", cascade="all, delete-orphan")
-    audio_features_records: Mapped[list["AudioFeatures"]] = relationship("AudioFeatures", back_populates="video", cascade="all, delete-orphan")
-    review_sessions: Mapped[list["ReviewSession"]] = relationship("ReviewSession", back_populates="video", cascade="all, delete-orphan")
-    analysis_records: Mapped[list["VideoAnalysis"]] = relationship("VideoAnalysis", back_populates="video", cascade="all, delete-orphan")
+    scoring_runs: Mapped[list["ScoringRun"]] = relationship(
+        "ScoringRun", back_populates="video", cascade="all, delete-orphan"
+    )
+    audio_features_records: Mapped[list["AudioFeatures"]] = relationship(
+        "AudioFeatures", back_populates="video", cascade="all, delete-orphan"
+    )
+    review_sessions: Mapped[list["ReviewSession"]] = relationship(
+        "ReviewSession", back_populates="video", cascade="all, delete-orphan"
+    )
+    analysis_records: Mapped[list["VideoAnalysis"]] = relationship(
+        "VideoAnalysis", back_populates="video", cascade="all, delete-orphan"
+    )
 
     __table_args__ = (
         Index("ix_videos_user_created_at", "user_id", "created_at"),
@@ -127,9 +161,15 @@ class Job(Base):
     __tablename__ = "jobs"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    video_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("videos.id", ondelete="CASCADE"), nullable=False, index=True)
-    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
-    status: Mapped[str] = mapped_column(String(32), default="queued", nullable=False)  # queued | running | succeeded | failed | cancelled
+    video_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("videos.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    status: Mapped[str] = mapped_column(
+        String(32), default="queued", nullable=False
+    )  # queued | running | succeeded | failed | cancelled
     current_stage: Mapped[str | None] = mapped_column(String(64), nullable=True)
     progress: Mapped[int] = mapped_column(BigInteger, default=0, nullable=False)
     priority: Mapped[int] = mapped_column(Integer, default=1, nullable=False)  # 1 (normal) to 4 (vip)
@@ -144,9 +184,13 @@ class Job(Base):
     # Relationships
     user: Mapped["User"] = relationship("User", back_populates="jobs")
     video: Mapped["Video"] = relationship("Video", back_populates="jobs")
-    stages: Mapped[list["JobStage"]] = relationship("JobStage", back_populates="job", cascade="all, delete-orphan", order_by="JobStage.started_at")
+    stages: Mapped[list["JobStage"]] = relationship(
+        "JobStage", back_populates="job", cascade="all, delete-orphan", order_by="JobStage.started_at"
+    )
     usage_records: Mapped[list["Usage"]] = relationship("Usage", back_populates="job")
-    dead_letter_record: Mapped[Optional["DeadLetterJob"]] = relationship("DeadLetterJob", back_populates="job", uselist=False, cascade="all, delete-orphan")
+    dead_letter_record: Mapped[Optional["DeadLetterJob"]] = relationship(
+        "DeadLetterJob", back_populates="job", uselist=False, cascade="all, delete-orphan"
+    )
 
     __table_args__ = (
         Index("ix_jobs_user_created_at", "user_id", "created_at"),
@@ -158,9 +202,15 @@ class JobStage(Base):
     __tablename__ = "job_stages"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    job_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("jobs.id", ondelete="CASCADE"), nullable=False, index=True)
-    name: Mapped[str] = mapped_column(String(64), nullable=False)  # ingest, proxy, transcribe, candidates, score, render
-    status: Mapped[str] = mapped_column(String(32), default="pending", nullable=False)  # pending | running | succeeded | failed | cancelled
+    job_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("jobs.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    name: Mapped[str] = mapped_column(
+        String(64), nullable=False
+    )  # ingest, proxy, transcribe, candidates, score, render
+    status: Mapped[str] = mapped_column(
+        String(32), default="pending", nullable=False
+    )  # pending | running | succeeded | failed | cancelled
     progress: Mapped[int] = mapped_column(BigInteger, default=0, nullable=False)
     started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
@@ -181,7 +231,9 @@ class Transcript(Base):
     __tablename__ = "transcripts"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    video_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("videos.id", ondelete="CASCADE"), unique=True, nullable=False)
+    video_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("videos.id", ondelete="CASCADE"), unique=True, nullable=False
+    )
     language: Mapped[str | None] = mapped_column(String(16), nullable=True)
     status: Mapped[str] = mapped_column(String(32), default="running", nullable=False)  # running | ready | failed
     model: Mapped[str | None] = mapped_column(String(64), nullable=True)
@@ -191,10 +243,18 @@ class Transcript(Base):
 
     # Relationships
     video: Mapped["Video"] = relationship("Video", back_populates="transcript")
-    words: Mapped[list["TranscriptWord"]] = relationship("TranscriptWord", back_populates="transcript", cascade="all, delete-orphan", order_by="TranscriptWord.idx")
-    segments: Mapped[list["TranscriptSegment"]] = relationship("TranscriptSegment", back_populates="transcript", cascade="all, delete-orphan", order_by="TranscriptSegment.idx")
-    speakers: Mapped[list["Speaker"]] = relationship("Speaker", back_populates="transcript", cascade="all, delete-orphan", order_by="Speaker.label")
-    clip_moments: Mapped[list["ClipMoment"]] = relationship("ClipMoment", back_populates="transcript", cascade="all, delete-orphan")
+    words: Mapped[list["TranscriptWord"]] = relationship(
+        "TranscriptWord", back_populates="transcript", cascade="all, delete-orphan", order_by="TranscriptWord.idx"
+    )
+    segments: Mapped[list["TranscriptSegment"]] = relationship(
+        "TranscriptSegment", back_populates="transcript", cascade="all, delete-orphan", order_by="TranscriptSegment.idx"
+    )
+    speakers: Mapped[list["Speaker"]] = relationship(
+        "Speaker", back_populates="transcript", cascade="all, delete-orphan", order_by="Speaker.label"
+    )
+    clip_moments: Mapped[list["ClipMoment"]] = relationship(
+        "ClipMoment", back_populates="transcript", cascade="all, delete-orphan"
+    )
 
     __table_args__ = (
         Index("ix_transcripts_video_id", "video_id"),
@@ -206,7 +266,9 @@ class TranscriptWord(Base):
     __tablename__ = "transcript_words"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    transcript_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("transcripts.id", ondelete="CASCADE"), nullable=False)
+    transcript_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("transcripts.id", ondelete="CASCADE"), nullable=False
+    )
     idx: Mapped[int] = mapped_column(BigInteger, nullable=False)
     word: Mapped[str] = mapped_column(String(255), nullable=False)
     start_ms: Mapped[int] = mapped_column(BigInteger, nullable=False)
@@ -227,7 +289,9 @@ class TranscriptSegment(Base):
     __tablename__ = "transcript_segments"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    transcript_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("transcripts.id", ondelete="CASCADE"), nullable=False)
+    transcript_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("transcripts.id", ondelete="CASCADE"), nullable=False
+    )
     idx: Mapped[int] = mapped_column(BigInteger, nullable=False)
     start_ms: Mapped[int] = mapped_column(BigInteger, nullable=False)
     end_ms: Mapped[int] = mapped_column(BigInteger, nullable=False)
@@ -247,7 +311,9 @@ class Speaker(Base):
     __tablename__ = "speakers"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    transcript_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("transcripts.id", ondelete="CASCADE"), nullable=False)
+    transcript_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("transcripts.id", ondelete="CASCADE"), nullable=False
+    )
     label: Mapped[str] = mapped_column(String(64), nullable=False)  # SPEAKER_00
     display_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
 
@@ -262,16 +328,23 @@ class Speaker(Base):
 
 class ClipMoment(Base):
     """Core idea span candidate / scored moment."""
+
     __tablename__ = "clip_moments"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    video_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("videos.id", ondelete="CASCADE"), nullable=False, index=True)
-    transcript_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("transcripts.id", ondelete="CASCADE"), nullable=False, index=True)
+    video_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("videos.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    transcript_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("transcripts.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     start_ms: Mapped[int] = mapped_column(BigInteger, nullable=False)
     end_ms: Mapped[int] = mapped_column(BigInteger, nullable=False)
     rank: Mapped[int | None] = mapped_column(Integer, nullable=True)
     final_score: Mapped[float | None] = mapped_column(Float, nullable=True)
-    status: Mapped[str] = mapped_column(String(32), default="candidate", nullable=False)  # candidate | scored | selected | rejected
+    status: Mapped[str] = mapped_column(
+        String(32), default="candidate", nullable=False
+    )  # candidate | scored | selected | rejected
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
 
     # Relationships
@@ -288,10 +361,13 @@ class ClipMoment(Base):
 
 class ScoringRun(Base):
     """Reproducibility run tracking models, prompts, weights, tokens and INR cost."""
+
     __tablename__ = "scoring_runs"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    video_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("videos.id", ondelete="CASCADE"), nullable=False, index=True)
+    video_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("videos.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     prompt_version: Mapped[str] = mapped_column(String(64), nullable=False)
     scorer_version: Mapped[str] = mapped_column(String(64), nullable=False)
     weights: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, default=dict, nullable=False)
@@ -305,26 +381,35 @@ class ScoringRun(Base):
     video: Mapped["Video"] = relationship("Video", back_populates="scoring_runs")
     clips: Mapped[list["Clip"]] = relationship("Clip", back_populates="scoring_run")
 
-    __table_args__ = (
-        Index("ix_scoring_runs_video_created", "video_id", "created_at"),
-    )
+    __table_args__ = (Index("ix_scoring_runs_video_created", "video_id", "created_at"),)
 
 
 class Clip(Base):
     """Actual clip variant (15s, 30s, 45s, 60s, auto) with fine trims, hook, and score breakdown."""
+
     __tablename__ = "clips"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    moment_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("clip_moments.id", ondelete="CASCADE"), nullable=False, index=True)
-    video_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("videos.id", ondelete="CASCADE"), nullable=False, index=True)
-    scoring_run_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("scoring_runs.id", ondelete="SET NULL"), nullable=True, index=True)
-    variant_length_s: Mapped[str] = mapped_column(String(16), default="auto", nullable=False)  # 15 | 30 | 45 | 60 | auto
+    moment_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("clip_moments.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    video_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("videos.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    scoring_run_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("scoring_runs.id", ondelete="SET NULL"), nullable=True, index=True
+    )
+    variant_length_s: Mapped[str] = mapped_column(
+        String(16), default="auto", nullable=False
+    )  # 15 | 30 | 45 | 60 | auto
     start_ms: Mapped[int] = mapped_column(BigInteger, nullable=False)
     end_ms: Mapped[int] = mapped_column(BigInteger, nullable=False)
     hook_text: Mapped[str] = mapped_column(Text, nullable=False)
     title: Mapped[str] = mapped_column(String(512), nullable=False)
     final_score: Mapped[float] = mapped_column(Float, nullable=False)
-    score_breakdown: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, default=dict, nullable=False)  # hook, emotion, coherence, payoff, novelty, audio_energy, laughter, pause_penalty
+    score_breakdown: Mapped[dict[str, Any]] = mapped_column(
+        JSON_TYPE, default=dict, nullable=False
+    )  # hook, emotion, coherence, payoff, novelty, audio_energy, laughter, pause_penalty
     reason: Mapped[str] = mapped_column(Text, nullable=False)
     model: Mapped[str] = mapped_column(String(64), nullable=False)
     prompt_version: Mapped[str] = mapped_column(String(64), nullable=False)
@@ -335,17 +420,35 @@ class Clip(Base):
     moment: Mapped["ClipMoment"] = relationship("ClipMoment", back_populates="clips")
     video: Mapped["Video"] = relationship("Video", back_populates="clips")
     scoring_run: Mapped[Optional["ScoringRun"]] = relationship("ScoringRun", back_populates="clips")
-    feedback: Mapped[list["ClipFeedback"]] = relationship("ClipFeedback", back_populates="clip", cascade="all, delete-orphan")
-    review_ratings: Mapped[list["ReviewRating"]] = relationship("ReviewRating", back_populates="clip", cascade="all, delete-orphan")
-    review_exports: Mapped[list["ClipReviewExport"]] = relationship("ClipReviewExport", back_populates="clip", cascade="all, delete-orphan")
-    reframe_records: Mapped[list["ClipReframe"]] = relationship("ClipReframe", back_populates="clip", cascade="all, delete-orphan")
-    captions: Mapped[list["ClipCaption"]] = relationship("ClipCaption", back_populates="clip", cascade="all, delete-orphan")
-    cleanups: Mapped[list["ClipCleanup"]] = relationship("ClipCleanup", back_populates="clip", cascade="all, delete-orphan")
+    feedback: Mapped[list["ClipFeedback"]] = relationship(
+        "ClipFeedback", back_populates="clip", cascade="all, delete-orphan"
+    )
+    review_ratings: Mapped[list["ReviewRating"]] = relationship(
+        "ReviewRating", back_populates="clip", cascade="all, delete-orphan"
+    )
+    review_exports: Mapped[list["ClipReviewExport"]] = relationship(
+        "ClipReviewExport", back_populates="clip", cascade="all, delete-orphan"
+    )
+    reframe_records: Mapped[list["ClipReframe"]] = relationship(
+        "ClipReframe", back_populates="clip", cascade="all, delete-orphan"
+    )
+    captions: Mapped[list["ClipCaption"]] = relationship(
+        "ClipCaption", back_populates="clip", cascade="all, delete-orphan"
+    )
+    cleanups: Mapped[list["ClipCleanup"]] = relationship(
+        "ClipCleanup", back_populates="clip", cascade="all, delete-orphan"
+    )
     exports: Mapped[list["Export"]] = relationship("Export", back_populates="clip", cascade="all, delete-orphan")
     edits: Mapped[list["ClipEdit"]] = relationship("ClipEdit", back_populates="clip", cascade="all, delete-orphan")
-    alternatives: Mapped[list["ClipAlternative"]] = relationship("ClipAlternative", back_populates="clip", cascade="all, delete-orphan")
-    editor_events: Mapped[list["EditorEvent"]] = relationship("EditorEvent", back_populates="clip", cascade="all, delete-orphan")
-    variant_sets: Mapped[list["VariantSet"]] = relationship("VariantSet", back_populates="clip", cascade="all, delete-orphan")
+    alternatives: Mapped[list["ClipAlternative"]] = relationship(
+        "ClipAlternative", back_populates="clip", cascade="all, delete-orphan"
+    )
+    editor_events: Mapped[list["EditorEvent"]] = relationship(
+        "EditorEvent", back_populates="clip", cascade="all, delete-orphan"
+    )
+    variant_sets: Mapped[list["VariantSet"]] = relationship(
+        "VariantSet", back_populates="clip", cascade="all, delete-orphan"
+    )
 
     __table_args__ = (
         Index("ix_clips_video_score", "video_id", "final_score"),
@@ -356,32 +459,42 @@ class Clip(Base):
 
 class ClipFeedback(Base):
     """User rating / thumbs up/down feedback for active learning and prompt improvement."""
+
     __tablename__ = "clip_feedback"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    clip_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("clips.id", ondelete="CASCADE"), nullable=False, index=True)
-    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    clip_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("clips.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     value: Mapped[str] = mapped_column(String(16), nullable=False)  # up | down
-    reason_tag: Mapped[str | None] = mapped_column(String(64), nullable=True)  # boring | no_context | bad_start | bad_end | off_topic | other
+    reason_tag: Mapped[str | None] = mapped_column(
+        String(64), nullable=True
+    )  # boring | no_context | bad_start | bad_end | off_topic | other
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
 
     # Relationships
     clip: Mapped["Clip"] = relationship("Clip", back_populates="feedback")
     user: Mapped["User"] = relationship("User")
 
-    __table_args__ = (
-        UniqueConstraint("clip_id", "user_id", name="uq_clip_feedback_clip_user"),
-    )
+    __table_args__ = (UniqueConstraint("clip_id", "user_id", name="uq_clip_feedback_clip_user"),)
 
 
 class AudioFeatures(Base):
     """Extracted per-second audio features metadata stored in S3 and summary in DB."""
+
     __tablename__ = "audio_features"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    video_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("videos.id", ondelete="CASCADE"), nullable=False, index=True)
+    video_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("videos.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     version: Mapped[str] = mapped_column(String(32), default="v1", nullable=False)
-    frames_key: Mapped[str] = mapped_column(String(1024), nullable=False)  # users/{uid}/videos/{vid}/features/audio_v{n}.npz
+    frames_key: Mapped[str] = mapped_column(
+        String(1024), nullable=False
+    )  # users/{uid}/videos/{vid}/features/audio_v{n}.npz
     summary: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, default=dict, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
 
@@ -396,6 +509,7 @@ class AudioFeatures(Base):
 
 class EvalVideo(Base):
     """Eval benchmark video dataset tracking."""
+
     __tablename__ = "eval_videos"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
@@ -409,6 +523,7 @@ class EvalVideo(Base):
 
 class EvalClipRating(Base):
     """Human rater ground-truth score (1-5) tied to time range or clip ID."""
+
     __tablename__ = "eval_clip_ratings"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
@@ -431,9 +546,15 @@ class Usage(Base):
     __tablename__ = "usage"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
-    video_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("videos.id", ondelete="SET NULL"), nullable=True, index=True)
-    job_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("jobs.id", ondelete="CASCADE"), nullable=True, index=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    video_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("videos.id", ondelete="SET NULL"), nullable=True, index=True
+    )
+    job_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("jobs.id", ondelete="CASCADE"), nullable=True, index=True
+    )
     metric: Mapped[str] = mapped_column(String(64), nullable=False)  # source_minutes, gpu_seconds, llm_tokens, etc.
     quantity: Mapped[Decimal] = mapped_column(Numeric(14, 4), nullable=False)
     cost_inr: Mapped[Decimal] = mapped_column(Numeric(12, 4), default=Decimal("0.0000"), nullable=False)
@@ -454,11 +575,16 @@ class Usage(Base):
 
 class ReviewSession(Base):
     """External creator review session accessible via private token without authentication."""
+
     __tablename__ = "review_sessions"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    video_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("videos.id", ondelete="CASCADE"), nullable=False, index=True)
-    created_by: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    video_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("videos.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    created_by: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     token: Mapped[str] = mapped_column(String(128), unique=True, nullable=False, index=True)
     creator_name: Mapped[str] = mapped_column(String(255), nullable=False)
     creator_email: Mapped[str | None] = mapped_column(String(255), nullable=True)
@@ -470,8 +596,12 @@ class ReviewSession(Base):
     # Relationships
     video: Mapped["Video"] = relationship("Video", back_populates="review_sessions")
     creator: Mapped["User"] = relationship("User", back_populates="review_sessions")
-    ratings: Mapped[list["ReviewRating"]] = relationship("ReviewRating", back_populates="session", cascade="all, delete-orphan")
-    survey: Mapped[Optional["ReviewSurvey"]] = relationship("ReviewSurvey", back_populates="session", uselist=False, cascade="all, delete-orphan")
+    ratings: Mapped[list["ReviewRating"]] = relationship(
+        "ReviewRating", back_populates="session", cascade="all, delete-orphan"
+    )
+    survey: Mapped[Optional["ReviewSurvey"]] = relationship(
+        "ReviewSurvey", back_populates="session", uselist=False, cascade="all, delete-orphan"
+    )
 
     __table_args__ = (
         UniqueConstraint("token", name="uq_review_session_token"),
@@ -482,13 +612,20 @@ class ReviewSession(Base):
 
 class ReviewRating(Base):
     """Per-clip rating submitted by creator in a review session."""
+
     __tablename__ = "review_ratings"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    session_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("review_sessions.id", ondelete="CASCADE"), nullable=False, index=True)
-    clip_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("clips.id", ondelete="CASCADE"), nullable=False, index=True)
+    session_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("review_sessions.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    clip_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("clips.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     verdict: Mapped[str] = mapped_column(String(32), nullable=False)  # post_as_is | post_with_edits | no
-    reason_tag: Mapped[str | None] = mapped_column(String(64), nullable=True)  # bad_start | bad_end | no_context | boring | off_topic | too_long | too_short | other
+    reason_tag: Mapped[str | None] = mapped_column(
+        String(64), nullable=True
+    )  # bad_start | bad_end | no_context | boring | off_topic | too_long | too_short | other
     comment: Mapped[str | None] = mapped_column(Text, nullable=True)
     watch_ms: Mapped[int] = mapped_column(BigInteger, default=0, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
@@ -497,17 +634,18 @@ class ReviewRating(Base):
     session: Mapped["ReviewSession"] = relationship("ReviewSession", back_populates="ratings")
     clip: Mapped["Clip"] = relationship("Clip", back_populates="review_ratings")
 
-    __table_args__ = (
-        UniqueConstraint("session_id", "clip_id", name="uq_review_rating_session_clip"),
-    )
+    __table_args__ = (UniqueConstraint("session_id", "clip_id", name="uq_review_rating_session_clip"),)
 
 
 class ReviewSurvey(Base):
     """Exit survey submitted by creator after rating clips."""
+
     __tablename__ = "review_survey"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    session_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("review_sessions.id", ondelete="CASCADE"), unique=True, nullable=False)
+    session_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("review_sessions.id", ondelete="CASCADE"), unique=True, nullable=False
+    )
     missing_text: Mapped[str | None] = mapped_column(Text, nullable=True)
     current_workflow_text: Mapped[str | None] = mapped_column(Text, nullable=True)
     current_cost_text: Mapped[str | None] = mapped_column(Text, nullable=True)
@@ -522,17 +660,18 @@ class ReviewSurvey(Base):
     # Relationships
     session: Mapped["ReviewSession"] = relationship("ReviewSession", back_populates="survey")
 
-    __table_args__ = (
-        Index("ix_review_survey_session_id", "session_id", unique=True),
-    )
+    __table_args__ = (Index("ix_review_survey_session_id", "session_id", unique=True),)
 
 
 class ClipReviewExport(Base):
     """Rendered crude video exports for creator preview and download."""
+
     __tablename__ = "clip_review_exports"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    clip_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("clips.id", ondelete="CASCADE"), nullable=False, index=True)
+    clip_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("clips.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     storage_key: Mapped[str] = mapped_column(String(1024), nullable=False)
     kind: Mapped[str] = mapped_column(String(32), nullable=False)  # horizontal | vertical_center
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
@@ -540,28 +679,35 @@ class ClipReviewExport(Base):
     # Relationships
     clip: Mapped["Clip"] = relationship("Clip", back_populates="review_exports")
 
-    __table_args__ = (
-        UniqueConstraint("clip_id", "kind", name="uq_clip_review_export_clip_kind"),
-    )
+    __table_args__ = (UniqueConstraint("clip_id", "kind", name="uq_clip_review_export_clip_kind"),)
 
 
 class VideoAnalysis(Base):
     """Video visual scene and face analysis summary stored per video version."""
+
     __tablename__ = "video_analysis"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    video_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("videos.id", ondelete="CASCADE"), nullable=False)
+    video_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("videos.id", ondelete="CASCADE"), nullable=False
+    )
     version: Mapped[str] = mapped_column(String(32), default="v1", nullable=False)
     fps_sampled: Mapped[float] = mapped_column(Float, default=6.0, nullable=False)
-    scenes: Mapped[list[dict[str, Any]]] = mapped_column(JSON_TYPE, default=list, nullable=False)  # [{start_ms, end_ms, type, confidence}]
-    status: Mapped[str] = mapped_column(String(32), default="ready", nullable=False)  # queued | running | ready | failed
+    scenes: Mapped[list[dict[str, Any]]] = mapped_column(
+        JSON_TYPE, default=list, nullable=False
+    )  # [{start_ms, end_ms, type, confidence}]
+    status: Mapped[str] = mapped_column(
+        String(32), default="ready", nullable=False
+    )  # queued | running | ready | failed
     frames_key: Mapped[str | None] = mapped_column(String(1024), nullable=True)  # S3 npz key
     summary: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, default=dict, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
 
     # Relationships
     video: Mapped["Video"] = relationship("Video", back_populates="analysis_records")
-    face_tracks: Mapped[list["FaceTrack"]] = relationship("FaceTrack", back_populates="analysis", cascade="all, delete-orphan", order_by="FaceTrack.track_id")
+    face_tracks: Mapped[list["FaceTrack"]] = relationship(
+        "FaceTrack", back_populates="analysis", cascade="all, delete-orphan", order_by="FaceTrack.track_id"
+    )
 
     __table_args__ = (
         UniqueConstraint("video_id", "version", name="uq_video_analysis_video_version"),
@@ -572,10 +718,13 @@ class VideoAnalysis(Base):
 
 class FaceTrack(Base):
     """Tracked face trajectory summary and speaker association."""
+
     __tablename__ = "face_tracks"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    analysis_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("video_analysis.id", ondelete="CASCADE"), nullable=False)
+    analysis_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("video_analysis.id", ondelete="CASCADE"), nullable=False
+    )
     track_id: Mapped[int] = mapped_column(Integer, nullable=False)
     start_ms: Mapped[int] = mapped_column(BigInteger, nullable=False)
     end_ms: Mapped[int] = mapped_column(BigInteger, nullable=False)
@@ -596,22 +745,38 @@ class FaceTrack(Base):
 
 class ClipReframe(Base):
     """Auto-generated or active reframed 9:16 crop path for a clip."""
+
     __tablename__ = "clip_reframes"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    clip_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("clips.id", ondelete="CASCADE"), nullable=False)
+    clip_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("clips.id", ondelete="CASCADE"), nullable=False
+    )
     analysis_version: Mapped[str] = mapped_column(String(32), default="v1", nullable=False)
-    mode: Mapped[str] = mapped_column(String(32), nullable=False)  # speaker_track | balanced | center | fit_blur | split_stack | content_fit | content_zoom | stack | pip
-    crop_path: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, nullable=False)  # keyframes [{t_ms, cx, cy, w, h}], segments, easing
-    layout: Mapped[dict[str, Any] | None] = mapped_column(JSON_TYPE, nullable=True)  # Phase 7b normalized layout regions & config
+    mode: Mapped[str] = mapped_column(
+        String(32), nullable=False
+    )  # speaker_track | balanced | center | fit_blur | split_stack | content_fit | content_zoom | stack | pip
+    crop_path: Mapped[dict[str, Any]] = mapped_column(
+        JSON_TYPE, nullable=False
+    )  # keyframes [{t_ms, cx, cy, w, h}], segments, easing
+    layout: Mapped[dict[str, Any] | None] = mapped_column(
+        JSON_TYPE, nullable=True
+    )  # Phase 7b normalized layout regions & config
     confidence: Mapped[float] = mapped_column(Float, default=1.0, nullable=False)
-    flags: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, default=dict, nullable=False)  # face_cut_risk, low_confidence, multi_person, fallback_reason
+    flags: Mapped[dict[str, Any]] = mapped_column(
+        JSON_TYPE, default=dict, nullable=False
+    )  # face_cut_risk, low_confidence, multi_person, fallback_reason
     source: Mapped[str] = mapped_column(String(32), default="auto", nullable=False)  # auto | manual
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
 
     # Relationships
     clip: Mapped["Clip"] = relationship("Clip", back_populates="reframe_records")
-    edits: Mapped[list["ClipReframeEdit"]] = relationship("ClipReframeEdit", back_populates="reframe", cascade="all, delete-orphan", order_by="ClipReframeEdit.created_at.desc()")
+    edits: Mapped[list["ClipReframeEdit"]] = relationship(
+        "ClipReframeEdit",
+        back_populates="reframe",
+        cascade="all, delete-orphan",
+        order_by="ClipReframeEdit.created_at.desc()",
+    )
 
     __table_args__ = (
         UniqueConstraint("clip_id", "analysis_version", "source", name="uq_clip_reframe_clip_version_source"),
@@ -622,11 +787,16 @@ class ClipReframe(Base):
 
 class ClipReframeEdit(Base):
     """Manual nudge/edit override layer on top of auto reframing."""
+
     __tablename__ = "clip_reframe_edits"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    clip_reframe_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("clip_reframes.id", ondelete="CASCADE"), nullable=False)
-    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    clip_reframe_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("clip_reframes.id", ondelete="CASCADE"), nullable=False
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
     keyframes: Mapped[list[dict[str, Any]]] = mapped_column(JSON_TYPE, nullable=False)
     mode: Mapped[str | None] = mapped_column(String(32), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
@@ -643,6 +813,7 @@ class ClipReframeEdit(Base):
 
 class CaptionStyle(Base):
     """Subtitle presentation style pack specification (ASS + preview)."""
+
     __tablename__ = "caption_styles"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
@@ -653,13 +824,12 @@ class CaptionStyle(Base):
     is_builtin: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
 
-    __table_args__ = (
-        UniqueConstraint("key", name="uq_caption_styles_key"),
-    )
+    __table_args__ = (UniqueConstraint("key", name="uq_caption_styles_key"),)
 
 
 class ExportPreset(Base):
     """Platform-specific export configuration preset."""
+
     __tablename__ = "export_presets"
 
     key: Mapped[str] = mapped_column(String(64), primary_key=True)
@@ -679,6 +849,7 @@ class ExportPreset(Base):
 
 class Plan(Base):
     """Subscription tiers and feature limits."""
+
     __tablename__ = "plans"
 
     key: Mapped[str] = mapped_column(String(64), primary_key=True)
@@ -687,10 +858,14 @@ class Plan(Base):
     price_inr_monthly: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     price_usd_monthly: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     monthly_source_minutes: Mapped[int] = mapped_column(Integer, default=30, nullable=False)
-    monthly_minutes: Mapped[int] = mapped_column(Integer, default=30, nullable=False)  # Alias for backward compatibility
+    monthly_minutes: Mapped[int] = mapped_column(
+        Integer, default=30, nullable=False
+    )  # Alias for backward compatibility
     max_exports_per_month: Mapped[int] = mapped_column(Integer, default=10, nullable=False)
     watermark: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
-    export_watermark: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)  # Alias for backward compatibility
+    export_watermark: Mapped[bool] = mapped_column(
+        Boolean, default=True, nullable=False
+    )  # Alias for backward compatibility
     max_export_height: Mapped[int] = mapped_column(Integer, default=1920, nullable=False)
     max_video_length_min: Mapped[int] = mapped_column(Integer, default=15, nullable=False)
     max_concurrent_jobs: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
@@ -710,14 +885,19 @@ class Plan(Base):
 
 class UserPlan(Base):
     """User assigned plan and active billing period."""
+
     __tablename__ = "user_plans"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), unique=True, nullable=False, index=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), unique=True, nullable=False, index=True
+    )
     plan_key: Mapped[str] = mapped_column(String(64), ForeignKey("plans.key", ondelete="CASCADE"), nullable=False)
     period_start: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
     period_end: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
-    status: Mapped[str] = mapped_column(String(32), default="active", nullable=False)  # active | past_due | canceled | expired
+    status: Mapped[str] = mapped_column(
+        String(32), default="active", nullable=False
+    )  # active | past_due | canceled | expired
     auto_renew: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     cancel_at_period_end: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     canceled_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
@@ -727,20 +907,23 @@ class UserPlan(Base):
     user: Mapped["User"] = relationship("User", back_populates="plan")
     plan: Mapped["Plan"] = relationship("Plan", back_populates="user_plans")
 
-    __table_args__ = (
-        UniqueConstraint("user_id", name="uq_user_plans_user_id"),
-    )
+    __table_args__ = (UniqueConstraint("user_id", name="uq_user_plans_user_id"),)
 
 
 class ClipCaption(Base):
     """Style-agnostic word captions stored in SOURCE time."""
+
     __tablename__ = "clip_captions"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    clip_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("clips.id", ondelete="CASCADE"), nullable=False, index=True)
+    clip_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("clips.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     version: Mapped[str] = mapped_column(String(32), default="v1", nullable=False)
     language: Mapped[str] = mapped_column(String(16), default="en", nullable=False)
-    words: Mapped[list[dict[str, Any]]] = mapped_column(JSON_TYPE, nullable=False)  # [{text, start_ms, end_ms, speaker, emphasis, deleted}]
+    words: Mapped[list[dict[str, Any]]] = mapped_column(
+        JSON_TYPE, nullable=False
+    )  # [{text, start_ms, end_ms, speaker, emphasis, deleted}]
     style_key: Mapped[str] = mapped_column(String(64), default="bold_pop", nullable=False, index=True)
     style_overrides: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, default=dict, nullable=False)
     source: Mapped[str] = mapped_column(String(32), default="auto", nullable=False)  # auto | manual
@@ -749,38 +932,48 @@ class ClipCaption(Base):
     # Relationships
     clip: Mapped["Clip"] = relationship("Clip", back_populates="captions")
 
-    __table_args__ = (
-        UniqueConstraint("clip_id", "version", "source", name="uq_clip_captions_clip_version_source"),
-    )
+    __table_args__ = (UniqueConstraint("clip_id", "version", "source", name="uq_clip_captions_clip_version_source"),)
 
 
 class ClipCleanup(Base):
     """Filler word and silence removal configuration and individual removal intervals."""
+
     __tablename__ = "clip_cleanups"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    clip_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("clips.id", ondelete="CASCADE"), nullable=False, index=True)
+    clip_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("clips.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     version: Mapped[str] = mapped_column(String(32), default="v1", nullable=False)
-    options: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, nullable=False)  # remove_fillers, remove_silence, max_silence_ms, filler_list, crossfade_ms
-    removals: Mapped[list[dict[str, Any]]] = mapped_column(JSON_TYPE, default=list, nullable=False)  # [{start_ms, end_ms, kind, text}]
+    options: Mapped[dict[str, Any]] = mapped_column(
+        JSON_TYPE, nullable=False
+    )  # remove_fillers, remove_silence, max_silence_ms, filler_list, crossfade_ms
+    removals: Mapped[list[dict[str, Any]]] = mapped_column(
+        JSON_TYPE, default=list, nullable=False
+    )  # [{start_ms, end_ms, kind, text}]
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
 
     # Relationships
     clip: Mapped["Clip"] = relationship("Clip", back_populates="cleanups")
 
-    __table_args__ = (
-        UniqueConstraint("clip_id", "version", name="uq_clip_cleanups_clip_version"),
-    )
+    __table_args__ = (UniqueConstraint("clip_id", "version", name="uq_clip_cleanups_clip_version"),)
 
 
 class Export(Base):
     """Final rendered clip export record."""
+
     __tablename__ = "exports"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    clip_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("clips.id", ondelete="CASCADE"), nullable=False, index=True)
-    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
-    status: Mapped[str] = mapped_column(String(32), default="queued", nullable=False, index=True)  # queued | rendering | succeeded | failed | cancelled
+    clip_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("clips.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    status: Mapped[str] = mapped_column(
+        String(32), default="queued", nullable=False, index=True
+    )  # queued | rendering | succeeded | failed | cancelled
     preset_key: Mapped[str] = mapped_column(String(64), nullable=False)
     params_snapshot: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, nullable=False)
     storage_key: Mapped[str | None] = mapped_column(String(1024), nullable=True)
@@ -809,18 +1002,21 @@ class Export(Base):
         post_update=True,
     )
 
-    __table_args__ = (
-        Index("ix_exports_created_at", "created_at"),
-    )
+    __table_args__ = (Index("ix_exports_created_at", "created_at"),)
 
 
 class ClipEdit(Base):
     """Versioned edit document for a clip (single source of truth)."""
+
     __tablename__ = "clip_edits"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    clip_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("clips.id", ondelete="CASCADE"), nullable=False, index=True)
-    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    clip_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("clips.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     version: Mapped[int] = mapped_column(Integer, nullable=False)
     doc: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, nullable=False)
     parent_version: Mapped[int | None] = mapped_column(Integer, nullable=True)
@@ -841,10 +1037,13 @@ class ClipEdit(Base):
 
 class ClipAlternative(Base):
     """Alternative hook or range trims populated from scoring runs or regeneration."""
+
     __tablename__ = "clip_alternatives"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    clip_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("clips.id", ondelete="CASCADE"), nullable=False, index=True)
+    clip_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("clips.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     kind: Mapped[str] = mapped_column(String(32), nullable=False)  # hook | range
     start_ms: Mapped[int] = mapped_column(BigInteger, nullable=False)
     end_ms: Mapped[int] = mapped_column(BigInteger, nullable=False)
@@ -865,11 +1064,16 @@ class ClipAlternative(Base):
 
 class EditorEvent(Base):
     """Instrumentation event for editor performance and user workflow tracking."""
+
     __tablename__ = "editor_events"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
-    clip_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("clips.id", ondelete="CASCADE"), nullable=True, index=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    clip_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("clips.id", ondelete="CASCADE"), nullable=True, index=True
+    )
     session_id: Mapped[str] = mapped_column(String(128), nullable=False, index=True)
     type: Mapped[str] = mapped_column(String(64), nullable=False)
     payload: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, default=dict, nullable=False)
@@ -890,12 +1094,16 @@ class EditorEvent(Base):
 # Phase 6 Models: Billing, Ledger, Invoices, Legal, Abuse & Operations
 # ---------------------------------------------------------------------------
 
+
 class Customer(Base):
     """Mapping between local user and payment gateway customer IDs."""
+
     __tablename__ = "customers"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     provider: Mapped[str] = mapped_column(String(32), nullable=False)  # razorpay | stripe
     provider_customer_id: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
     meta: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, default=dict, nullable=False)
@@ -913,15 +1121,24 @@ class Customer(Base):
 
 class Subscription(Base):
     """Mirrored subscription record synced via webhooks."""
+
     __tablename__ = "subscriptions"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
-    customer_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("customers.id", ondelete="SET NULL"), nullable=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    customer_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("customers.id", ondelete="SET NULL"), nullable=True
+    )
     provider: Mapped[str] = mapped_column(String(32), nullable=False)  # razorpay | stripe
     provider_subscription_id: Mapped[str] = mapped_column(String(255), unique=True, nullable=False, index=True)
-    plan_key: Mapped[str] = mapped_column(String(64), ForeignKey("plans.key", ondelete="RESTRICT"), nullable=False, index=True)
-    status: Mapped[str] = mapped_column(String(32), default="pending", nullable=False, index=True)  # active | past_due | canceled | expired | halted | pending
+    plan_key: Mapped[str] = mapped_column(
+        String(64), ForeignKey("plans.key", ondelete="RESTRICT"), nullable=False, index=True
+    )
+    status: Mapped[str] = mapped_column(
+        String(32), default="pending", nullable=False, index=True
+    )  # active | past_due | canceled | expired | halted | pending
     currency: Mapped[str] = mapped_column(String(10), default="INR", nullable=False)
     current_period_start: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     current_period_end: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
@@ -930,7 +1147,9 @@ class Subscription(Base):
     ended_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     meta: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, default=dict, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
-    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, onupdate=utc_now, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utc_now, onupdate=utc_now, nullable=False
+    )
 
     # Relationships
     user: Mapped["User"] = relationship("User", back_populates="subscriptions")
@@ -947,17 +1166,26 @@ class Subscription(Base):
 
 class Payment(Base):
     """Payment transaction log for audits, subscriptions, and top-ups."""
+
     __tablename__ = "payments"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
-    subscription_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("subscriptions.id", ondelete="SET NULL"), nullable=True, index=True)
-    invoice_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("invoices.id", ondelete="SET NULL"), nullable=True, index=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    subscription_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("subscriptions.id", ondelete="SET NULL"), nullable=True, index=True
+    )
+    invoice_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("invoices.id", ondelete="SET NULL"), nullable=True, index=True
+    )
     provider: Mapped[str] = mapped_column(String(32), nullable=False)  # razorpay | stripe
     provider_payment_id: Mapped[str] = mapped_column(String(255), unique=True, nullable=False, index=True)
     amount: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
     currency: Mapped[str] = mapped_column(String(10), default="INR", nullable=False)
-    status: Mapped[str] = mapped_column(String(32), default="succeeded", nullable=False, index=True)  # succeeded | failed | refunded | partially_refunded
+    status: Mapped[str] = mapped_column(
+        String(32), default="succeeded", nullable=False, index=True
+    )  # succeeded | failed | refunded | partially_refunded
     error_code: Mapped[str | None] = mapped_column(String(64), nullable=True)
     error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
     meta: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, default=dict, nullable=False)
@@ -968,24 +1196,33 @@ class Payment(Base):
     subscription: Mapped[Optional["Subscription"]] = relationship("Subscription", back_populates="payments")
     invoice: Mapped[Optional["Invoice"]] = relationship("Invoice", back_populates="payments", foreign_keys=[invoice_id])
 
-    __table_args__ = (
-        Index("ix_payments_user_created", "user_id", "created_at"),
-    )
+    __table_args__ = (Index("ix_payments_user_created", "user_id", "created_at"),)
 
 
 class Invoice(Base):
     """Sequential, gap-free tax invoice or receipt with GST breakdown and S3 PDF."""
+
     __tablename__ = "invoices"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
-    subscription_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("subscriptions.id", ondelete="SET NULL"), nullable=True, index=True)
-    payment_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), nullable=True)  # Populated when payment is created
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    subscription_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("subscriptions.id", ondelete="SET NULL"), nullable=True, index=True
+    )
+    payment_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), nullable=True
+    )  # Populated when payment is created
     invoice_number: Mapped[str] = mapped_column(String(64), unique=True, nullable=False, index=True)
     financial_year: Mapped[str] = mapped_column(String(16), nullable=False, index=True)  # e.g., 2026-27
     seq_number: Mapped[int] = mapped_column(Integer, nullable=False)
-    type: Mapped[str] = mapped_column(String(32), default="tax_invoice", nullable=False)  # tax_invoice | receipt | credit_note
-    original_invoice_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("invoices.id", ondelete="SET NULL"), nullable=True)
+    type: Mapped[str] = mapped_column(
+        String(32), default="tax_invoice", nullable=False
+    )  # tax_invoice | receipt | credit_note
+    original_invoice_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("invoices.id", ondelete="SET NULL"), nullable=True
+    )
 
     # Customer & Tax details
     customer_name: Mapped[str] = mapped_column(String(255), nullable=False)
@@ -993,7 +1230,9 @@ class Invoice(Base):
     customer_address: Mapped[dict[str, Any] | None] = mapped_column(JSON_TYPE, nullable=True)
     customer_gstin: Mapped[str | None] = mapped_column(String(32), nullable=True)
     customer_state_code: Mapped[str | None] = mapped_column(String(10), nullable=True)
-    place_of_supply: Mapped[str] = mapped_column(String(32), default="intra_state", nullable=False)  # intra_state | inter_state | export
+    place_of_supply: Mapped[str] = mapped_column(
+        String(32), default="intra_state", nullable=False
+    )  # intra_state | inter_state | export
 
     # Financial Breakdowns
     taxable_amount: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
@@ -1016,7 +1255,9 @@ class Invoice(Base):
     # Relationships
     user: Mapped["User"] = relationship("User", back_populates="invoices")
     subscription: Mapped[Optional["Subscription"]] = relationship("Subscription", back_populates="invoices")
-    payments: Mapped[list["Payment"]] = relationship("Payment", back_populates="invoice", foreign_keys=[Payment.invoice_id])
+    payments: Mapped[list["Payment"]] = relationship(
+        "Payment", back_populates="invoice", foreign_keys=[Payment.invoice_id]
+    )
     credit_notes: Mapped[list["Invoice"]] = relationship("Invoice", remote_side=[original_invoice_id])
 
     __table_args__ = (
@@ -1028,6 +1269,7 @@ class Invoice(Base):
 
 class InvoiceSequence(Base):
     """Gap-free atomic sequence counter for financial year tax invoice generation."""
+
     __tablename__ = "invoice_sequences"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
@@ -1035,15 +1277,16 @@ class InvoiceSequence(Base):
     financial_year: Mapped[str] = mapped_column(String(16), nullable=False)
     seq_type: Mapped[str] = mapped_column(String(32), default="tax_invoice", nullable=False)
     last_val: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
-    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, onupdate=utc_now, nullable=False)
-
-    __table_args__ = (
-        UniqueConstraint("prefix", "financial_year", "seq_type", name="uq_invoice_seq_prefix_fy_type"),
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utc_now, onupdate=utc_now, nullable=False
     )
+
+    __table_args__ = (UniqueConstraint("prefix", "financial_year", "seq_type", name="uq_invoice_seq_prefix_fy_type"),)
 
 
 class WebhookEvent(Base):
     """Idempotency log for payment webhooks to safely handle replays and out-of-order events."""
+
     __tablename__ = "webhook_events"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
@@ -1051,7 +1294,9 @@ class WebhookEvent(Base):
     event_id: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
     event_type: Mapped[str] = mapped_column(String(128), nullable=False, index=True)
     payload: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, nullable=False)
-    status: Mapped[str] = mapped_column(String(32), default="received", nullable=False)  # received | processed | ignored | failed
+    status: Mapped[str] = mapped_column(
+        String(32), default="received", nullable=False
+    )  # received | processed | ignored | failed
     error: Mapped[str | None] = mapped_column(Text, nullable=True)
     processed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
@@ -1064,10 +1309,13 @@ class WebhookEvent(Base):
 
 class TopUp(Base):
     """One-time credit pack purchases adding source minutes with expiration."""
+
     __tablename__ = "top_ups"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     pack_key: Mapped[str] = mapped_column(String(64), nullable=False)
     minutes: Mapped[int] = mapped_column(Integer, nullable=False)
     remaining_minutes: Mapped[int] = mapped_column(Integer, nullable=False)
@@ -1075,23 +1323,26 @@ class TopUp(Base):
     currency: Mapped[str] = mapped_column(String(10), default="INR", nullable=False)
     status: Mapped[str] = mapped_column(String(32), default="active", nullable=False)  # active | exhausted | expired
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, index=True)
-    payment_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("payments.id", ondelete="SET NULL"), nullable=True)
+    payment_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("payments.id", ondelete="SET NULL"), nullable=True
+    )
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
 
     # Relationships
     user: Mapped["User"] = relationship("User", back_populates="top_ups")
 
-    __table_args__ = (
-        Index("ix_top_ups_user_status_exp", "user_id", "status", "expires_at"),
-    )
+    __table_args__ = (Index("ix_top_ups_user_status_exp", "user_id", "status", "expires_at"),)
 
 
 class QuotaLedger(Base):
     """Append-only audit ledger of every minute reserved, reconciled, refunded, and topped up."""
+
     __tablename__ = "quota_ledger"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     delta_minutes: Mapped[Decimal] = mapped_column(Numeric(12, 4), nullable=False)
     balance_after: Mapped[Decimal] = mapped_column(Numeric(12, 4), nullable=False)
     reason: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
@@ -1103,13 +1354,12 @@ class QuotaLedger(Base):
     # Relationships
     user: Mapped["User"] = relationship("User", back_populates="quota_ledger_entries")
 
-    __table_args__ = (
-        Index("ix_quota_ledger_user_created", "user_id", "created_at"),
-    )
+    __table_args__ = (Index("ix_quota_ledger_user_created", "user_id", "created_at"),)
 
 
 class InviteCode(Base):
     """Waitlist and soft-launch invite gating table."""
+
     __tablename__ = "invite_codes"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
@@ -1117,22 +1367,31 @@ class InviteCode(Base):
     max_uses: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
     uses_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
-    created_by: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    created_by: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), nullable=True
+    )
     expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
 
     # Relationships
-    redemptions: Mapped[list["UserInvite"]] = relationship("UserInvite", back_populates="invite_code", cascade="all, delete-orphan")
+    redemptions: Mapped[list["UserInvite"]] = relationship(
+        "UserInvite", back_populates="invite_code", cascade="all, delete-orphan"
+    )
 
 
 class UserInvite(Base):
     """User invite redemption audit record."""
+
     __tablename__ = "user_invites"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), unique=True, nullable=False, index=True)
-    invite_code_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("invite_codes.id", ondelete="CASCADE"), nullable=False, index=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), unique=True, nullable=False, index=True
+    )
+    invite_code_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("invite_codes.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     redeemed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
 
     # Relationships
@@ -1141,10 +1400,13 @@ class UserInvite(Base):
 
 class TermsAcceptance(Base):
     """Versioned legal document acceptance records for DPDP Act and compliance."""
+
     __tablename__ = "terms_acceptances"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     doc_type: Mapped[str] = mapped_column(String(64), nullable=False)  # terms | privacy | aup | refund | dmca
     doc_version: Mapped[str] = mapped_column(String(32), nullable=False)
     ip_hash: Mapped[str] = mapped_column(String(128), nullable=False)
@@ -1154,13 +1416,12 @@ class TermsAcceptance(Base):
     # Relationships
     user: Mapped["User"] = relationship("User", back_populates="terms_acceptances")
 
-    __table_args__ = (
-        Index("ix_terms_acceptances_user_doc", "user_id", "doc_type", "doc_version"),
-    )
+    __table_args__ = (Index("ix_terms_acceptances_user_doc", "user_id", "doc_type", "doc_version"),)
 
 
 class TakedownRequest(Base):
     """DMCA and copyright takedown notices queue with counter-notice flow and SLA timers."""
+
     __tablename__ = "takedown_requests"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
@@ -1170,7 +1431,9 @@ class TakedownRequest(Base):
     claimant_organization: Mapped[str | None] = mapped_column(String(255), nullable=True)
     work_description: Mapped[str] = mapped_column(Text, nullable=False)
     infringing_url_or_id: Mapped[str] = mapped_column(String(1024), nullable=False)
-    video_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("videos.id", ondelete="SET NULL"), nullable=True, index=True)
+    video_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("videos.id", ondelete="SET NULL"), nullable=True, index=True
+    )
     good_faith_confirmed: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     perjury_confirmed: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     signature: Mapped[str] = mapped_column(String(255), nullable=False)
@@ -1178,25 +1441,30 @@ class TakedownRequest(Base):
     # status: submitted | under_review | actioned_blocked | counter_notice_received | restored | rejected
     counter_notice_payload: Mapped[dict[str, Any] | None] = mapped_column(JSON_TYPE, nullable=True)
     sla_deadline: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
-    actioned_by: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    actioned_by: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), nullable=True
+    )
     audit_trail: Mapped[list[dict[str, Any]]] = mapped_column(JSON_TYPE, default=list, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
-    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, onupdate=utc_now, nullable=False)
-
-    __table_args__ = (
-        Index("ix_takedown_requests_created_status", "created_at", "status"),
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utc_now, onupdate=utc_now, nullable=False
     )
+
+    __table_args__ = (Index("ix_takedown_requests_created_status", "created_at", "status"),)
 
 
 class DeletionAudit(Base):
     """Auditable log of video or account deletion operations."""
+
     __tablename__ = "deletion_audits"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     entity_type: Mapped[str] = mapped_column(String(32), nullable=False)  # video | account
     entity_id: Mapped[str] = mapped_column(String(128), nullable=False, index=True)
     user_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), nullable=True, index=True)
-    status: Mapped[str] = mapped_column(String(32), default="pending_grace", nullable=False)  # pending_grace | completed | cancelled
+    status: Mapped[str] = mapped_column(
+        String(32), default="pending_grace", nullable=False
+    )  # pending_grace | completed | cancelled
     requested_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
     grace_period_ends_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
@@ -1205,18 +1473,21 @@ class DeletionAudit(Base):
     audit_data: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, default=dict, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
 
-    __table_args__ = (
-        Index("ix_deletion_audits_entity", "entity_type", "entity_id"),
-    )
+    __table_args__ = (Index("ix_deletion_audits_entity", "entity_type", "entity_id"),)
 
 
 class DeadLetterJob(Base):
     """Permanent graveyard for stuck/exhausted jobs to prevent silent hangs and enable debugging."""
+
     __tablename__ = "dead_letter_jobs"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    job_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("jobs.id", ondelete="CASCADE"), unique=True, nullable=False, index=True)
-    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    job_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("jobs.id", ondelete="CASCADE"), unique=True, nullable=False, index=True
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     failed_stage: Mapped[str] = mapped_column(String(64), nullable=False)
     error_code: Mapped[str] = mapped_column(String(64), nullable=False)
     error_message: Mapped[str] = mapped_column(Text, nullable=False)
@@ -1236,6 +1507,7 @@ class DeadLetterJob(Base):
 
 class AnalyticsEvent(Base):
     """Self-hosted telemetry and conversion event table (no PII in properties)."""
+
     __tablename__ = "analytics_events"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
@@ -1246,31 +1518,36 @@ class AnalyticsEvent(Base):
     ip_hash: Mapped[str | None] = mapped_column(String(128), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False, index=True)
 
-    __table_args__ = (
-        Index("ix_analytics_events_name_created", "event_name", "created_at"),
-    )
+    __table_args__ = (Index("ix_analytics_events_name_created", "event_name", "created_at"),)
 
 
 class AppConfigFlag(Base):
     """Dynamic application feature flags and runtime configurations."""
+
     __tablename__ = "app_config_flags"
 
     key: Mapped[str] = mapped_column(String(64), primary_key=True)
     value: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, nullable=False)
     description: Mapped[str | None] = mapped_column(String(255), nullable=True)
-    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, onupdate=utc_now, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utc_now, onupdate=utc_now, nullable=False
+    )
 
 
 # ---------------------------------------------------------------------------
 # Phase 7a Models: Brand Kit and Auto-Variants
 # ---------------------------------------------------------------------------
 
+
 class BrandAsset(Base):
     """Uploaded user assets for brand kits: logos, fonts, intro/outro clips."""
+
     __tablename__ = "brand_assets"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     kind: Mapped[str] = mapped_column(String(32), nullable=False, index=True)  # logo | font | intro | outro
     storage_key: Mapped[str] = mapped_column(String(1024), nullable=False)
     filename: Mapped[str] = mapped_column(String(512), nullable=False)
@@ -1279,7 +1556,9 @@ class BrandAsset(Base):
     width: Mapped[int | None] = mapped_column(Integer, nullable=True)
     height: Mapped[int | None] = mapped_column(Integer, nullable=True)
     duration_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
-    status: Mapped[str] = mapped_column(String(32), default="processing", nullable=False, index=True)  # processing | ready | failed
+    status: Mapped[str] = mapped_column(
+        String(32), default="processing", nullable=False, index=True
+    )  # processing | ready | failed
     metadata_json: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, default=dict, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
 
@@ -1294,25 +1573,42 @@ class BrandAsset(Base):
 
 class BrandKit(Base):
     """Reusable brand identity kit (logo, colors, typography, intro/outro, caption style)."""
+
     __tablename__ = "brand_kits"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     is_default: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
-    colors: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, default=dict, nullable=False)  # primary, secondary, text, highlight, background
-    fonts: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, default=dict, nullable=False)   # heading_asset_id, body_asset_id, font_family
-    logo_asset_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("brand_assets.id", ondelete="SET NULL"), nullable=True)
-    logo_position: Mapped[str] = mapped_column(String(32), default="top_right", nullable=False)  # top_left | top_right | bottom_left | bottom_right
+    colors: Mapped[dict[str, Any]] = mapped_column(
+        JSON_TYPE, default=dict, nullable=False
+    )  # primary, secondary, text, highlight, background
+    fonts: Mapped[dict[str, Any]] = mapped_column(
+        JSON_TYPE, default=dict, nullable=False
+    )  # heading_asset_id, body_asset_id, font_family
+    logo_asset_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("brand_assets.id", ondelete="SET NULL"), nullable=True
+    )
+    logo_position: Mapped[str] = mapped_column(
+        String(32), default="top_right", nullable=False
+    )  # top_left | top_right | bottom_left | bottom_right
     logo_opacity: Mapped[float] = mapped_column(Float, default=1.0, nullable=False)
     logo_scale: Mapped[float] = mapped_column(Float, default=0.15, nullable=False)
     caption_style_key: Mapped[str | None] = mapped_column(String(64), nullable=True)
     caption_overrides: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, default=dict, nullable=False)
-    intro_asset_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("brand_assets.id", ondelete="SET NULL"), nullable=True)
-    outro_asset_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("brand_assets.id", ondelete="SET NULL"), nullable=True)
+    intro_asset_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("brand_assets.id", ondelete="SET NULL"), nullable=True
+    )
+    outro_asset_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("brand_assets.id", ondelete="SET NULL"), nullable=True
+    )
     watermark_free_override: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
-    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, onupdate=utc_now, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utc_now, onupdate=utc_now, nullable=False
+    )
 
     # Relationships
     user: Mapped["User"] = relationship("User", back_populates="brand_kits")
@@ -1328,11 +1624,16 @@ class BrandKit(Base):
 
 class VariantSet(Base):
     """A generated set of auto-variants for a single clip moment."""
+
     __tablename__ = "variant_sets"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    clip_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("clips.id", ondelete="CASCADE"), nullable=False, index=True)
-    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    clip_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("clips.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     status: Mapped[str] = mapped_column(String(32), default="ready", nullable=False)  # pending | ready | failed
     dimensions: Mapped[list[str]] = mapped_column(JSON_TYPE, default=list, nullable=False)  # ["hook", "style", "cta"]
     requested_count: Mapped[int] = mapped_column(Integer, default=4, nullable=False)
@@ -1341,19 +1642,25 @@ class VariantSet(Base):
     # Relationships
     clip: Mapped["Clip"] = relationship("Clip", back_populates="variant_sets")
     user: Mapped["User"] = relationship("User", back_populates="variant_sets")
-    variants: Mapped[list["ClipVariant"]] = relationship("ClipVariant", back_populates="variant_set", cascade="all, delete-orphan", order_by="ClipVariant.created_at.asc()")
-
-    __table_args__ = (
-        Index("ix_variant_sets_clip_created", "clip_id", "created_at"),
+    variants: Mapped[list["ClipVariant"]] = relationship(
+        "ClipVariant",
+        back_populates="variant_set",
+        cascade="all, delete-orphan",
+        order_by="ClipVariant.created_at.asc()",
     )
+
+    __table_args__ = (Index("ix_variant_sets_clip_created", "clip_id", "created_at"),)
 
 
 class ClipVariant(Base):
     """An individual variant of a clip moment with lightweight edit_doc snapshot."""
+
     __tablename__ = "clip_variants"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    set_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("variant_sets.id", ondelete="CASCADE"), nullable=False, index=True)
+    set_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("variant_sets.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     edit_doc: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, nullable=False)
     label: Mapped[str] = mapped_column(String(128), nullable=False)
     hook_text: Mapped[str | None] = mapped_column(Text, nullable=True)
@@ -1378,13 +1685,4 @@ class ClipVariant(Base):
         post_update=True,
     )
 
-    __table_args__ = (
-        Index("ix_clip_variants_created_at", "created_at"),
-    )
-
-
-
-
-
-
-
+    __table_args__ = (Index("ix_clip_variants_created_at", "created_at"),)

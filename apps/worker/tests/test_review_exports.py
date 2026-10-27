@@ -99,6 +99,7 @@ def test_export_crude_clip_execution_and_idempotency(mock_popen):
 def test_real_ffmpeg_crude_export_if_available():
     """Marked FFmpeg test that runs against real binary if present on host."""
     import shutil
+
     if not shutil.which("ffmpeg"):
         pytest.skip("ffmpeg binary not installed on host machine")
 
@@ -110,11 +111,28 @@ def test_real_ffmpeg_crude_export_if_available():
 
         # Create 2s test video
         import subprocess
-        subprocess.run([
-            "ffmpeg", "-y", "-f", "lavfi", "-i", "testsrc=duration=2:size=640x360:rate=30",
-            "-f", "lavfi", "-i", "sine=frequency=1000:duration=2",
-            "-c:v", "libx264", "-c:a", "aac", synth_input
-        ], check=True, capture_output=True)
+
+        subprocess.run(
+            [
+                "ffmpeg",
+                "-y",
+                "-f",
+                "lavfi",
+                "-i",
+                "testsrc=duration=2:size=640x360:rate=30",
+                "-f",
+                "lavfi",
+                "-i",
+                "sine=frequency=1000:duration=2",
+                "-c:v",
+                "libx264",
+                "-c:a",
+                "aac",
+                synth_input,
+            ],
+            check=True,
+            capture_output=True,
+        )
 
         # Export horizontal
         export_crude_clip(synth_input, synth_out_h, start_ms=0, end_ms=1500, kind="horizontal")

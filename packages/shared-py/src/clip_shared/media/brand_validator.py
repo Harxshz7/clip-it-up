@@ -1,14 +1,13 @@
 """Validation engine for Brand Kit assets: logos, custom fonts, intro/outro video clips."""
-import os
-import re
-from typing import Any
-import xml.etree.ElementTree as ET
 
-from PIL import Image
+import os
+import xml.etree.ElementTree as ET
+from typing import Any
+
 from fontTools.ttLib import TTFont
+from PIL import Image
 
 from clip_shared.media.ffmpeg import MediaValidationError, probe_video
-
 
 # Common unicode ranges for validation
 LATIN_BASIC_RANGE = range(0x0020, 0x007F)  # Printable ASCII
@@ -40,7 +39,7 @@ def validate_logo_asset(
     if size_bytes > max_size_bytes:
         raise MediaValidationError(
             "LOGO_TOO_LARGE",
-            f"Logo size ({size_bytes / (1024*1024):.1f}MB) exceeds limit ({max_size_bytes / (1024*1024):.1f}MB).",
+            f"Logo size ({size_bytes / (1024 * 1024):.1f}MB) exceeds limit ({max_size_bytes / (1024 * 1024):.1f}MB).",
         )
 
     ext = os.path.splitext(file_path)[1].lower()
@@ -80,9 +79,7 @@ def validate_logo_asset(
                 raise MediaValidationError("LOGO_TOO_LARGE", f"Logo dimensions {w}x{h} exceed 4096x4096px limit.")
 
             # Check alpha channel
-            has_alpha = img.mode in ("RGBA", "LA", "PA") or (
-                img.mode == "P" and "transparency" in img.info
-            )
+            has_alpha = img.mode in ("RGBA", "LA", "PA") or (img.mode == "P" and "transparency" in img.info)
 
             return {
                 "format": img_format.lower(),
@@ -121,7 +118,7 @@ def validate_font_asset(
     if size_bytes > max_size_bytes:
         raise MediaValidationError(
             "FONT_TOO_LARGE",
-            f"Font size ({size_bytes / (1024*1024):.1f}MB) exceeds limit ({max_size_bytes / (1024*1024):.1f}MB).",
+            f"Font size ({size_bytes / (1024 * 1024):.1f}MB) exceeds limit ({max_size_bytes / (1024 * 1024):.1f}MB).",
         )
 
     try:
@@ -169,7 +166,9 @@ def validate_font_asset(
 
     warning = None
     if not has_indic:
-        warning = "Font lacks Indic glyph coverage (Devanagari/regional scripts); fallback font will be used for Indic text."
+        warning = (
+            "Font lacks Indic glyph coverage (Devanagari/regional scripts); fallback font will be used for Indic text."
+        )
 
     return {
         "font_family": family_name,
@@ -200,7 +199,7 @@ def validate_video_asset(
     if size_bytes > max_size_bytes:
         raise MediaValidationError(
             "VIDEO_TOO_LARGE",
-            f"{kind.capitalize()} video size ({size_bytes / (1024*1024):.1f}MB) exceeds limit ({max_size_bytes / (1024*1024):.1f}MB).",
+            f"{kind.capitalize()} video size ({size_bytes / (1024 * 1024):.1f}MB) exceeds limit ({max_size_bytes / (1024 * 1024):.1f}MB).",
         )
 
     meta = probe_video(file_path, max_duration_min=5)

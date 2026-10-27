@@ -39,7 +39,7 @@ def check_disk_space(target_dir: str, required_bytes: int) -> None:
     if usage.free < min_required:
         raise MediaValidationError(
             code="INSUFFICIENT_DISK_SPACE",
-            message=f"Insufficient worker disk space. Free: {usage.free / (1024*1024):.1f}MB, Required: {min_required / (1024*1024):.1f}MB",
+            message=f"Insufficient worker disk space. Free: {usage.free / (1024 * 1024):.1f}MB, Required: {min_required / (1024 * 1024):.1f}MB",
         )
 
 
@@ -53,9 +53,12 @@ def probe_video(file_path: str, max_duration_min: int = 120) -> VideoMetadata:
 
     cmd = [
         "ffprobe",
-        "-v", "error",
-        "-show_entries", "format=duration,size,bit_rate:stream=index,codec_type,codec_name,width,height,r_frame_rate,avg_frame_rate,duration",
-        "-print_format", "json",
+        "-v",
+        "error",
+        "-show_entries",
+        "format=duration,size,bit_rate:stream=index,codec_type,codec_name,width,height,r_frame_rate,avg_frame_rate,duration",
+        "-print_format",
+        "json",
         file_path,
     ]
 
@@ -193,12 +196,17 @@ def extract_audio(
     cmd = [
         "ffmpeg",
         "-y",
-        "-i", input_video,
+        "-i",
+        input_video,
         "-vn",
-        "-acodec", "pcm_s16le",
-        "-ar", "16000",
-        "-ac", "1",
-        "-progress", "pipe:1",
+        "-acodec",
+        "pcm_s16le",
+        "-ar",
+        "16000",
+        "-ac",
+        "1",
+        "-progress",
+        "pipe:1",
         "-nostats",
         output_wav,
     ]
@@ -235,15 +243,24 @@ def generate_proxy(
     cmd = [
         "ffmpeg",
         "-y",
-        "-i", input_video,
-        "-vf", "scale=-2:min(720\\,ih)",
-        "-c:v", "libx264",
-        "-crf", "23",
-        "-preset", "veryfast",
-        "-c:a", "aac",
-        "-b:a", "128k",
-        "-movflags", "+faststart",
-        "-progress", "pipe:1",
+        "-i",
+        input_video,
+        "-vf",
+        "scale=-2:min(720\\,ih)",
+        "-c:v",
+        "libx264",
+        "-crf",
+        "23",
+        "-preset",
+        "veryfast",
+        "-c:a",
+        "aac",
+        "-b:a",
+        "128k",
+        "-movflags",
+        "+faststart",
+        "-progress",
+        "pipe:1",
         "-nostats",
         output_mp4,
     ]
@@ -289,12 +306,14 @@ def run_parallel_audio_and_proxy(
         def cb(pct):
             progress_audio[0] = pct
             update_combined()
+
         extract_audio(input_video, output_wav, duration_seconds, progress_cb=cb)
 
     def proxy_worker():
         def cb(pct):
             progress_proxy[0] = pct
             update_combined()
+
         generate_proxy(input_video, output_mp4, duration_seconds, progress_cb=cb)
 
     t_audio = threading.Thread(target=audio_worker)
@@ -341,18 +360,30 @@ def build_crude_clip_ffmpeg_cmd(
     cmd = [
         "ffmpeg",
         "-y",
-        "-ss", f"{start_s:.3f}",
-        "-i", input_video,
-        "-t", f"{duration_s:.3f}",
-        "-vf", vf_filter,
-        "-c:v", "libx264",
-        "-crf", "23",
-        "-preset", "veryfast",
-        "-c:a", "aac",
-        "-b:a", "128k",
-        "-movflags", "+faststart",
-        "-avoid_negative_ts", "make_zero",
-        "-progress", "pipe:1",
+        "-ss",
+        f"{start_s:.3f}",
+        "-i",
+        input_video,
+        "-t",
+        f"{duration_s:.3f}",
+        "-vf",
+        vf_filter,
+        "-c:v",
+        "libx264",
+        "-crf",
+        "23",
+        "-preset",
+        "veryfast",
+        "-c:a",
+        "aac",
+        "-b:a",
+        "128k",
+        "-movflags",
+        "+faststart",
+        "-avoid_negative_ts",
+        "make_zero",
+        "-progress",
+        "pipe:1",
         "-nostats",
         output_mp4,
     ]
@@ -400,19 +431,41 @@ def export_crude_clip(
             if "drawtext" in stderr_text:
                 logger.warn("retrying_export_without_drawtext", kind=kind)
                 fallback_cmd = [
-                    "ffmpeg", "-y",
-                    "-ss", f"{(start_ms/1000.0):.3f}",
-                    "-i", input_video,
-                    "-t", f"{duration_s:.3f}",
+                    "ffmpeg",
+                    "-y",
+                    "-ss",
+                    f"{(start_ms / 1000.0):.3f}",
+                    "-i",
+                    input_video,
+                    "-t",
+                    f"{duration_s:.3f}",
                 ]
                 if kind == "vertical_center":
-                    fallback_cmd.extend(["-vf", "crop=min(iw\\,ih*9/16):min(ih\\,iw*16/9):(iw-min(iw\\,ih*9/16))/2:(ih-min(ih\\,iw*16/9))/2"])
-                fallback_cmd.extend([
-                    "-c:v", "libx264", "-crf", "23", "-preset", "veryfast",
-                    "-c:a", "aac", "-b:a", "128k", "-movflags", "+faststart",
-                    "-avoid_negative_ts", "make_zero",
-                    output_mp4,
-                ])
+                    fallback_cmd.extend(
+                        [
+                            "-vf",
+                            "crop=min(iw\\,ih*9/16):min(ih\\,iw*16/9):(iw-min(iw\\,ih*9/16))/2:(ih-min(ih\\,iw*16/9))/2",
+                        ]
+                    )
+                fallback_cmd.extend(
+                    [
+                        "-c:v",
+                        "libx264",
+                        "-crf",
+                        "23",
+                        "-preset",
+                        "veryfast",
+                        "-c:a",
+                        "aac",
+                        "-b:a",
+                        "128k",
+                        "-movflags",
+                        "+faststart",
+                        "-avoid_negative_ts",
+                        "make_zero",
+                        output_mp4,
+                    ]
+                )
                 fb_proc = subprocess.run(fallback_cmd, capture_output=True, text=True, check=False)
                 if fb_proc.returncode != 0:
                     raise RuntimeError(f"FFmpeg crude export fallback failed: {fb_proc.stderr}")
@@ -423,4 +476,3 @@ def export_crude_clip(
             progress_cb(100.0)
     except FileNotFoundError:
         raise FileNotFoundError("ffmpeg binary not found in worker environment.")
-

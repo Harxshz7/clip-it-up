@@ -42,8 +42,7 @@ class Pass2CandidateScore(BaseModel):
 
 def build_pass1_prompt(candidates: list[Pass1CandidateItem], video_summary: str) -> str:
     candidates_formatted = "\n\n".join(
-        f"[{c.id}] ({c.start_ms/1000:.1f}s - {c.end_ms/1000:.1f}s):\n\"{c.text}\""
-        for c in candidates
+        f'[{c.id}] ({c.start_ms / 1000:.1f}s - {c.end_ms / 1000:.1f}s):\n"{c.text}"' for c in candidates
     )
     return f"""You are evaluating video segments to find the most viral, engaging standalone short clips.
 
@@ -74,8 +73,8 @@ Full Video Context:
 
 Evaluate this specific candidate window:
 - ID: {candidate_id}
-- Speaker: {speaker or 'Speaker'}
-- Range: {start_ms}ms to {end_ms}ms ({start_ms/1000:.1f}s - {end_ms/1000:.1f}s)
+- Speaker: {speaker or "Speaker"}
+- Range: {start_ms}ms to {end_ms}ms ({start_ms / 1000:.1f}s - {end_ms / 1000:.1f}s)
 - Transcript:
 "{text}"
 

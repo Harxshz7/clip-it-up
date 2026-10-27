@@ -5,6 +5,7 @@ Revises: 0009_phase7a_brand_and_variants
 Create Date: 2026-10-26 00:00:00.000000
 
 """
+
 from collections.abc import Sequence
 
 import sqlalchemy as sa

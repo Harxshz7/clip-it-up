@@ -34,13 +34,10 @@ def generate_moment_variants(
 
     # Find segments within this moment
     moment_segments = [
-        s for s in segments
-        if s["start_ms"] >= moment_start_ms - 200 and s["end_ms"] <= moment_end_ms + 200
+        s for s in segments if s["start_ms"] >= moment_start_ms - 200 and s["end_ms"] <= moment_end_ms + 200
     ]
     if not moment_segments:
-        moment_segments = [
-            {"start_ms": moment_start_ms, "end_ms": moment_end_ms, "text": base_hook_text}
-        ]
+        moment_segments = [{"start_ms": moment_start_ms, "end_ms": moment_end_ms, "text": base_hook_text}]
 
     variants: list[ClipVariantData] = []
 
@@ -54,7 +51,7 @@ def generate_moment_variants(
             title=base_title,
             final_score=base_score,
             score_breakdown=base_breakdown,
-            reason=f"Optimal natural cut ({round((moment_end_ms - moment_start_ms)/1000.0, 1)}s): {base_reason}",
+            reason=f"Optimal natural cut ({round((moment_end_ms - moment_start_ms) / 1000.0, 1)}s): {base_reason}",
         )
     )
 
@@ -76,13 +73,13 @@ def generate_moment_variants(
 
         for seg in moment_segments:
             seg_dur = seg["end_ms"] - seg["start_ms"]
-            if accumulated_ms + seg_dur > target_ms + 3000: # allow 3s slack
+            if accumulated_ms + seg_dur > target_ms + 3000:  # allow 3s slack
                 break
             used_segs.append(seg)
             accumulated_ms = seg["end_ms"] - cand_start
             best_end = seg["end_ms"]
 
-        if not used_segs or (best_end - cand_start < 8000): # at least 8s
+        if not used_segs or (best_end - cand_start < 8000):  # at least 8s
             continue
 
         actual_duration_s = (best_end - cand_start) / 1000.0

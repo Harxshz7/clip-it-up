@@ -1,10 +1,9 @@
 import hashlib
 import math
 import time
-from typing import Any
 
 import redis.asyncio as aioredis
-from fastapi import HTTPException, Request, status
+from fastapi import HTTPException, status
 
 from clip_shared.billing.exceptions import RateLimitExceededError
 from clip_shared.config import get_settings, load_billing_config
@@ -17,6 +16,7 @@ class RedisRateLimiter:
     Redis token bucket rate limiter with typed 429 exceptions and accurate Retry-After header.
     Works with live Redis or in-memory fallback for local development/testing.
     """
+
     _local_buckets: dict[str, tuple[float, float]] = {}  # key -> (tokens, last_time)
 
     @classmethod

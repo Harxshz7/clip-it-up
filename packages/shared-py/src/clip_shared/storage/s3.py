@@ -12,9 +12,9 @@ from clip_shared.config import get_settings
 def sanitize_filename(filename: str) -> str:
     """Sanitize filename to prevent path traversal or unsafe characters."""
     # Keep alphanumeric, dot, underscore, dash
-    clean = re.sub(r'[^a-zA-Z0-9_.-]', '_', filename)
+    clean = re.sub(r"[^a-zA-Z0-9_.-]", "_", filename)
     # Remove leading dots or slashes
-    clean = clean.lstrip('._')
+    clean = clean.lstrip("._")
     return clean or "unnamed_video.mp4"
 
 
@@ -33,10 +33,7 @@ class S3Client:
             "region_name": self.settings.S3_REGION,
             "aws_access_key_id": self.settings.S3_ACCESS_KEY_ID,
             "aws_secret_access_key": self.settings.S3_SECRET_ACCESS_KEY,
-            "config": Config(
-                signature_version="s3v4",
-                s3={"addressing_style": "path"}
-            ),
+            "config": Config(signature_version="s3v4", s3={"addressing_style": "path"}),
         }
 
         if self.settings.S3_ENDPOINT_URL:
@@ -205,6 +202,7 @@ class S3Client:
     def upload_json(self, data: Any, storage_key: str) -> None:
         """Serialize data to JSON and upload to S3."""
         import json
+
         payload_bytes = json.dumps(data, indent=2).encode("utf-8")
         self.client.put_object(
             Bucket=self.settings.S3_BUCKET_NAME,
@@ -216,6 +214,7 @@ class S3Client:
     def download_json(self, storage_key: str) -> Any:
         """Download and parse a JSON object from S3."""
         import json
+
         response = self.client.get_object(Bucket=self.settings.S3_BUCKET_NAME, Key=storage_key)
         body = response["Body"].read().decode("utf-8")
         return json.loads(body)

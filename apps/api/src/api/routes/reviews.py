@@ -95,6 +95,7 @@ async def _get_valid_session_by_token(token: str, db: AsyncSession) -> ReviewSes
 # OWNER ENDPOINTS (Authenticated)
 # ---------------------------------------------------------------------------
 
+
 @router.post("/videos/{video_id}/review-sessions", response_model=ReviewSessionCreatedResponse)
 async def create_review_session(
     video_id: uuid.UUID,
@@ -138,6 +139,7 @@ async def create_review_session(
     # 3. Trigger crude export in background
     try:
         from worker.tasks.review import generate_review_exports
+
         generate_review_exports.delay(str(video_id), payload.top_n)
     except Exception as e:
         logger.warn("celery_dispatch_failed_trying_sync_or_ignoring", err=str(e))
@@ -299,6 +301,7 @@ async def delete_review_session(
 # PUBLIC CREATOR ENDPOINTS (Token-Gated, No Auth, Rate-Limited)
 # ---------------------------------------------------------------------------
 
+
 @router.get("/review/{token}", response_model=ReviewSessionPublicResponse)
 async def get_public_review_session(
     token: str,
@@ -332,11 +335,7 @@ async def get_public_review_session(
 
     clips = []
     if moment_ids:
-        c_stmt = (
-            select(Clip)
-            .where(Clip.moment_id.in_(moment_ids))
-            .order_by(desc(Clip.final_score))
-        )
+        c_stmt = select(Clip).where(Clip.moment_id.in_(moment_ids)).order_by(desc(Clip.final_score))
         c_res = await db.execute(c_stmt)
         all_clips = c_res.scalars().all()
 
@@ -348,12 +347,7 @@ async def get_public_review_session(
                 clips.append((m, auto_c))
     else:
         # Fallback to direct clips
-        c_stmt = (
-            select(Clip)
-            .where(Clip.video_id == session.video_id)
-            .order_by(desc(Clip.final_score))
-            .limit(8)
-        )
+        c_stmt = select(Clip).where(Clip.video_id == session.video_id).order_by(desc(Clip.final_score)).limit(8)
         c_res = await db.execute(c_stmt)
         direct_clips = c_res.scalars().all()
         clips = [(None, c) for c in direct_clips]
@@ -609,6 +603,7 @@ async def submit_review_session(
 # GATE REPORT ENDPOINT
 # ---------------------------------------------------------------------------
 
+
 @router.get("/reviews/gate", response_model=GateReportResponse)
 async def get_gate_report(
     user: AuthenticatedUser = Depends(get_current_user),
@@ -616,5 +611,6 @@ async def get_gate_report(
 ):
     """Generate and return Gate Decision Report across all submitted review sessions."""
     from eval.gate import generate_gate_report
+
     report = await generate_gate_report(db=db)
     return report

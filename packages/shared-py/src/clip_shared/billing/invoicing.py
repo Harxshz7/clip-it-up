@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 
 from clip_shared.config import get_settings, load_billing_config
 from clip_shared.db.base import utc_now
-from clip_shared.db.models import Invoice, InvoiceSequence, Payment
+from clip_shared.db.models import Invoice, InvoiceSequence
 from clip_shared.storage.s3 import get_s3_client
 
 settings = get_settings()
@@ -64,7 +64,9 @@ class InvoiceService:
             return seq.last_val
 
     @classmethod
-    async def get_next_sequence_async(cls, db: AsyncSession, prefix: str, fy: str, seq_type: str = "tax_invoice") -> int:
+    async def get_next_sequence_async(
+        cls, db: AsyncSession, prefix: str, fy: str, seq_type: str = "tax_invoice"
+    ) -> int:
         stmt = (
             select(InvoiceSequence)
             .where(
@@ -288,7 +290,11 @@ class InvoiceService:
     @classmethod
     def generate_invoice_html(cls, invoice: Invoice, seller_cfg: dict[str, Any]) -> str:
         """Render clean, responsive HTML invoice document."""
-        title = "CREDIT NOTE" if invoice.type == "credit_note" else ("TAX INVOICE" if invoice.type == "tax_invoice" else "PAYMENT RECEIPT")
+        title = (
+            "CREDIT NOTE"
+            if invoice.type == "credit_note"
+            else ("TAX INVOICE" if invoice.type == "tax_invoice" else "PAYMENT RECEIPT")
+        )
         date_str = invoice.created_at.strftime("%d %b %Y")
 
         gst_rows = ""
@@ -338,11 +344,11 @@ td {{ padding: 10px; border-bottom: 1px solid #e5e7eb; }}
     <div style="color: #6b7280;"><strong>Financial Year:</strong> {invoice.financial_year}</div>
   </div>
   <div class="seller" style="text-align: right;">
-    <strong style="font-size: 15px;">{seller_cfg.get('legal_name', 'clip-it-up')}</strong><br>
-    GSTIN: {seller_cfg.get('gstin', 'N/A')}<br>
-    SAC Code: {seller_cfg.get('sac_code', '998314')}<br>
-    State: {seller_cfg.get('state_name', 'Maharashtra')} ({seller_cfg.get('state_code', '27')})<br>
-    {seller_cfg.get('address_line1', '')}
+    <strong style="font-size: 15px;">{seller_cfg.get("legal_name", "clip-it-up")}</strong><br>
+    GSTIN: {seller_cfg.get("gstin", "N/A")}<br>
+    SAC Code: {seller_cfg.get("sac_code", "998314")}<br>
+    State: {seller_cfg.get("state_name", "Maharashtra")} ({seller_cfg.get("state_code", "27")})<br>
+    {seller_cfg.get("address_line1", "")}
   </div>
 </div>
 
@@ -370,7 +376,7 @@ td {{ padding: 10px; border-bottom: 1px solid #e5e7eb; }}
   <tbody>
     <tr>
       <td>clip-it-up SaaS Subscription Services</td>
-      <td style="text-align: center;">{seller_cfg.get('sac_code', '998314')}</td>
+      <td style="text-align: center;">{seller_cfg.get("sac_code", "998314")}</td>
       <td style="text-align: right;">{invoice.currency} {invoice.taxable_amount:.2f}</td>
       <td style="text-align: right;">{invoice.currency} {invoice.taxable_amount:.2f}</td>
     </tr>
@@ -387,7 +393,7 @@ td {{ padding: 10px; border-bottom: 1px solid #e5e7eb; }}
 
 <div class="footer">
   This is a computer-generated tax document requiring no physical signature.<br>
-  clip-it-up Technologies Private Limited &bull; {seller_cfg.get('support_email', 'billing@clipitup.com')}
+  clip-it-up Technologies Private Limited &bull; {seller_cfg.get("support_email", "billing@clipitup.com")}
 </div>
 </body>
 </html>
@@ -403,6 +409,7 @@ td {{ padding: 10px; border-bottom: 1px solid #e5e7eb; }}
         html_content = cls.generate_invoice_html(invoice, seller_cfg)
         try:
             from weasyprint import HTML
+
             return HTML(string=html_content).write_pdf()
         except Exception:
             pass
@@ -416,11 +423,11 @@ td {{ padding: 10px; border-bottom: 1px solid #e5e7eb; }}
 ({invoice.type.upper()}: {invoice.invoice_number}) Tj
 /F1 11 Tf
 0 -24 Td
-(Date: {invoice.created_at.strftime('%Y-%m-%d')} | FY: {invoice.financial_year}) Tj
+(Date: {invoice.created_at.strftime("%Y-%m-%d")} | FY: {invoice.financial_year}) Tj
 0 -18 Td
 (Customer: {invoice.customer_name} <{invoice.customer_email}>) Tj
 0 -18 Td
-(Place of Supply: {invoice.place_of_supply} | GSTIN: {invoice.customer_gstin or 'None'}) Tj
+(Place of Supply: {invoice.place_of_supply} | GSTIN: {invoice.customer_gstin or "None"}) Tj
 0 -28 Td
 (Taxable Amount: {invoice.currency} {invoice.taxable_amount:.2f}) Tj
 0 -18 Td
@@ -486,51 +493,55 @@ startxref
 
         output = io.StringIO()
         writer = csv.writer(output)
-        writer.writerow([
-            "Invoice Number",
-            "Date",
-            "Financial Year",
-            "Type",
-            "Customer Name",
-            "Customer Email",
-            "Customer GSTIN",
-            "State Code",
-            "Place of Supply",
-            "Taxable Amount",
-            "CGST Rate",
-            "CGST Amount",
-            "SGST Rate",
-            "SGST Amount",
-            "IGST Rate",
-            "IGST Amount",
-            "Total Tax",
-            "Total Amount",
-            "Currency",
-            "Status",
-        ])
+        writer.writerow(
+            [
+                "Invoice Number",
+                "Date",
+                "Financial Year",
+                "Type",
+                "Customer Name",
+                "Customer Email",
+                "Customer GSTIN",
+                "State Code",
+                "Place of Supply",
+                "Taxable Amount",
+                "CGST Rate",
+                "CGST Amount",
+                "SGST Rate",
+                "SGST Amount",
+                "IGST Rate",
+                "IGST Amount",
+                "Total Tax",
+                "Total Amount",
+                "Currency",
+                "Status",
+            ]
+        )
 
         for inv in invoices:
-            writer.writerow([
-                inv.invoice_number,
-                inv.created_at.strftime("%Y-%m-%d"),
-                inv.financial_year,
-                inv.type,
-                inv.customer_name,
-                inv.customer_email,
-                inv.customer_gstin or "",
-                inv.customer_state_code or "",
-                inv.place_of_supply,
-                f"{inv.taxable_amount:.2f}",
-                f"{inv.cgst_rate:.4f}",
-                f"{inv.cgst_amount:.2f}",
-                f"{inv.sgst_rate:.4f}",
-                f"{inv.sgst_amount:.2f}",
-                f"{inv.igst_rate:.4f}",
-                f"{inv.igst_amount:.2f}",
-                f"{inv.total_tax:.2f}",
-                f"{inv.total_amount:.2f}",
-                inv.currency,
-                inv.status,
-            ])
+            writer.writerow(
+                [
+                    inv.invoice_number,
+                    inv.created_at.strftime("%Y-%m-%d"),
+                    inv.financial_year,
+                    inv.type,
+                    inv.customer_name,
+                    inv.customer_email,
+                    inv.customer_gstin or "",
+                    inv.customer_state_code or "",
+                    inv.place_of_supply,
+                    f"{inv.taxable_amount:.2f}",
+                    f"{inv.cgst_rate:.4f}",
+                    f"{inv.cgst_amount:.2f}",
+                    f"{inv.sgst_rate:.4f}",
+                    f"{inv.sgst_amount:.2f}",
+                    f"{inv.igst_rate:.4f}",
+                    f"{inv.igst_amount:.2f}",
+                    f"{inv.total_tax:.2f}",
+                    f"{inv.total_amount:.2f}",
+                    inv.currency,
+                    inv.status,
+                ]
+            )
 
         return output.getvalue()

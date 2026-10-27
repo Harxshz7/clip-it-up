@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime
 
 import pytest
 from httpx import AsyncClient
@@ -9,7 +9,6 @@ from clip_shared.db.base import utc_now
 from clip_shared.db.models import (
     Clip,
     ClipMoment,
-    ScoringRun,
     Transcript,
     TranscriptWord,
     User,
@@ -17,9 +16,7 @@ from clip_shared.db.models import (
 )
 
 
-async def _create_test_clip(
-    db_session: AsyncSession, user_id: uuid.UUID
-) -> tuple[Video, Clip]:
+async def _create_test_clip(db_session: AsyncSession, user_id: uuid.UUID) -> tuple[Video, Clip]:
     vid = uuid.uuid4()
     video = Video(
         id=vid,
@@ -273,11 +270,29 @@ async def test_editor_bulk_and_events_and_metrics(
 
     # 2. Record events
     session_id = str(uuid.uuid4())
-    now_iso = datetime.now(timezone.utc).isoformat()
+    now_iso = datetime.now(UTC).isoformat()
     events_payload = [
-        {"session_id": session_id, "type": "clip_visible", "clip_id": str(clip.id), "payload": {"time": 1000}, "created_at": now_iso},
-        {"session_id": session_id, "type": "delete_word", "clip_id": str(clip.id), "payload": {"word": "world"}, "created_at": now_iso},
-        {"session_id": session_id, "type": "export_click", "clip_id": str(clip.id), "payload": {"preset": "tiktok"}, "created_at": now_iso},
+        {
+            "session_id": session_id,
+            "type": "clip_visible",
+            "clip_id": str(clip.id),
+            "payload": {"time": 1000},
+            "created_at": now_iso,
+        },
+        {
+            "session_id": session_id,
+            "type": "delete_word",
+            "clip_id": str(clip.id),
+            "payload": {"word": "world"},
+            "created_at": now_iso,
+        },
+        {
+            "session_id": session_id,
+            "type": "export_click",
+            "clip_id": str(clip.id),
+            "payload": {"preset": "tiktok"},
+            "created_at": now_iso,
+        },
     ]
     ev_res = await client.post("/editor/events", json={"events": events_payload})
     assert ev_res.status_code == 200

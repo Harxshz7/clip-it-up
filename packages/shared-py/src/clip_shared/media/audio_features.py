@@ -8,6 +8,7 @@ import numpy as np
 
 try:
     import librosa
+
     LIBROSA_AVAILABLE = True
 except ImportError:
     LIBROSA_AVAILABLE = False
@@ -51,9 +52,11 @@ class HeuristicLaughterDetector(LaughterDetector):
                     fft_mag = np.abs(np.fft.rfft(frame))
                     spectral_centroid = float(np.sum(freqs * fft_mag) / (np.sum(fft_mag) + 1e-9))
 
+                frame_rms = float(np.sqrt(np.mean(frame**2))) if len(frame) > 0 else 0.0
+
                 # Laughter typically has moderate-high RMS, high ZCR variations, and mid-high spectral centroid (1500 - 3500 Hz)
-                if rms > 0.02 and zcr > 0.08 and (1200.0 <= spectral_centroid <= 3800.0):
-                    score = min(1.0, (rms * 10.0 + zcr * 2.0 + (spectral_centroid / 4000.0)) / 3.0)
+                if frame_rms > 0.02 and zcr > 0.08 and (1200.0 <= spectral_centroid <= 3800.0):
+                    score = min(1.0, (frame_rms * 10.0 + zcr * 2.0 + (spectral_centroid / 4000.0)) / 3.0)
                     probs[i] = score
         except Exception:
             pass
@@ -64,12 +67,13 @@ class HeuristicLaughterDetector(LaughterDetector):
 @dataclass
 class AudioFeaturesResult:
     """Per-second audio features for an entire video."""
+
     duration_seconds: float
-    rms_energy: np.ndarray             # 1D array, length = duration_s
-    spectral_flux: np.ndarray          # 1D array, length = duration_s
-    pitch_variance: np.ndarray         # 1D array, length = duration_s
-    laughter_prob: np.ndarray          # 1D array, length = duration_s
-    pause_map: list[dict[str, Any]] = field(default_factory=list) # [{start_ms, end_ms, duration_ms}]
+    rms_energy: np.ndarray  # 1D array, length = duration_s
+    spectral_flux: np.ndarray  # 1D array, length = duration_s
+    pitch_variance: np.ndarray  # 1D array, length = duration_s
+    laughter_prob: np.ndarray  # 1D array, length = duration_s
+    pause_map: list[dict[str, Any]] = field(default_factory=list)  # [{start_ms, end_ms, duration_ms}]
     summary: dict[str, Any] = field(default_factory=dict)
 
     def to_npz_bytes(self) -> bytes:
@@ -85,7 +89,13 @@ class AudioFeaturesResult:
         return bio.getvalue()
 
     @classmethod
-    def from_npz_bytes(cls, data: bytes, duration_seconds: float, pause_map: list[dict[str, Any]] | None = None, summary: dict[str, Any] | None = None) -> "AudioFeaturesResult":
+    def from_npz_bytes(
+        cls,
+        data: bytes,
+        duration_seconds: float,
+        pause_map: list[dict[str, Any]] | None = None,
+        summary: dict[str, Any] | None = None,
+    ) -> "AudioFeaturesResult":
         bio = io.BytesIO(data)
         npz = np.load(bio)
         return cls(
@@ -124,7 +134,7 @@ class AudioFeaturesResult:
             overlap_start = max(start_ms, p_start)
             overlap_end = min(end_ms, p_end)
             if overlap_end > overlap_start:
-                pause_duration_ms += (overlap_end - overlap_start)
+                pause_duration_ms += overlap_end - overlap_start
 
         pause_ratio = min(1.0, pause_duration_ms / window_duration_ms)
 
@@ -204,7 +214,7 @@ def extract_audio_features(
             try:
                 stft = np.abs(librosa.stft(chunk, n_fft=min(512, len(chunk)), hop_length=256))
                 if stft.shape[1] > 1:
-                    flux_val = float(np.mean(np.diff(stft, axis=1)**2))
+                    flux_val = float(np.mean(np.diff(stft, axis=1) ** 2))
                 else:
                     flux_val = 0.0
                 sc = librosa.feature.spectral_centroid(y=chunk, sr=sr, hop_length=256)
@@ -241,12 +251,14 @@ def extract_audio_features(
             next_start = word_timings[i + 1].get("start_ms", 0)
             gap_ms = next_start - curr_end
             if gap_ms >= 300:  # Pause threshold: 300ms
-                pause_map.append({
-                    "start_ms": curr_end,
-                    "end_ms": next_start,
-                    "duration_ms": gap_ms,
-                    "is_major_pause": gap_ms >= 700,
-                })
+                pause_map.append(
+                    {
+                        "start_ms": curr_end,
+                        "end_ms": next_start,
+                        "duration_ms": gap_ms,
+                        "is_major_pause": gap_ms >= 700,
+                    }
+                )
 
     summary = {
         "duration_seconds": duration_s,

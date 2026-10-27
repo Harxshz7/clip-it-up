@@ -1,4 +1,5 @@
 """Per-clip 9:16 reframe planner with multi-person tracking, content-aware layouts, and fallback chain."""
+
 from dataclasses import dataclass
 from typing import Any
 
@@ -141,8 +142,7 @@ def plan_clip_reframe(
 
         # Check speaker thumbnail in corners
         has_corner_face = any(
-            is_corner_thumbnail_face(getattr(t, "summary", {}))
-            for t in seg_tracks
+            is_corner_thumbnail_face(getattr(t, "summary", {})) for t in seg_tracks
         ) or content_meta.get("has_speaker_thumbnail", False)
 
         chosen_mode: ReframeMode | None = mode_override  # type: ignore
@@ -153,15 +153,38 @@ def plan_clip_reframe(
         # Mode selection logic
         if not chosen_mode:
             # A. HYBRID PIP OR SCREEN CONTENT WITH SPEAKER THUMBNAIL
-            if (shot_type == "hybrid_pip" or has_corner_face) and (content_meta.get("has_screen_share") or shot_type in ("hybrid_pip", "screen_content", "screen_share_or_slides")):
+            if (shot_type == "hybrid_pip" or has_corner_face) and (
+                content_meta.get("has_screen_share")
+                or shot_type in ("hybrid_pip", "screen_content", "screen_share_or_slides")
+            ):
                 if cfg["enable_pip"] and seg_conf >= 0.70:
                     chosen_mode = "pip"
                     # Create PIP layout
                     seg_layout = ReframeLayout(
                         type="pip",
                         regions=[
-                            LayoutRegion(src_x=0.0, src_y=0.0, src_w=1.0, src_h=1.0, dst_x=0.0, dst_y=0.21875, dst_w=1.0, dst_h=0.5625),
-                            LayoutRegion(src_x=0.82, src_y=0.10, src_w=0.15, src_h=0.15, dst_x=0.68, dst_y=0.12, dst_w=0.28, dst_h=0.16, shape="rounded_rect", corner_radius=12.0),
+                            LayoutRegion(
+                                src_x=0.0,
+                                src_y=0.0,
+                                src_w=1.0,
+                                src_h=1.0,
+                                dst_x=0.0,
+                                dst_y=0.21875,
+                                dst_w=1.0,
+                                dst_h=0.5625,
+                            ),
+                            LayoutRegion(
+                                src_x=0.82,
+                                src_y=0.10,
+                                src_w=0.15,
+                                src_h=0.15,
+                                dst_x=0.68,
+                                dst_y=0.12,
+                                dst_w=0.28,
+                                dst_h=0.16,
+                                shape="rounded_rect",
+                                corner_radius=12.0,
+                            ),
                         ],
                     )
                 else:
@@ -177,20 +200,44 @@ def plan_clip_reframe(
                 if roi_box:
                     roi_h = roi_box[3]
                     effective_font_px = min_font_px * (1920.0 / float(max(0.1, roi_h) * src_h))
-                    if effective_font_px < cfg["min_readability_text_height_px"] or content_meta.get("unreadable_flag_expected"):
+                    if effective_font_px < cfg["min_readability_text_height_px"] or content_meta.get(
+                        "unreadable_flag_expected"
+                    ):
                         has_unreadable_text = True
                         chosen_mode = "content_fit"
                         fallback_reason = "unreadable_text_micro_font"
                         seg_layout = ReframeLayout(
                             type="content_fit",
-                            regions=[LayoutRegion(src_x=0.0, src_y=0.0, src_w=1.0, src_h=1.0, dst_x=0.0, dst_y=0.21875, dst_w=1.0, dst_h=0.5625)],
+                            regions=[
+                                LayoutRegion(
+                                    src_x=0.0,
+                                    src_y=0.0,
+                                    src_w=1.0,
+                                    src_h=1.0,
+                                    dst_x=0.0,
+                                    dst_y=0.21875,
+                                    dst_w=1.0,
+                                    dst_h=0.5625,
+                                )
+                            ],
                         )
                     elif cfg["enable_content_zoom"]:
                         chosen_mode = "content_zoom"
                         snapped_roi = snap_roi_to_text_bounds(roi_box)
                         seg_layout = ReframeLayout(
                             type="content_zoom",
-                            regions=[LayoutRegion(src_x=snapped_roi[0], src_y=snapped_roi[1], src_w=snapped_roi[2], src_h=snapped_roi[3], dst_x=0.0, dst_y=0.0, dst_w=1.0, dst_h=1.0)],
+                            regions=[
+                                LayoutRegion(
+                                    src_x=snapped_roi[0],
+                                    src_y=snapped_roi[1],
+                                    src_w=snapped_roi[2],
+                                    src_h=snapped_roi[3],
+                                    dst_x=0.0,
+                                    dst_y=0.0,
+                                    dst_w=1.0,
+                                    dst_h=1.0,
+                                )
+                            ],
                         )
                     else:
                         chosen_mode = "content_fit"
@@ -200,7 +247,18 @@ def plan_clip_reframe(
                     fallback_reason = "screen_content_full_fit"
                     seg_layout = ReframeLayout(
                         type="content_fit",
-                        regions=[LayoutRegion(src_x=0.0, src_y=0.0, src_w=1.0, src_h=1.0, dst_x=0.0, dst_y=0.21875, dst_w=1.0, dst_h=0.5625)],
+                        regions=[
+                            LayoutRegion(
+                                src_x=0.0,
+                                src_y=0.0,
+                                src_w=1.0,
+                                src_h=1.0,
+                                dst_x=0.0,
+                                dst_y=0.21875,
+                                dst_w=1.0,
+                                dst_h=0.5625,
+                            )
+                        ],
                     )
 
             # C. GROUP / 3+ PERSON PANELS
@@ -219,8 +277,26 @@ def plan_clip_reframe(
                     seg_layout = ReframeLayout(
                         type="split_stack",
                         regions=[
-                            LayoutRegion(src_x=getattr(t0, "summary", {}).get("mean_cx", 0.3) - 0.15, src_y=0.25, src_w=0.30, src_h=0.35, dst_x=0.0, dst_y=0.0, dst_w=1.0, dst_h=0.5),
-                            LayoutRegion(src_x=getattr(t1, "summary", {}).get("mean_cx", 0.7) - 0.15, src_y=0.25, src_w=0.30, src_h=0.35, dst_x=0.0, dst_y=0.5, dst_w=1.0, dst_h=0.5),
+                            LayoutRegion(
+                                src_x=getattr(t0, "summary", {}).get("mean_cx", 0.3) - 0.15,
+                                src_y=0.25,
+                                src_w=0.30,
+                                src_h=0.35,
+                                dst_x=0.0,
+                                dst_y=0.0,
+                                dst_w=1.0,
+                                dst_h=0.5,
+                            ),
+                            LayoutRegion(
+                                src_x=getattr(t1, "summary", {}).get("mean_cx", 0.7) - 0.15,
+                                src_y=0.25,
+                                src_w=0.30,
+                                src_h=0.35,
+                                dst_x=0.0,
+                                dst_y=0.5,
+                                dst_w=1.0,
+                                dst_h=0.5,
+                            ),
                         ],
                     )
                 else:
@@ -231,7 +307,11 @@ def plan_clip_reframe(
             elif shot_type == "two_shot" and len(seg_tracks) == 2:
                 t0_cx = getattr(seg_tracks[0], "summary", {}).get("mean_cx", 0.35)
                 t1_cx = getattr(seg_tracks[1], "summary", {}).get("mean_cx", 0.65)
-                span = abs(t1_cx - t0_cx) + (getattr(seg_tracks[0], "summary", {}).get("mean_w", 0.14) / 2.0) + (getattr(seg_tracks[1], "summary", {}).get("mean_w", 0.14) / 2.0)
+                span = (
+                    abs(t1_cx - t0_cx)
+                    + (getattr(seg_tracks[0], "summary", {}).get("mean_w", 0.14) / 2.0)
+                    + (getattr(seg_tracks[1], "summary", {}).get("mean_w", 0.14) / 2.0)
+                )
 
                 if span <= (crop_w - 0.04):
                     chosen_mode = "balanced"
@@ -250,46 +330,97 @@ def plan_clip_reframe(
             if chosen_mode in ("fit_blur", "content_fit"):
                 seg_layout = ReframeLayout(
                     type="content_fit",
-                    regions=[LayoutRegion(src_x=0.0, src_y=0.0, src_w=1.0, src_h=1.0, dst_x=0.0, dst_y=0.21875, dst_w=1.0, dst_h=0.5625)],
+                    regions=[
+                        LayoutRegion(
+                            src_x=0.0,
+                            src_y=0.0,
+                            src_w=1.0,
+                            src_h=1.0,
+                            dst_x=0.0,
+                            dst_y=0.21875,
+                            dst_w=1.0,
+                            dst_h=0.5625,
+                        )
+                    ],
                 )
             elif chosen_mode == "split_stack":
                 seg_layout = ReframeLayout(
                     type="split_stack",
                     regions=[
-                        LayoutRegion(src_x=0.20, src_y=0.25, src_w=0.30, src_h=0.35, dst_x=0.0, dst_y=0.0, dst_w=1.0, dst_h=0.5),
-                        LayoutRegion(src_x=0.65, src_y=0.25, src_w=0.30, src_h=0.35, dst_x=0.0, dst_y=0.5, dst_w=1.0, dst_h=0.5),
+                        LayoutRegion(
+                            src_x=0.20, src_y=0.25, src_w=0.30, src_h=0.35, dst_x=0.0, dst_y=0.0, dst_w=1.0, dst_h=0.5
+                        ),
+                        LayoutRegion(
+                            src_x=0.65, src_y=0.25, src_w=0.30, src_h=0.35, dst_x=0.0, dst_y=0.5, dst_w=1.0, dst_h=0.5
+                        ),
                     ],
                 )
             elif chosen_mode == "stack":
                 seg_layout = ReframeLayout(
                     type="stack",
                     regions=[
-                        LayoutRegion(src_x=0.0, src_y=0.0, src_w=1.0, src_h=0.60, dst_x=0.0, dst_y=0.0, dst_w=1.0, dst_h=0.60),
-                        LayoutRegion(src_x=0.35, src_y=0.25, src_w=0.30, src_h=0.40, dst_x=0.0, dst_y=0.60, dst_w=1.0, dst_h=0.40),
+                        LayoutRegion(
+                            src_x=0.0, src_y=0.0, src_w=1.0, src_h=0.60, dst_x=0.0, dst_y=0.0, dst_w=1.0, dst_h=0.60
+                        ),
+                        LayoutRegion(
+                            src_x=0.35, src_y=0.25, src_w=0.30, src_h=0.40, dst_x=0.0, dst_y=0.60, dst_w=1.0, dst_h=0.40
+                        ),
                     ],
                 )
             elif chosen_mode == "pip":
                 seg_layout = ReframeLayout(
                     type="pip",
                     regions=[
-                        LayoutRegion(src_x=0.0, src_y=0.0, src_w=1.0, src_h=1.0, dst_x=0.0, dst_y=0.21875, dst_w=1.0, dst_h=0.5625),
-                        LayoutRegion(src_x=0.82, src_y=0.10, src_w=0.15, src_h=0.15, dst_x=0.68, dst_y=0.12, dst_w=0.28, dst_h=0.16, shape="rounded_rect"),
+                        LayoutRegion(
+                            src_x=0.0,
+                            src_y=0.0,
+                            src_w=1.0,
+                            src_h=1.0,
+                            dst_x=0.0,
+                            dst_y=0.21875,
+                            dst_w=1.0,
+                            dst_h=0.5625,
+                        ),
+                        LayoutRegion(
+                            src_x=0.82,
+                            src_y=0.10,
+                            src_w=0.15,
+                            src_h=0.15,
+                            dst_x=0.68,
+                            dst_y=0.12,
+                            dst_w=0.28,
+                            dst_h=0.16,
+                            shape="rounded_rect",
+                        ),
                     ],
                 )
             else:
                 seg_layout = ReframeLayout(
                     type="crop",
-                    regions=[LayoutRegion(src_x=0.5 - crop_w / 2.0, src_y=0.0, src_w=crop_w, src_h=crop_h, dst_x=0.0, dst_y=0.0, dst_w=1.0, dst_h=1.0)],
+                    regions=[
+                        LayoutRegion(
+                            src_x=0.5 - crop_w / 2.0,
+                            src_y=0.0,
+                            src_w=crop_w,
+                            src_h=crop_h,
+                            dst_x=0.0,
+                            dst_y=0.0,
+                            dst_w=1.0,
+                            dst_h=1.0,
+                        )
+                    ],
                 )
 
-        reframe_segments.append(ReframeSegment(
-            start_ms=seg_start,
-            end_ms=seg_end,
-            mode=chosen_mode,
-            confidence=seg_conf,
-            fallback_reason=fallback_reason,
-            layout=seg_layout,
-        ))
+        reframe_segments.append(
+            ReframeSegment(
+                start_ms=seg_start,
+                end_ms=seg_end,
+                mode=chosen_mode,
+                confidence=seg_conf,
+                fallback_reason=fallback_reason,
+                layout=seg_layout,
+            )
+        )
         overall_confidences.append(seg_conf)
 
         if fallback_reason and not primary_fallback_reason:
@@ -413,7 +544,9 @@ def plan_clip_reframe(
         reaction_cutaway=has_reaction_cutaway,
         ping_pong_prevented=has_ping_pong_prevented,
         fallback_reason=primary_fallback_reason,
-        suggested_fix="Switch to Fit (content_fit)" if (has_face_cut_risk or mean_conf < 0.65 or has_unreadable_text) else None,
+        suggested_fix="Switch to Fit (content_fit)"
+        if (has_face_cut_risk or mean_conf < 0.65 or has_unreadable_text)
+        else None,
     )
 
     crop_path = ReframeCropPath(

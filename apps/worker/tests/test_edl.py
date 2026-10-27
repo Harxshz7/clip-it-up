@@ -1,4 +1,3 @@
-
 from clip_shared.media.edl import EditDecisionList
 
 
@@ -58,7 +57,7 @@ def test_edl_single_middle_removal():
 
     # Test clamped time map
     assert edl.src_to_out_clamped(5000) == 4000  # Clamped to cut boundary
-    assert edl.out_to_src(4000) == 6000          # Cut seam maps to next keep segment start
+    assert edl.out_to_src(4000) == 6000  # Cut seam maps to next keep segment start
     assert edl.out_to_src(5000) == 7000
 
 
@@ -104,8 +103,8 @@ def test_edl_removals_out_of_bounds():
     """Verify removals completely outside clip range are filtered or clamped."""
     removals = [
         {"start_ms": -5000, "end_ms": -100, "kind": "silence"},  # Outside left
-        {"start_ms": 20000, "end_ms": 30000, "kind": "filler"}, # Outside right
-        {"start_ms": 4000, "end_ms": 6000, "kind": "filler"},   # Valid inside
+        {"start_ms": 20000, "end_ms": 30000, "kind": "filler"},  # Outside right
+        {"start_ms": 4000, "end_ms": 6000, "kind": "filler"},  # Valid inside
     ]
     edl = EditDecisionList.create(clip_start_ms=1000, clip_end_ms=10000, removals=removals)
     assert len(edl.removals) == 1
@@ -151,7 +150,7 @@ def test_edl_remap_words():
     """Verify word timestamp remapping through EDL."""
     words = [
         {"text": "Hello", "start_ms": 1000, "end_ms": 1500},
-        {"text": "um", "start_ms": 2000, "end_ms": 2500},      # in removal
+        {"text": "um", "start_ms": 2000, "end_ms": 2500},  # in removal
         {"text": "world", "start_ms": 3000, "end_ms": 3600},
     ]
     edl = EditDecisionList.create(

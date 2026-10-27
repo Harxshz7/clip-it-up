@@ -16,7 +16,6 @@ from clip_shared.db.models import (
     Project,
     ScoringRun,
     Transcript,
-    TranscriptSegment,
     TranscriptWord,
     User,
     UserPlan,
@@ -37,20 +36,20 @@ DEFAULT_CAPTION_STYLES = [
             "font_weight": "900",
             "font_size_pt": 68,
             "uppercase": True,
-            "primary_color": "&H00FFFFFF",      # ASS format: &HAABBGGRR (White)
-            "highlight_color": "&H0000E6FF",    # Yellow in BGR (&H0000E6FF)
-            "outline_color": "&H00000000",      # Black
+            "primary_color": "&H00FFFFFF",  # ASS format: &HAABBGGRR (White)
+            "highlight_color": "&H0000E6FF",  # Yellow in BGR (&H0000E6FF)
+            "outline_color": "&H00000000",  # Black
             "outline_width": 5.5,
             "shadow_color": "&H80000000",
             "shadow_offset": 2.0,
-            "alignment": 2,                     # Bottom Center
+            "alignment": 2,  # Bottom Center
             "margin_v": 280,
             "margin_h": 60,
             "max_chars_per_line": 24,
             "max_lines": 2,
             "words_per_chunk": 3,
             "min_duration_ms": 250,
-            "animation": "pop",                 # pop scale-in on active word
+            "animation": "pop",  # pop scale-in on active word
             "highlight_style": "word_scale_color",
             "safe_zone_anchor": "bottom",
         },
@@ -66,7 +65,7 @@ DEFAULT_CAPTION_STYLES = [
             "font_size_pt": 52,
             "uppercase": False,
             "primary_color": "&H00FFFFFF",
-            "highlight_color": "&H00F8BD38",    # Cyan / Sky accent in BGR
+            "highlight_color": "&H00F8BD38",  # Cyan / Sky accent in BGR
             "outline_color": "&H00111111",
             "outline_width": 2.0,
             "shadow_color": "&H90000000",
@@ -93,8 +92,8 @@ DEFAULT_CAPTION_STYLES = [
             "font_weight": "800",
             "font_size_pt": 62,
             "uppercase": True,
-            "primary_color": "&H00CCCCCC",      # Dimmed white / light gray for inactive
-            "highlight_color": "&H0000CCFF",    # Amber/Yellow for active
+            "primary_color": "&H00CCCCCC",  # Dimmed white / light gray for inactive
+            "highlight_color": "&H0000CCFF",  # Amber/Yellow for active
             "outline_color": "&H00000000",
             "outline_width": 4.5,
             "shadow_color": "&H80000000",
@@ -106,7 +105,7 @@ DEFAULT_CAPTION_STYLES = [
             "max_lines": 2,
             "words_per_chunk": 4,
             "min_duration_ms": 250,
-            "animation": "karaoke",             # \k tags timing
+            "animation": "karaoke",  # \k tags timing
             "highlight_style": "karaoke_sweep",
             "safe_zone_anchor": "bottom",
         },
@@ -363,9 +362,18 @@ def seed_database():
         # 7. App Config Flags
         default_flags = {
             "INVITE_ONLY": {"enabled": False, "description": "Gate signup behind invite codes for soft launch"},
-            "PROVIDER_STRIPE_ENABLED": {"enabled": False, "description": "Enable Stripe USD subscriptions alongside Razorpay"},
-            "GST_ENABLED": {"enabled": False, "description": "Issue tax invoices with GSTIN and CGST/SGST/IGST breakdown"},
-            "CAPTCHA_ENABLED": {"enabled": False, "description": "Enable Cloudflare Turnstile on public signup and review forms"},
+            "PROVIDER_STRIPE_ENABLED": {
+                "enabled": False,
+                "description": "Enable Stripe USD subscriptions alongside Razorpay",
+            },
+            "GST_ENABLED": {
+                "enabled": False,
+                "description": "Issue tax invoices with GSTIN and CGST/SGST/IGST breakdown",
+            },
+            "CAPTCHA_ENABLED": {
+                "enabled": False,
+                "description": "Enable Cloudflare Turnstile on public signup and review forms",
+            },
             "TOPUPS_ENABLED": {"enabled": True, "description": "Allow purchasing one-off top-up minute packs"},
             "SHOW_WHY_CHOSEN": {"enabled": True, "description": "Show AI reasoning tags on clips in frontend"},
             "MAINTENANCE_MODE": {"enabled": False, "description": "Show read-only maintenance notice across web UI"},
@@ -440,26 +448,42 @@ def seed_database():
 
             # Add sample words
             sample_words = [
-                ("The", 0, 200), ("biggest", 210, 500), ("mistake", 510, 850),
-                ("founders", 860, 1200), ("make", 1210, 1500), ("is", 1510, 1650),
-                ("building", 1660, 2100), ("features", 2110, 2500), ("nobody", 2510, 2900),
-                ("asked", 2910, 3200), ("for.", 3210, 3600), ("Talk", 3700, 4000),
-                ("to", 4010, 4100), ("ten", 4110, 4400), ("customers", 4410, 4900),
-                ("before", 4910, 5300), ("writing", 5310, 5700), ("a", 5710, 5800),
-                ("single", 5810, 6200), ("line", 6210, 6500), ("of", 6510, 6650),
+                ("The", 0, 200),
+                ("biggest", 210, 500),
+                ("mistake", 510, 850),
+                ("founders", 860, 1200),
+                ("make", 1210, 1500),
+                ("is", 1510, 1650),
+                ("building", 1660, 2100),
+                ("features", 2110, 2500),
+                ("nobody", 2510, 2900),
+                ("asked", 2910, 3200),
+                ("for.", 3210, 3600),
+                ("Talk", 3700, 4000),
+                ("to", 4010, 4100),
+                ("ten", 4110, 4400),
+                ("customers", 4410, 4900),
+                ("before", 4910, 5300),
+                ("writing", 5310, 5700),
+                ("a", 5710, 5800),
+                ("single", 5810, 6200),
+                ("line", 6210, 6500),
+                ("of", 6510, 6650),
                 ("code.", 6660, 7100),
             ]
             for idx, (w, s, e) in enumerate(sample_words):
-                db.add(TranscriptWord(
-                    id=uuid.uuid4(),
-                    transcript_id=demo_transcript.id,
-                    idx=idx,
-                    word=w,
-                    start_ms=s,
-                    end_ms=e,
-                    speaker="SPEAKER_00",
-                    confidence=0.98,
-                ))
+                db.add(
+                    TranscriptWord(
+                        id=uuid.uuid4(),
+                        transcript_id=demo_transcript.id,
+                        idx=idx,
+                        word=w,
+                        start_ms=s,
+                        end_ms=e,
+                        speaker="SPEAKER_00",
+                        confidence=0.98,
+                    )
+                )
 
             # Add Scoring Run
             scoring_run = ScoringRun(
@@ -481,19 +505,25 @@ def seed_database():
                 (
                     "The #1 Mistake First-Time Founders Make",
                     "Talk to 10 customers before writing code",
-                    0, 28000, 0.94,
+                    0,
+                    28000,
+                    0.94,
                     "High emotional punchline, immediate actionable advice for founders.",
                 ),
                 (
                     "Why Retention Beats Acquisition Every Single Time",
                     "A leaky bucket will kill your SaaS faster than competitors",
-                    45000, 72000, 0.89,
+                    45000,
+                    72000,
+                    0.89,
                     "Clear hook contrast between vanity signups and paying retention.",
                 ),
                 (
                     "The 1,000 True Fans Playbook for Modern Creators",
                     "You don't need millions of followers to make a great living",
-                    90000, 118000, 0.86,
+                    90000,
+                    118000,
+                    0.86,
                     "Strong contrarian take on audience size vs monetization depth.",
                 ),
             ]
@@ -530,58 +560,66 @@ def seed_database():
                 db.flush()
 
                 # Add Reframe
-                db.add(ClipReframe(
-                    id=uuid.uuid4(),
-                    clip_id=clip.id,
-                    analysis_version="v1",
-                    mode="speaker_track",
-                    crop_path={"keyframes": [{"t_ms": 0, "cx": 0.5, "cy": 0.5, "w": 0.5625, "h": 1.0}]},
-                    confidence=0.96,
-                    flags={},
-                    source="auto",
-                ))
+                db.add(
+                    ClipReframe(
+                        id=uuid.uuid4(),
+                        clip_id=clip.id,
+                        analysis_version="v1",
+                        mode="speaker_track",
+                        crop_path={"keyframes": [{"t_ms": 0, "cx": 0.5, "cy": 0.5, "w": 0.5625, "h": 1.0}]},
+                        confidence=0.96,
+                        flags={},
+                        source="auto",
+                    )
+                )
 
                 # Add Caption
-                db.add(ClipCaption(
-                    id=uuid.uuid4(),
-                    clip_id=clip.id,
-                    version="v1",
-                    language="en",
-                    words=[{"text": w, "start_ms": s, "end_ms": e, "deleted": False} for w, s, e in sample_words],
-                    style_key="bold_pop",
-                    style_overrides={},
-                    source="auto",
-                ))
+                db.add(
+                    ClipCaption(
+                        id=uuid.uuid4(),
+                        clip_id=clip.id,
+                        version="v1",
+                        language="en",
+                        words=[{"text": w, "start_ms": s, "end_ms": e, "deleted": False} for w, s, e in sample_words],
+                        style_key="bold_pop",
+                        style_overrides={},
+                        source="auto",
+                    )
+                )
 
                 # Add Edit Doc
-                db.add(ClipEdit(
-                    id=uuid.uuid4(),
-                    clip_id=clip.id,
-                    user_id=user.id,
-                    version=1,
-                    doc={
-                        "version": 1,
-                        "clip_id": str(clip.id),
-                        "video_id": str(demo_vid_id),
-                        "source_range": {"start_ms": start_ms, "end_ms": end_ms},
-                        "removals": [],
-                        "captions": {
-                            "style_key": "bold_pop",
-                            "words": [{"text": w, "start_ms": s, "end_ms": e, "deleted": False} for w, s, e in sample_words],
+                db.add(
+                    ClipEdit(
+                        id=uuid.uuid4(),
+                        clip_id=clip.id,
+                        user_id=user.id,
+                        version=1,
+                        doc={
+                            "version": 1,
+                            "clip_id": str(clip.id),
+                            "video_id": str(demo_vid_id),
+                            "source_range": {"start_ms": start_ms, "end_ms": end_ms},
+                            "removals": [],
+                            "captions": {
+                                "style_key": "bold_pop",
+                                "words": [
+                                    {"text": w, "start_ms": s, "end_ms": e, "deleted": False}
+                                    for w, s, e in sample_words
+                                ],
+                            },
+                            "reframe": {
+                                "mode": "speaker_track",
+                                "keyframes": [{"t_ms": 0, "cx": 0.5, "cy": 0.5, "w": 0.5625, "h": 1.0}],
+                            },
                         },
-                        "reframe": {
-                            "mode": "speaker_track",
-                            "keyframes": [{"t_ms": 0, "cx": 0.5, "cy": 0.5, "w": 0.5625, "h": 1.0}],
-                        },
-                    },
-                    label="Initial Scored Clip",
-                    is_checkpoint=True,
-                ))
+                        label="Initial Scored Clip",
+                        is_checkpoint=True,
+                    )
+                )
 
             print(f"Seeded demo sample video: {demo_video.id} with 3 scored clips")
 
         db.commit()
-
 
 
 if __name__ == "__main__":

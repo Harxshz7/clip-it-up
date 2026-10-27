@@ -1,4 +1,5 @@
 """Tests for Auto-Variants API routes: generation, batch export, metrics, zip download, and deletion purge."""
+
 import io
 import uuid
 import zipfile
@@ -310,6 +311,7 @@ async def test_supervisor_account_deletion_purges_brand_and_variants(db_session:
     from unittest.mock import MagicMock
 
     from clip_shared.storage.s3 import get_s3_client
+
     s3 = get_s3_client()
     s3.delete_object = MagicMock()
     s3.delete_object(b_asset.storage_key)

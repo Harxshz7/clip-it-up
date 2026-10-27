@@ -140,7 +140,6 @@ async def deep_health_check(db: AsyncSession = Depends(get_db)) -> JSONResponse:
 
     # 5. Worker Heartbeats & Active Jobs
     try:
-        from clip_shared.db.models import Job
         active_jobs_res = await db.execute(text("SELECT count(*) FROM jobs WHERE status = 'running'"))
         active_jobs = active_jobs_res.scalar() or 0
         diagnostics["subsystems"]["workers"] = {
@@ -153,4 +152,3 @@ async def deep_health_check(db: AsyncSession = Depends(get_db)) -> JSONResponse:
     code = status.HTTP_200_OK if is_healthy else status.HTTP_503_SERVICE_UNAVAILABLE
     diagnostics["status"] = "ok" if is_healthy else "degraded"
     return JSONResponse(status_code=code, content=diagnostics)
-

@@ -137,6 +137,7 @@ async def http_exception_handler(request: Request, exc: HTTPException):
 
 from fastapi.encoders import jsonable_encoder
 
+
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     return JSONResponse(

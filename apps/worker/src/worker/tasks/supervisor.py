@@ -4,24 +4,18 @@ from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from celery import shared_task
-from sqlalchemy import desc, select
 
 from clip_shared.billing.quota import QuotaService
 from clip_shared.config import get_settings
 from clip_shared.db.base import utc_now
 from clip_shared.db.models import (
     BrandAsset,
-    BrandKit,
-    ClipVariant,
     DeadLetterJob,
     DeletionAudit,
     Job,
     JobStage,
-    Plan,
     ReviewSession,
     User,
-    UserPlan,
-    VariantSet,
     Video,
 )
 from clip_shared.db.session import get_sync_db
@@ -79,6 +73,7 @@ def supervise_stuck_jobs() -> dict[str, Any]:
 
                 queue = STAGE_QUEUES.get(current_stage, "cpu")
                 from worker.tasks.pipeline import run_stage
+
                 run_stage.apply_async(args=[str(job.id), current_stage], queue=queue)
 
                 logger.warning(
@@ -125,6 +120,7 @@ def supervise_stuck_jobs() -> dict[str, Any]:
                 db.flush()
                 all_stages = db.query(JobStage).filter(JobStage.job_id == job.id).all()
                 from worker.tasks.pipeline import build_job_event_payload
+
                 publish_job_event_sync(str(job.id), build_job_event_payload(job, all_stages))
 
                 logger.error(
@@ -159,9 +155,7 @@ def cleanup_retention_and_expired_data() -> dict[str, Any]:
     with get_sync_db() as db:
         # 1. Close expired creator review sessions
         expired_sessions = (
-            db.query(ReviewSession)
-            .filter(ReviewSession.status == "open", ReviewSession.expires_at < now)
-            .all()
+            db.query(ReviewSession).filter(ReviewSession.status == "open", ReviewSession.expires_at < now).all()
         )
         for sess in expired_sessions:
             sess.status = "closed"
@@ -170,9 +164,7 @@ def cleanup_retention_and_expired_data() -> dict[str, Any]:
 
         # 2. Check users with expired 7-day deletion grace period
         due_deletions = (
-            db.query(User)
-            .filter(User.deletion_scheduled_at != None, User.deletion_scheduled_at <= now)
-            .all()
+            db.query(User).filter(User.deletion_scheduled_at != None, User.deletion_scheduled_at <= now).all()
         )
         for del_user in due_deletions:
             # Audit record

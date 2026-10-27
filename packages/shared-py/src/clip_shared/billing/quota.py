@@ -1,7 +1,6 @@
 import uuid
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
-from typing import Any
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -20,7 +19,6 @@ from clip_shared.db.models import (
     Plan,
     QuotaLedger,
     TopUp,
-    User,
     UserPlan,
 )
 
@@ -60,7 +58,9 @@ class QuotaService:
 
         plan_key = user_plan.plan_key if user_plan else "free"
         now = datetime.now(UTC)
-        period_start = user_plan.period_start if user_plan else now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        period_start = (
+            user_plan.period_start if user_plan else now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        )
         period_end = user_plan.period_end if (user_plan and user_plan.period_end) else period_start + timedelta(days=30)
 
         # Plan details
@@ -105,10 +105,13 @@ class QuotaService:
         return int(res.scalar() or 0)
 
     @classmethod
-    async def get_monthly_usage_stats(cls, db: AsyncSession, user_id: uuid.UUID, period_start: datetime) -> tuple[float, int, int]:
+    async def get_monthly_usage_stats(
+        cls, db: AsyncSession, user_id: uuid.UUID, period_start: datetime
+    ) -> tuple[float, int, int]:
         """Compute used source minutes, reserved minutes, and used exports in current period."""
         # 1. Used source minutes from usage table
         from clip_shared.db.models import Usage
+
         src_stmt = select(func.coalesce(func.sum(Usage.quantity), Decimal("0.00"))).where(
             Usage.user_id == user_id,
             Usage.metric == "source_minutes",
@@ -272,9 +275,11 @@ class QuotaService:
         if latest is not None:
             return Decimal(str(latest[0]))
 
-        total = db.query(func.coalesce(func.sum(QuotaLedger.delta_minutes), Decimal("0.0000"))).filter(
-            QuotaLedger.user_id == user_id
-        ).scalar()
+        total = (
+            db.query(func.coalesce(func.sum(QuotaLedger.delta_minutes), Decimal("0.0000")))
+            .filter(QuotaLedger.user_id == user_id)
+            .scalar()
+        )
         return Decimal(str(total or "0.0000"))
 
     @classmethod

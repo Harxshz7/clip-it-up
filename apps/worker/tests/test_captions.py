@@ -1,4 +1,3 @@
-
 from clip_shared.db.seed import DEFAULT_CAPTION_STYLES
 from clip_shared.media.captions import (
     chunk_words_into_lines,
@@ -43,10 +42,10 @@ def test_detect_emphasis_words():
     words = [
         {"text": "You", "start_ms": 0, "end_ms": 200},
         {"text": "will", "start_ms": 200, "end_ms": 400},
-        {"text": "never", "start_ms": 400, "end_ms": 800},   # Strong word
+        {"text": "never", "start_ms": 400, "end_ms": 800},  # Strong word
         {"text": "believe", "start_ms": 800, "end_ms": 1100},
         {"text": "this", "start_ms": 1100, "end_ms": 1300},
-        {"text": "100", "start_ms": 1300, "end_ms": 1600},    # Number
+        {"text": "100", "start_ms": 1300, "end_ms": 1600},  # Number
         {"text": "percent", "start_ms": 1600, "end_ms": 1900},
     ]
 
@@ -139,5 +138,5 @@ def test_caption_safe_zone_structural_bounds():
     for style in DEFAULT_CAPTION_STYLES:
         spec = style["spec"]
         assert spec["margin_v"] >= 200  # Stays above TikTok/Reels UI
-        assert spec["margin_h"] >= 40   # 5% side margins
+        assert spec["margin_h"] >= 40  # 5% side margins
         assert spec["max_chars_per_line"] <= 40  # Prevents overflowing 1080px width

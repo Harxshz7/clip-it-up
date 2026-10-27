@@ -1,4 +1,5 @@
 """Filler word and silence detection, cut snapping, and cleanup planner."""
+
 import re
 from dataclasses import dataclass
 from typing import Any
@@ -136,7 +137,9 @@ def detect_filler_removals(
         for seq in multi_fillers:
             k = len(seq)
             if i + k <= n:
-                candidate_tokens = [_clean_token(words[i + j].get("text", words[i + j].get("word", ""))) for j in range(k)]
+                candidate_tokens = [
+                    _clean_token(words[i + j].get("text", words[i + j].get("word", ""))) for j in range(k)
+                ]
                 if candidate_tokens == seq:
                     seq_start = int(words[i].get("start_ms", 0))
                     seq_end = int(words[i + k - 1].get("end_ms", 0))
@@ -296,6 +299,7 @@ def snap_cut_point(
 @dataclass
 class CleanupPlanResult:
     """Result of analyzing and planning clip cleanup."""
+
     clip_start_ms: int
     clip_end_ms: int
     options: dict[str, Any]
@@ -379,9 +383,7 @@ def plan_clip_cleanup(
             s_start = snap_cut_point(r.start_ms, audio_data)
             s_end = snap_cut_point(r.end_ms, audio_data)
             if s_end > s_start:
-                snapped_removals.append(
-                    Removal(start_ms=s_start, end_ms=s_end, kind=r.kind, text=r.text)
-                )
+                snapped_removals.append(Removal(start_ms=s_start, end_ms=s_end, kind=r.kind, text=r.text))
         candidate_removals = snapped_removals
 
     # 5. Enforce 25% safety cap if total removal exceeds threshold

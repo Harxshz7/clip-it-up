@@ -1,4 +1,5 @@
 """Lazy reframe generation service linking VideoAnalysis, FaceTracks, and ClipReframe persistence."""
+
 import uuid
 from typing import Any
 

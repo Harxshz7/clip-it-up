@@ -214,7 +214,12 @@ async def complete_multipart(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={"error": {"code": "MULTIPART_COMPLETE_FAILED", "message": f"Failed to complete multipart upload: {str(e)}"}},
+            detail={
+                "error": {
+                    "code": "MULTIPART_COMPLETE_FAILED",
+                    "message": f"Failed to complete multipart upload: {str(e)}",
+                }
+            },
         ) from e
 
     return {"status": "multipart_completed", "video_id": str(video_id)}
@@ -311,6 +316,7 @@ async def complete_video_upload(
     # Enqueue Celery pipeline task
     try:
         from worker.celery_app import celery_app
+
         celery_app.send_task("worker.tasks.pipeline.start_pipeline", args=[str(job.id)])
     except Exception:
         # Log warning if celery broker is offline during unit testing
@@ -561,7 +567,11 @@ async def export_transcript(
     speakers_map = {s.label: s.display_name or s.label for s in speakers}
 
     # Fetch segments
-    seg_stmt = select(TranscriptSegment).where(TranscriptSegment.transcript_id == transcript.id).order_by(TranscriptSegment.idx)
+    seg_stmt = (
+        select(TranscriptSegment)
+        .where(TranscriptSegment.transcript_id == transcript.id)
+        .order_by(TranscriptSegment.idx)
+    )
     seg_res = await db.execute(seg_stmt)
     segments = seg_res.scalars().all()
 
@@ -592,7 +602,9 @@ async def export_transcript(
         content = export_vtt(segment_items, speakers_map=speakers_map)
     elif format == "json":
         # Fetch words for json
-        w_stmt = select(TranscriptWord).where(TranscriptWord.transcript_id == transcript.id).order_by(TranscriptWord.idx)
+        w_stmt = (
+            select(TranscriptWord).where(TranscriptWord.transcript_id == transcript.id).order_by(TranscriptWord.idx)
+        )
         w_res = await db.execute(w_stmt)
         words = w_res.scalars().all()
         word_items = [

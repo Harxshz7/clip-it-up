@@ -45,7 +45,9 @@ async def get_clerk_jwks() -> dict[str, Any]:
                 return _jwks_cache
             raise HTTPException(
                 status_code=503,
-                detail={"error": {"code": "AUTH_JWKS_UNAVAILABLE", "message": f"Unable to reach auth provider: {str(e)}"}},
+                detail={
+                    "error": {"code": "AUTH_JWKS_UNAVAILABLE", "message": f"Unable to reach auth provider: {str(e)}"}
+                },
             ) from e
 
 
@@ -70,7 +72,12 @@ async def get_current_user(
         if settings.ENVIRONMENT != "development":
             raise HTTPException(
                 status_code=403,
-                detail={"error": {"code": "DEV_BYPASS_FORBIDDEN", "message": "Dev auth bypass is forbidden outside development environment."}},
+                detail={
+                    "error": {
+                        "code": "DEV_BYPASS_FORBIDDEN",
+                        "message": "Dev auth bypass is forbidden outside development environment.",
+                    }
+                },
             )
 
         dev_user_id = uuid.UUID(settings.DEV_USER_ID)

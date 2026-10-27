@@ -94,6 +94,7 @@ class LLMClient:
 
         # Live Anthropic API Call
         import anthropic
+
         client = anthropic.Anthropic(api_key=self.api_key)
 
         for attempt in range(max_retries):
@@ -109,7 +110,8 @@ class LLMClient:
                 response = client.messages.create(
                     model=model,
                     max_tokens=2048,
-                    system=system_prompt or "You are a precise video virality scoring system. Always output accurate structured JSON.",
+                    system=system_prompt
+                    or "You are a precise video virality scoring system. Always output accurate structured JSON.",
                     tools=[tool_schema],
                     tool_choice={"type": "tool", "name": "submit_score"},
                     messages=messages,
@@ -158,6 +160,7 @@ class LLMClient:
         if schema == Pass1BatchResponse:
             # Extract candidate ids like [cand_0]
             import re
+
             ids = re.findall(r"\[([a-zA-Z0-9_\-]+)\]", prompt)
             if not ids:
                 ids = ["cand_0", "cand_1", "cand_2"]
@@ -167,15 +170,18 @@ class LLMClient:
                 # Deterministic scoring based on hash
                 h_val = int(hashlib.md5(cid.encode("utf-8")).hexdigest()[:4], 16)
                 score = round(4.0 + (h_val % 60) / 10.0, 1)  # 4.0 to 10.0
-                scores.append(Pass1CoarseScore(
-                    id=cid,
-                    coarse_score=score,
-                    reason=f"Strong hook and clear narrative arc in segment {i+1}.",
-                ))
+                scores.append(
+                    Pass1CoarseScore(
+                        id=cid,
+                        coarse_score=score,
+                        reason=f"Strong hook and clear narrative arc in segment {i + 1}.",
+                    )
+                )
             return Pass1BatchResponse(scores=scores), in_tok, out_tok
 
         elif schema == Pass2CandidateScore:
             import re
+
             id_match = re.search(r"ID:\s*([a-zA-Z0-9_\-]+)", prompt)
             candidate_id = id_match.group(1) if id_match else "cand_0"
 
@@ -185,7 +191,9 @@ class LLMClient:
 
             # Extract first sentence for hook
             lines = prompt.split('Transcript:\n"')
-            trans_text = lines[1].split('"\n')[0] if len(lines) > 1 else "Why do most startups fail in their first year?"
+            trans_text = (
+                lines[1].split('"\n')[0] if len(lines) > 1 else "Why do most startups fail in their first year?"
+            )
             first_sentence = trans_text.split(".")[0].split("?")[0] + ("?" if "?" in trans_text else ".")
 
             h_val = int(hashlib.md5(trans_text.encode("utf-8")).hexdigest()[:4], 16)

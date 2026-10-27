@@ -57,10 +57,7 @@ def select_top_moments(
         if cand_score < diversity_score_override:
             bucket_start = (cand_start // window_ms) * window_ms
             bucket_end = bucket_start + window_ms
-            clips_in_bucket = sum(
-                1 for s in selected
-                if not (s["end_ms"] < bucket_start or s["start_ms"] > bucket_end)
-            )
+            clips_in_bucket = sum(1 for s in selected if not (s["end_ms"] < bucket_start or s["start_ms"] > bucket_end))
             if clips_in_bucket >= max_clips_per_window:
                 continue
 

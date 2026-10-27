@@ -1,7 +1,8 @@
 """FFmpeg filtergraph generator for 9:16 vertical cropping, multi-person split_stack, pip, stack, and fit_blur rendering."""
+
 from typing import Any
 
-from clip_shared.schemas.reframe import ReframeCropPath, ReframeKeyframe, ReframeLayout
+from clip_shared.schemas.reframe import ReframeCropPath, ReframeKeyframe
 
 
 def np_clip(val: float, low: float, high: float) -> float:
@@ -47,7 +48,9 @@ def crop_path_to_ffmpeg_filter(
     regions = []
     if layout_data:
         layout_type = layout_data.get("type") if isinstance(layout_data, dict) else getattr(layout_data, "type", None)
-        regions = layout_data.get("regions", []) if isinstance(layout_data, dict) else getattr(layout_data, "regions", [])
+        regions = (
+            layout_data.get("regions", []) if isinstance(layout_data, dict) else getattr(layout_data, "regions", [])
+        )
 
     active_mode = layout_type or mode
 
@@ -58,8 +61,14 @@ def crop_path_to_ffmpeg_filter(
         if len(regions) >= 2:
             r0 = regions[0] if isinstance(regions[0], dict) else regions[0].model_dump()
             r1 = regions[1] if isinstance(regions[1], dict) else regions[1].model_dump()
-            t_cx, t_cy = r0.get("src_x", 0.35) + r0.get("src_w", 0.3) / 2.0, r0.get("src_y", 0.35) + r0.get("src_h", 0.3) / 2.0
-            b_cx, b_cy = r1.get("src_x", 0.65) + r1.get("src_w", 0.3) / 2.0, r1.get("src_y", 0.35) + r1.get("src_h", 0.3) / 2.0
+            t_cx, t_cy = (
+                r0.get("src_x", 0.35) + r0.get("src_w", 0.3) / 2.0,
+                r0.get("src_y", 0.35) + r0.get("src_h", 0.3) / 2.0,
+            )
+            b_cx, b_cy = (
+                r1.get("src_x", 0.65) + r1.get("src_w", 0.3) / 2.0,
+                r1.get("src_y", 0.35) + r1.get("src_h", 0.3) / 2.0,
+            )
         else:
             t_cx, t_cy = 0.35, 0.40
             b_cx, b_cy = 0.65, 0.40
@@ -70,8 +79,10 @@ def crop_path_to_ffmpeg_filter(
         sub_w_px = int(round(src_h * sub_aspect * (720 / 1280.0)))  # proportional
         sub_w_px = min(src_w, max(120, int(src_w * 0.45)))
         sub_h_px = int(sub_w_px / sub_aspect)
-        if sub_w_px % 2 != 0: sub_w_px -= 1
-        if sub_h_px % 2 != 0: sub_h_px -= 1
+        if sub_w_px % 2 != 0:
+            sub_w_px -= 1
+        if sub_h_px % 2 != 0:
+            sub_h_px -= 1
 
         top_x = int(np_clip(t_cx * src_w - (sub_w_px / 2.0), 0, src_w - sub_w_px))
         top_y = int(np_clip(t_cy * src_h - (sub_h_px / 2.0), 0, src_h - sub_h_px))
@@ -89,7 +100,7 @@ def crop_path_to_ffmpeg_filter(
     # 2. STACK LAYOUT (Content ~60% on top, Speaker ~40% below)
     if active_mode == "stack":
         top_h = int(out_h * 0.60)  # 1152
-        bot_h = out_h - top_h      # 768
+        bot_h = out_h - top_h  # 768
 
         if len(regions) >= 2:
             r_c = regions[0] if isinstance(regions[0], dict) else regions[0].model_dump()
@@ -104,12 +115,16 @@ def crop_path_to_ffmpeg_filter(
             c_x, c_y, c_w, c_h = 0, 0, src_w, src_h
             s_cx, s_cy = 0.5, 0.4
 
-        if c_w % 2 != 0: c_w -= 1
-        if c_h % 2 != 0: c_h -= 1
+        if c_w % 2 != 0:
+            c_w -= 1
+        if c_h % 2 != 0:
+            c_h -= 1
         spk_w = int(src_w * 0.40)
         spk_h = int(spk_w * (bot_h / float(out_w)))
-        if spk_w % 2 != 0: spk_w -= 1
-        if spk_h % 2 != 0: spk_h -= 1
+        if spk_w % 2 != 0:
+            spk_w -= 1
+        if spk_h % 2 != 0:
+            spk_h -= 1
         s_x = int(np_clip(s_cx * src_w - (spk_w / 2.0), 0, src_w - spk_w))
         s_y = int(np_clip(s_cy * src_h - (spk_h / 2.0), 0, src_h - spk_h))
 
@@ -126,18 +141,22 @@ def crop_path_to_ffmpeg_filter(
         # PIP size ~25% of output width
         pip_w = int(out_w * 0.28)
         pip_h = int(pip_w * 1.15)
-        if pip_w % 2 != 0: pip_w -= 1
-        if pip_h % 2 != 0: pip_h -= 1
+        if pip_w % 2 != 0:
+            pip_w -= 1
+        if pip_h % 2 != 0:
+            pip_h -= 1
 
         # Safe corner coordinates (top-right safe zone: x=W-w-50, y=140)
-        pip_x = f"W-w-50"
+        pip_x = "W-w-50"
         pip_y = "140"
 
         # Speaker crop
         spk_crop_w = int(src_w * 0.25)
         spk_crop_h = int(src_h * 0.35)
-        if spk_crop_w % 2 != 0: spk_crop_w -= 1
-        if spk_crop_h % 2 != 0: spk_crop_h -= 1
+        if spk_crop_w % 2 != 0:
+            spk_crop_w -= 1
+        if spk_crop_h % 2 != 0:
+            spk_crop_h -= 1
 
         if len(regions) >= 2:
             r_s = regions[1] if isinstance(regions[1], dict) else regions[1].model_dump()
@@ -176,8 +195,10 @@ def crop_path_to_ffmpeg_filter(
     crop_w_px = max(2, int(round(ref_kf.w * src_w)))
     crop_h_px = max(2, int(round(ref_kf.h * src_h)))
 
-    if crop_w_px % 2 != 0: crop_w_px -= 1
-    if crop_h_px % 2 != 0: crop_h_px -= 1
+    if crop_w_px % 2 != 0:
+        crop_w_px -= 1
+    if crop_h_px % 2 != 0:
+        crop_h_px -= 1
 
     out_suffix = f"[{out_label}]" if out_label else ""
 

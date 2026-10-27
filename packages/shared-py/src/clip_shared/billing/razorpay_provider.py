@@ -4,7 +4,6 @@ import json
 import uuid
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
-from typing import Any
 
 from clip_shared.billing.exceptions import WebhookVerificationError
 from clip_shared.billing.provider import (

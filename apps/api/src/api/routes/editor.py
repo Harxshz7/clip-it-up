@@ -1,7 +1,5 @@
-import json
-import statistics
 import uuid
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime
 from typing import Any
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
@@ -12,7 +10,6 @@ from api.dependencies import get_current_user
 from clip_shared.config import get_settings
 from clip_shared.db.base import utc_now
 from clip_shared.db.models import (
-    CaptionStyle,
     Clip,
     ClipAlternative,
     ClipCaption,
@@ -21,24 +18,17 @@ from clip_shared.db.models import (
     ClipMoment,
     ClipReframe,
     EditorEvent,
-    Export,
-    ExportPreset,
-    Plan,
     Transcript,
     TranscriptWord,
     Usage,
-    UserPlan,
     Video,
 )
 from clip_shared.db.session import get_db
-from clip_shared.media.captions import build_clip_captions_data
-from clip_shared.media.cleanup import plan_clip_cleanup
-from clip_shared.media.plan_limits import compute_params_snapshot_hash
 from clip_shared.pubsub.redis import publish_event_async
 from clip_shared.schemas.auth import AuthenticatedUser
 from clip_shared.schemas.editor import (
-    CaptionWordModel,
     CaptionsModel,
+    CaptionWordModel,
     CleanupOptionsModel,
     ClipAlternativeResponse,
     ClipBulkActionRequest,
@@ -57,8 +47,6 @@ from clip_shared.schemas.editor import (
     ReframeModel,
     RemovalModel,
 )
-from clip_shared.schemas.exports import ExportResponse
-from clip_shared.storage.s3 import get_s3_client
 
 router = APIRouter(tags=["editor"])
 settings = get_settings()
@@ -74,9 +62,7 @@ async def _get_clip_and_verify_ownership(
     clip_id: uuid.UUID, user_id: uuid.UUID, db: AsyncSession
 ) -> tuple[Clip, Video]:
     stmt = (
-        select(Clip, Video)
-        .join(Video, Clip.video_id == Video.id)
-        .where(Clip.id == clip_id, Video.user_id == user_id)
+        select(Clip, Video).join(Video, Clip.video_id == Video.id).where(Clip.id == clip_id, Video.user_id == user_id)
     )
     res = await db.execute(stmt)
     row = res.first()
@@ -97,12 +83,7 @@ async def _build_auto_edit_doc(clip: Clip, video: Video, db: AsyncSession) -> Cl
     hook = HookModel(text=clip.hook_text, source="auto", start_ms=clip.start_ms)
 
     # 3. Captions
-    c_stmt = (
-        select(ClipCaption)
-        .where(ClipCaption.clip_id == clip.id)
-        .order_by(desc(ClipCaption.created_at))
-        .limit(1)
-    )
+    c_stmt = select(ClipCaption).where(ClipCaption.clip_id == clip.id).order_by(desc(ClipCaption.created_at)).limit(1)
     c_res = await db.execute(c_stmt)
     existing_caption = c_res.scalar_one_or_none()
 
@@ -160,12 +141,7 @@ async def _build_auto_edit_doc(clip: Clip, video: Video, db: AsyncSession) -> Cl
     )
 
     # 4. Reframe
-    rf_stmt = (
-        select(ClipReframe)
-        .where(ClipReframe.clip_id == clip.id)
-        .order_by(desc(ClipReframe.created_at))
-        .limit(1)
-    )
+    rf_stmt = select(ClipReframe).where(ClipReframe.clip_id == clip.id).order_by(desc(ClipReframe.created_at)).limit(1)
     rf_res = await db.execute(rf_stmt)
     reframe_rec = rf_res.scalar_one_or_none()
 
@@ -194,12 +170,7 @@ async def _build_auto_edit_doc(clip: Clip, video: Video, db: AsyncSession) -> Cl
     reframe = ReframeModel(mode_overrides={}, keyframes=reframe_kfs)
 
     # 5. Clean-up & Removals
-    cl_stmt = (
-        select(ClipCleanup)
-        .where(ClipCleanup.clip_id == clip.id)
-        .order_by(desc(ClipCleanup.created_at))
-        .limit(1)
-    )
+    cl_stmt = select(ClipCleanup).where(ClipCleanup.clip_id == clip.id).order_by(desc(ClipCleanup.created_at)).limit(1)
     cl_res = await db.execute(cl_stmt)
     cleanup_rec = cl_res.scalar_one_or_none()
 
@@ -250,6 +221,7 @@ async def _build_auto_edit_doc(clip: Clip, video: Video, db: AsyncSession) -> Cl
 # 1. Edit Doc: GET, PUT (autosave + collapse), Checkpoint, Versions, Restore, Reset
 # ---------------------------------------------------------------------------
 
+
 @router.get("/clips/{clip_id}/edit", response_model=ClipEditResponse)
 async def get_clip_edit(
     clip_id: uuid.UUID,
@@ -262,12 +234,7 @@ async def get_clip_edit(
     """
     clip, video = await _get_clip_and_verify_ownership(clip_id, user.id, db)
 
-    stmt = (
-        select(ClipEdit)
-        .where(ClipEdit.clip_id == clip_id)
-        .order_by(desc(ClipEdit.version))
-        .limit(1)
-    )
+    stmt = select(ClipEdit).where(ClipEdit.clip_id == clip_id).order_by(desc(ClipEdit.version)).limit(1)
     res = await db.execute(stmt)
     active_edit = res.scalar_one_or_none()
 
@@ -354,12 +321,7 @@ async def save_clip_edit(
     clip, video = await _get_clip_and_verify_ownership(clip_id, user.id, db)
 
     # 1. Fetch current highest version
-    stmt = (
-        select(ClipEdit)
-        .where(ClipEdit.clip_id == clip_id)
-        .order_by(desc(ClipEdit.version))
-        .limit(1)
-    )
+    stmt = select(ClipEdit).where(ClipEdit.clip_id == clip_id).order_by(desc(ClipEdit.version)).limit(1)
     res = await db.execute(stmt)
     latest = res.scalar_one_or_none()
 
@@ -394,7 +356,7 @@ async def save_clip_edit(
     # 2. Check optimistic concurrency
     if if_match:
         try:
-            expected_ver = int(if_match.strip('"\' '))
+            expected_ver = int(if_match.strip("\"' "))
             if expected_ver != latest.version:
                 raise HTTPException(
                     status_code=status.HTTP_409_CONFLICT,
@@ -414,11 +376,7 @@ async def save_clip_edit(
     # If not a checkpoint, latest is not a checkpoint, and created < 30s ago -> collapse
     now = utc_now()
     time_since_creation = (now - _ensure_tz(latest.created_at)).total_seconds()
-    can_collapse = (
-        not payload.is_checkpoint
-        and not latest.is_checkpoint
-        and time_since_creation < 30.0
-    )
+    can_collapse = not payload.is_checkpoint and not latest.is_checkpoint and time_since_creation < 30.0
 
     doc_data = payload.doc.model_dump()
 
@@ -473,12 +431,7 @@ async def create_checkpoint(
     """Create a persistent explicit checkpoint version."""
     clip, video = await _get_clip_and_verify_ownership(clip_id, user.id, db)
 
-    stmt = (
-        select(ClipEdit)
-        .where(ClipEdit.clip_id == clip_id)
-        .order_by(desc(ClipEdit.version))
-        .limit(1)
-    )
+    stmt = select(ClipEdit).where(ClipEdit.clip_id == clip_id).order_by(desc(ClipEdit.version)).limit(1)
     res = await db.execute(stmt)
     latest = res.scalar_one_or_none()
 
@@ -530,11 +483,7 @@ async def list_edit_versions(
     """List all version summaries for a clip."""
     await _get_clip_and_verify_ownership(clip_id, user.id, db)
 
-    stmt = (
-        select(ClipEdit)
-        .where(ClipEdit.clip_id == clip_id)
-        .order_by(desc(ClipEdit.version))
-    )
+    stmt = select(ClipEdit).where(ClipEdit.clip_id == clip_id).order_by(desc(ClipEdit.version))
     res = await db.execute(stmt)
     edits = res.scalars().all()
     return [
@@ -656,6 +605,7 @@ async def reset_edit_to_auto(
 # 2. Alternatives & Regenerate
 # ---------------------------------------------------------------------------
 
+
 @router.get("/clips/{clip_id}/alternatives", response_model=list[ClipAlternativeResponse])
 async def list_clip_alternatives(
     clip_id: uuid.UUID,
@@ -698,7 +648,10 @@ async def regenerate_clip(
         target_s = int(params.get("length_s", 30))
         target_dur_ms = target_s * 1000
         new_start = clip.start_ms
-        new_end = min(video.duration_seconds * 1000 if video.duration_seconds else new_start + target_dur_ms, new_start + target_dur_ms)
+        new_end = min(
+            video.duration_seconds * 1000 if video.duration_seconds else new_start + target_dur_ms,
+            new_start + target_dur_ms,
+        )
         alt_kind = "range"
         alt_text = f"Regenerated {target_s}s trim"
         alt_reason = f"Targeted duration variant ({target_s}s)"
@@ -778,6 +731,7 @@ async def regenerate_clip(
 # 3. Bulk Actions
 # ---------------------------------------------------------------------------
 
+
 @router.post("/clips/bulk")
 async def bulk_clip_actions(
     payload: ClipBulkActionRequest,
@@ -832,6 +786,7 @@ async def bulk_clip_actions(
 # ---------------------------------------------------------------------------
 # 4. Instrumentation & Admin Metrics
 # ---------------------------------------------------------------------------
+
 
 @router.post("/editor/events")
 async def record_editor_events(
@@ -903,7 +858,14 @@ async def get_editor_metrics(
             t_from_start = (_ensure_tz(ev.created_at) - start_time).total_seconds()
             if ev.type == "clip_visible" and not time_to_first_clips:
                 time_to_first_clips.append(t_from_start)
-            elif ev.type in ("edit_action", "delete_word", "trim_boundary", "style_change", "swap_hook", "toggle_cleanup"):
+            elif ev.type in (
+                "edit_action",
+                "delete_word",
+                "trim_boundary",
+                "style_change",
+                "swap_hook",
+                "toggle_cleanup",
+            ):
                 edit_counts[ev.type] = edit_counts.get(ev.type, 0) + 1
                 if not has_edit:
                     has_edit = True

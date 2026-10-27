@@ -24,15 +24,18 @@ def get_transcription_backend(backend_type: str | None = None) -> BaseTranscript
     if backend_name == "whisperx":
         try:
             from worker.transcription.whisperx_backend import WhisperXBackend
+
             return WhisperXBackend()
         except Exception as e:
             # If running on non-GPU environment without whisperx installed, log warning and fallback to mock if dev
             import structlog
+
             logger = structlog.get_logger()
             logger.warning("whisperx_import_failed_fallback", error=str(e), fallback="mock")
             return MockTranscriptionBackend()
     elif backend_name == "deepgram":
         from worker.transcription.deepgram_backend import DeepgramBackend
+
         return DeepgramBackend()
     elif backend_name == "mock":
         return MockTranscriptionBackend()

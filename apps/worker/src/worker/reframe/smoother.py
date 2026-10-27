@@ -1,4 +1,5 @@
 """Crop trajectory smoothing with deadzone, velocity clamping, hard cut snapping, and boundary constraints."""
+
 from dataclasses import dataclass
 
 import numpy as np
@@ -115,13 +116,15 @@ class CropSmoother:
             cx, cy = self._clamp_center(current_cx, current_cy, kf.w, kf.h)
             current_cx, current_cy = cx, cy
 
-            smoothed.append(ReframeKeyframe(
-                t_ms=kf.t_ms,
-                cx=round(float(cx), 4),
-                cy=round(float(cy), 4),
-                w=round(float(kf.w), 4),
-                h=round(float(kf.h), 4),
-            ))
+            smoothed.append(
+                ReframeKeyframe(
+                    t_ms=kf.t_ms,
+                    cx=round(float(cx), 4),
+                    cy=round(float(cy), 4),
+                    w=round(float(kf.w), 4),
+                    h=round(float(kf.h), 4),
+                )
+            )
 
             last_t = kf.t_ms
 

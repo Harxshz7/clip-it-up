@@ -3,6 +3,7 @@
 Generates edit-doc forks across {hook, caption style, CTA} combinations.
 Guarantees baseline inclusion, duplicate elimination, token/cost tracking, and caching.
 """
+
 import copy
 import hashlib
 import uuid
@@ -113,19 +114,20 @@ def call_variant_llm(
     # Mock / Offline deterministic generator
     mock_hooks = [
         HookCandidate(text=f"The real truth about {original_hook[:24]}...", angle="intrigue", predicted_score=0.92),
-        HookCandidate(text="Stop scrolling if you want to understand this:", angle="pattern_interrupt", predicted_score=0.88),
-        HookCandidate(text="Why 99% of people get this completely backwards:", angle="contrarian", predicted_score=0.95),
+        HookCandidate(
+            text="Stop scrolling if you want to understand this:", angle="pattern_interrupt", predicted_score=0.88
+        ),
+        HookCandidate(
+            text="Why 99% of people get this completely backwards:", angle="contrarian", predicted_score=0.95
+        ),
         HookCandidate(text="Wait until you see how this ends...", angle="curiosity_gap", predicted_score=0.86),
         HookCandidate(text="The #1 shortcut nobody talks about:", angle="bold_claim", predicted_score=0.90),
     ]
 
     goal_key = cta_goal.lower() if cta_goal.lower() in DEFAULT_CTA_TEMPLATES else "follow"
-    mock_ctas = [
-        CTACandidate(text=t, goal=goal_key)
-        for t in DEFAULT_CTA_TEMPLATES[goal_key]
-    ]
+    mock_ctas = [CTACandidate(text=t, goal=goal_key) for t in DEFAULT_CTA_TEMPLATES[goal_key]]
 
-    parsed = VariantGenerationBatchResponse(hooks=mock_hooks[:max(count, 4)], ctas=mock_ctas)
+    parsed = VariantGenerationBatchResponse(hooks=mock_hooks[: max(count, 4)], ctas=mock_ctas)
     in_tokens = 380
     out_tokens = 160
     cost_inr = 0.15
@@ -201,16 +203,18 @@ def generate_clip_variants(
         combo_key = (original_hook, base_style, base_cta)
         seen_combos.add(combo_key)
 
-        variants.append({
-            "id": uuid.uuid4(),
-            "label": "Variant A (Baseline)",
-            "hook_text": original_hook,
-            "caption_style_key": base_style,
-            "cta_text": base_cta,
-            "cta_style": "overlay" if base_cta else None,
-            "score_hint": 1.0,
-            "edit_doc": baseline_doc,
-        })
+        variants.append(
+            {
+                "id": uuid.uuid4(),
+                "label": "Variant A (Baseline)",
+                "hook_text": original_hook,
+                "caption_style_key": base_style,
+                "cta_text": base_cta,
+                "cta_style": "overlay" if base_cta else None,
+                "score_hint": 1.0,
+                "edit_doc": baseline_doc,
+            }
+        )
 
     # Step 6: Combinatorial expansion
     letters = ["B", "C", "D", "E", "F", "G", "H", "I", "J"]
@@ -238,7 +242,7 @@ def generate_clip_variants(
         if combo_key not in seen_combos:
             seen_combos.add(combo_key)
             var_idx = len(variants)
-            letter = letters[var_idx - 1] if var_idx <= len(letters) else f"V{var_idx+1}"
+            letter = letters[var_idx - 1] if var_idx <= len(letters) else f"V{var_idx + 1}"
             label_desc = labels_pool[(var_idx - 1) % len(labels_pool)]
             label = f"Variant {letter} ({label_desc})"
 
@@ -260,16 +264,18 @@ def generate_clip_variants(
             else:
                 v_doc["cta"] = None
 
-            variants.append({
-                "id": uuid.uuid4(),
-                "label": label,
-                "hook_text": curr_hook,
-                "caption_style_key": curr_style,
-                "cta_text": curr_cta,
-                "cta_style": "overlay" if curr_cta else None,
-                "score_hint": round(0.95 - (var_idx * 0.02), 2),
-                "edit_doc": v_doc,
-            })
+            variants.append(
+                {
+                    "id": uuid.uuid4(),
+                    "label": label,
+                    "hook_text": curr_hook,
+                    "caption_style_key": curr_style,
+                    "cta_text": curr_cta,
+                    "cta_style": "overlay" if curr_cta else None,
+                    "score_hint": round(0.95 - (var_idx * 0.02), 2),
+                    "edit_doc": v_doc,
+                }
+            )
 
         # Advance combinator indices
         h_idx += 1

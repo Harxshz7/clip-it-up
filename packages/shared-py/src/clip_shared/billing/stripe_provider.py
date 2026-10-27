@@ -4,7 +4,6 @@ import json
 import uuid
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
-from typing import Any
 
 from clip_shared.billing.exceptions import WebhookVerificationError
 from clip_shared.billing.provider import (
@@ -140,7 +139,7 @@ class StripeBillingProvider(BillingProvider):
         if not timestamp or not v1_sig:
             return False
 
-        signed_payload = f"{timestamp}.".encode("utf-8") + raw_payload
+        signed_payload = f"{timestamp}.".encode() + raw_payload
         expected_sig = hmac.new(self.webhook_secret.encode("utf-8"), signed_payload, hashlib.sha256).hexdigest()
         return hmac.compare_digest(expected_sig, v1_sig)
 

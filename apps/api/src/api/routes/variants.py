@@ -1,4 +1,5 @@
 """API routes for Auto-Variants generation, batch export, metrics logging, and zip packaging."""
+
 import csv
 import io
 import uuid
@@ -79,6 +80,7 @@ def to_variant_set_response(v_set: VariantSet) -> VariantSetResponse:
 # Variant Generation & Management
 # ---------------------------------------------------------------------------
 
+
 @router.post("/clips/{clip_id}/variants", response_model=VariantSetResponse, status_code=status.HTTP_201_CREATED)
 async def generate_variants_for_clip(
     clip_id: uuid.UUID,
@@ -97,7 +99,12 @@ async def generate_variants_for_clip(
     if not features.get("auto_variants", False):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail={"error": {"code": "AUTO_VARIANTS_NOT_IN_PLAN", "message": "Auto-variants generation requires Creator or Pro plan. Upgrade to unlock multi-angle variants."}},
+            detail={
+                "error": {
+                    "code": "AUTO_VARIANTS_NOT_IN_PLAN",
+                    "message": "Auto-variants generation requires Creator or Pro plan. Upgrade to unlock multi-angle variants.",
+                }
+            },
         )
 
     # 2. Quota check
@@ -106,7 +113,12 @@ async def generate_variants_for_clip(
     if requested_count > max_variants:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail={"error": {"code": "LIMIT_EXCEEDED", "message": f"Requested {requested_count} variants exceeds your plan limit of {max_variants} per clip."}},
+            detail={
+                "error": {
+                    "code": "LIMIT_EXCEEDED",
+                    "message": f"Requested {requested_count} variants exceeds your plan limit of {max_variants} per clip.",
+                }
+            },
         )
 
     # 3. Retrieve base edit doc
@@ -128,11 +140,15 @@ async def generate_variants_for_clip(
     # 5. Retrieve default brand kit if any
     b_stmt = select(BrandKit).where(BrandKit.user_id == user.id, BrandKit.is_default == True)  # noqa: E712
     brand_kit = (await db.execute(b_stmt)).scalar_one_or_none()
-    brand_dict = {
-        "id": str(brand_kit.id),
-        "caption_style_key": brand_kit.caption_style_key,
-        "colors": brand_kit.colors,
-    } if brand_kit else None
+    brand_dict = (
+        {
+            "id": str(brand_kit.id),
+            "caption_style_key": brand_kit.caption_style_key,
+            "colors": brand_kit.colors,
+        }
+        if brand_kit
+        else None
+    )
 
     # 6. Run generation engine
     variants_data, in_tok, out_tok, cost_inr, is_cache = generate_clip_variants(
@@ -191,11 +207,7 @@ async def generate_variants_for_clip(
     await db.commit()
 
     # Reload with variants
-    stmt = (
-        select(VariantSet)
-        .options(selectinload(VariantSet.variants))
-        .where(VariantSet.id == v_set.id)
-    )
+    stmt = select(VariantSet).options(selectinload(VariantSet.variants)).where(VariantSet.id == v_set.id)
     loaded_set = (await db.execute(stmt)).scalar_one()
     return to_variant_set_response(loaded_set)
 
@@ -220,7 +232,12 @@ async def get_clip_variants(
     if not v_set:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail={"error": {"code": "NOT_FOUND", "message": "No variant set found for this clip. Generate variants first."}},
+            detail={
+                "error": {
+                    "code": "NOT_FOUND",
+                    "message": "No variant set found for this clip. Generate variants first.",
+                }
+            },
         )
     return to_variant_set_response(v_set)
 
@@ -253,6 +270,7 @@ async def delete_clip_variant(
 # Batch Export & Performance Metrics
 # ---------------------------------------------------------------------------
 
+
 @router.post("/variant-sets/{set_id}/export", response_model=VariantBatchExportResponse)
 async def batch_export_variant_set(
     set_id: uuid.UUID,
@@ -281,7 +299,12 @@ async def batch_export_variant_set(
     if len(variants) != len(payload.variant_ids):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail={"error": {"code": "INVALID_VARIANTS", "message": "Some selected variant IDs do not belong to this variant set."}},
+            detail={
+                "error": {
+                    "code": "INVALID_VARIANTS",
+                    "message": "Some selected variant IDs do not belong to this variant set.",
+                }
+            },
         )
 
     # Enforce monthly export quota for all requested exports
@@ -330,6 +353,7 @@ async def batch_export_variant_set(
         # Dispatch Celery render task
         try:
             from worker.tasks.render import render_export_task
+
             render_export_task.delay(str(exp_id))
         except Exception:
             pass
@@ -381,6 +405,7 @@ async def update_export_performance_metrics(
 # Zip Packaging with CSV Manifest
 # ---------------------------------------------------------------------------
 
+
 @router.get("/variant-sets/{set_id}/download-zip")
 async def download_variant_set_zip(
     set_id: uuid.UUID,
@@ -406,7 +431,9 @@ async def download_variant_set_zip(
     # Fetch associated clip
     c_stmt = select(Clip).where(Clip.id == v_set.clip_id)
     clip = (await db.execute(c_stmt)).scalar_one_or_none()
-    clip_slug = sanitize_filename(clip.title or f"clip_{str(clip.id)[:8]}") if clip else f"clip_{str(v_set.clip_id)[:8]}"
+    clip_slug = (
+        sanitize_filename(clip.title or f"clip_{str(clip.id)[:8]}") if clip else f"clip_{str(v_set.clip_id)[:8]}"
+    )
 
     # Build manifest CSV
     csv_buffer = io.StringIO()
@@ -440,14 +467,16 @@ async def download_variant_set_zip(
                     else:
                         zf.writestr(filename, b"Rendering In Progress")
 
-            csv_writer.writerow([
-                filename,
-                v.hook_text or "",
-                v.caption_style_key or "",
-                v.cta_text or "",
-                preset,
-                export_status,
-            ])
+            csv_writer.writerow(
+                [
+                    filename,
+                    v.hook_text or "",
+                    v.caption_style_key or "",
+                    v.cta_text or "",
+                    preset,
+                    export_status,
+                ]
+            )
 
         # Write manifest.csv into root of zip
         zf.writestr("manifest.csv", csv_buffer.getvalue())

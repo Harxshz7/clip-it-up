@@ -129,7 +129,9 @@ def run_scoring_pipeline(
         db.query(TranscriptSegment)
         .filter(TranscriptSegment.transcript_id == transcript.id)
         .order_by(TranscriptSegment.idx)
-        .all() if transcript else []
+        .all()
+        if transcript
+        else []
     )
     segments = [
         {"idx": s.idx, "start_ms": s.start_ms, "end_ms": s.end_ms, "speaker": s.speaker, "text": s.text}
@@ -138,9 +140,7 @@ def run_scoring_pipeline(
 
     # Fetch or Extract Audio Features
     audio_feat_record = (
-        db.query(AudioFeatures)
-        .filter(AudioFeatures.video_id == video_id, AudioFeatures.version == "v1")
-        .first()
+        db.query(AudioFeatures).filter(AudioFeatures.video_id == video_id, AudioFeatures.version == "v1").first()
     )
 
     audio_feat_res: AudioFeaturesResult | None = None
@@ -185,7 +185,8 @@ def run_scoring_pipeline(
             id=str(c.id),
             start_ms=c.start_ms,
             end_ms=c.end_ms,
-            text=" ".join(s["text"] for s in segments if s["start_ms"] >= c.start_ms and s["end_ms"] <= c.end_ms) or "Candidate text",
+            text=" ".join(s["text"] for s in segments if s["start_ms"] >= c.start_ms and s["end_ms"] <= c.end_ms)
+            or "Candidate text",
         )
         for c in candidates
     ]
@@ -241,7 +242,9 @@ def run_scoring_pipeline(
     scored_moments_data: list[dict[str, Any]] = []
 
     for i, cand in enumerate(pass2_candidates):
-        cand_text = " ".join(s["text"] for s in segments if s["start_ms"] >= cand.start_ms and s["end_ms"] <= cand.end_ms)
+        cand_text = " ".join(
+            s["text"] for s in segments if s["start_ms"] >= cand.start_ms and s["end_ms"] <= cand.end_ms
+        )
         p2_prompt = build_pass2_prompt(
             candidate_id=str(cand.id),
             start_ms=cand.start_ms,

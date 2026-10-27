@@ -1,4 +1,5 @@
 """Scene classifier assigning shot types: talking_head, two_shot, group, screen_content, whiteboard, hybrid_pip, b_roll_other."""
+
 import math
 from abc import ABC, abstractmethod
 from typing import Any
@@ -50,12 +51,14 @@ def detect_text_regions_lite(frame: np.ndarray) -> list[tuple[float, float, floa
         if 6 <= bh <= 120 and bw >= 12 and (bw / float(bh)) >= 1.1:
             # Check bounding area not full screen
             if (bw * bh) < (w * h * 0.85):
-                text_boxes.append((
-                    float(x / w),
-                    float(y / h),
-                    float(bw / w),
-                    float(bh / h),
-                ))
+                text_boxes.append(
+                    (
+                        float(x / w),
+                        float(y / h),
+                        float(bw / w),
+                        float(bh / h),
+                    )
+                )
 
     return text_boxes
 
@@ -141,7 +144,8 @@ class RuleBasedSceneClassifier(BaseSceneClassifier):
         concurrent_counts = []
         for t_ms in sample_times:
             count = sum(
-                1 for trk in overlapping_tracks
+                1
+                for trk in overlapping_tracks
                 if (trk.get_bbox_at(t_ms) is not None or (trk.start_ms <= t_ms <= trk.end_ms))
             )
             concurrent_counts.append(count)
@@ -268,12 +272,14 @@ class EnhancedSceneClassifier(BaseSceneClassifier):
                     static_ratio=static_ratio,
                     motion_energy=motion_energy,
                 )
-                sub_shots.append({
-                    "start_ms": cur,
-                    "end_ms": sub_end,
-                    "type": sub_type,
-                    "confidence": round(sub_conf, 2),
-                })
+                sub_shots.append(
+                    {
+                        "start_ms": cur,
+                        "end_ms": sub_end,
+                        "type": sub_type,
+                        "confidence": round(sub_conf, 2),
+                    }
+                )
                 cur = sub_end
 
         # Primary classification across entire shot
@@ -366,7 +372,11 @@ class EnhancedSceneClassifier(BaseSceneClassifier):
                 scores["b_roll_other"] += 1.5
 
         # 4. Screen content evidence (slides, code, UI) when no multi-face conversation
-        if not has_whiteboard and not has_thumbnail and (has_screen_share or text_density > 0.25 or static_ratio > 0.70):
+        if (
+            not has_whiteboard
+            and not has_thumbnail
+            and (has_screen_share or text_density > 0.25 or static_ratio > 0.70)
+        ):
             if num_tracks == 0:
                 scores["screen_content"] += 6.0
             elif num_tracks == 1:

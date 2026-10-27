@@ -1,4 +1,5 @@
 """Celery background tasks for video rendering and export."""
+
 import os
 import shutil
 import tempfile
@@ -159,7 +160,11 @@ def render_export_task(self, export_id: str) -> dict[str, Any]:
 
         # Resolve reframe crop path
         reframe_rec = db.query(ClipReframe).filter(ClipReframe.clip_id == clip.id).first()
-        crop_path = reframe_rec.crop_path if reframe_rec else {"keyframes": [{"t_ms": 0, "cx": 0.5, "cy": 0.5, "w": 0.5625, "h": 1.0}]}
+        crop_path = (
+            reframe_rec.crop_path
+            if reframe_rec
+            else {"keyframes": [{"t_ms": 0, "cx": 0.5, "cy": 0.5, "w": 0.5625, "h": 1.0}]}
+        )
 
         # Resolve captions and style
         captions_rec = db.query(ClipCaption).filter(ClipCaption.clip_id == clip.id).first()
@@ -178,12 +183,15 @@ def render_export_task(self, export_id: str) -> dict[str, Any]:
         export_rec.status = "rendering"
         db.commit()
 
-        publish_export_event_sync(export_id, {
-            "type": "export_progress",
-            "export_id": export_id,
-            "status": "rendering",
-            "progress": 5.0,
-        })
+        publish_export_event_sync(
+            export_id,
+            {
+                "type": "export_progress",
+                "export_id": export_id,
+                "status": "rendering",
+                "progress": 5.0,
+            },
+        )
 
     # Prepare temp workspace
     temp_dir = tempfile.mkdtemp(prefix=f"export_{export_id}_")
@@ -279,12 +287,15 @@ def render_export_task(self, export_id: str) -> dict[str, Any]:
         def on_progress(pct: float):
             # Scale progress between 10% and 90%
             eff_pct = round(10.0 + (pct * 0.8), 1)
-            publish_export_event_sync(export_id, {
-                "type": "export_progress",
-                "export_id": export_id,
-                "status": "rendering",
-                "progress": eff_pct,
-            })
+            publish_export_event_sync(
+                export_id,
+                {
+                    "type": "export_progress",
+                    "export_id": export_id,
+                    "status": "rendering",
+                    "progress": eff_pct,
+                },
+            )
 
         # Execute single-pass render
         render_metrics = execute_export_render(
@@ -354,17 +365,20 @@ def render_export_task(self, export_id: str) -> dict[str, Any]:
             db.commit()
 
         # Publish SSE export ready
-        publish_export_event_sync(export_id, {
-            "type": "export_ready",
-            "export_id": export_id,
-            "status": "succeeded",
-            "progress": 100.0,
-            "storage_key": dest_s3_key,
-            "duration_ms": render_metrics["duration_ms"],
-            "size_bytes": render_metrics["size_bytes"],
-            "render_ms": render_metrics["render_ms"],
-            "realtime_factor": render_metrics.get("realtime_factor"),
-        })
+        publish_export_event_sync(
+            export_id,
+            {
+                "type": "export_ready",
+                "export_id": export_id,
+                "status": "succeeded",
+                "progress": 100.0,
+                "storage_key": dest_s3_key,
+                "duration_ms": render_metrics["duration_ms"],
+                "size_bytes": render_metrics["size_bytes"],
+                "render_ms": render_metrics["render_ms"],
+                "realtime_factor": render_metrics.get("realtime_factor"),
+            },
+        )
 
         logger.info(
             "export_succeeded",
@@ -384,12 +398,15 @@ def render_export_task(self, export_id: str) -> dict[str, Any]:
                 export_rec.error = str(e)
                 db.commit()
 
-        publish_export_event_sync(export_id, {
-            "type": "export_failed",
-            "export_id": export_id,
-            "status": "failed",
-            "error": str(e),
-        })
+        publish_export_event_sync(
+            export_id,
+            {
+                "type": "export_failed",
+                "export_id": export_id,
+                "status": "failed",
+                "error": str(e),
+            },
+        )
         raise e
 
     finally:

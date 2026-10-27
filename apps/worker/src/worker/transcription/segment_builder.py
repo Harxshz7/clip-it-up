@@ -35,7 +35,7 @@ def build_segments_from_words(
         seg_text = " ".join(w.word for w in current_words).strip()
 
         # Clean multiple spaces
-        seg_text = re.sub(r'\s+', ' ', seg_text)
+        seg_text = re.sub(r"\s+", " ", seg_text)
 
         segment = SegmentItem(
             idx=segment_idx,
@@ -62,7 +62,7 @@ def build_segments_from_words(
         current_words.append(word)
 
         # Check for sentence punctuation ending
-        has_terminal_punct = bool(re.search(r'[.!?…]+$', word.word.strip()))
+        has_terminal_punct = bool(re.search(r"[.!?…]+$", word.word.strip()))
         duration_exceeded = (word.end_ms - current_words[0].start_ms) >= max_duration_ms
         count_exceeded = len(current_words) >= max_words
 

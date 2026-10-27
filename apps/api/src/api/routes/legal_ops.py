@@ -1,11 +1,9 @@
-import hashlib
 import uuid
 from datetime import UTC, datetime, timedelta
-from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
-from pydantic import BaseModel, Field
-from sqlalchemy import desc, select
+from fastapi import APIRouter, Depends, HTTPException, Request, status
+from pydantic import BaseModel
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.dependencies import get_current_user
@@ -13,11 +11,9 @@ from clip_shared.db.base import utc_now
 from clip_shared.db.models import (
     Clip,
     DeletionAudit,
-    Job,
     Project,
     TakedownRequest,
     TermsAcceptance,
-    Transcript,
     User,
     Video,
 )
@@ -32,6 +28,7 @@ router = APIRouter(prefix="/legal", tags=["legal-ops"])
 # ---------------------------------------------------------------------------
 # Schemas
 # ---------------------------------------------------------------------------
+
 
 class AcceptTermsRequest(BaseModel):
     doc_type: str  # terms | privacy | aup | refund | dmca
@@ -67,6 +64,7 @@ class SupportTicketRequest(BaseModel):
 # Terms Acceptance Tracking
 # ---------------------------------------------------------------------------
 
+
 @router.post("/accept-terms")
 async def record_terms_acceptance(
     payload: AcceptTermsRequest,
@@ -97,6 +95,7 @@ async def record_terms_acceptance(
 # DMCA & Copyright Takedown Flow
 # ---------------------------------------------------------------------------
 
+
 @router.post("/dmca/takedown")
 async def submit_takedown_notice(
     payload: TakedownNoticeRequest,
@@ -106,7 +105,12 @@ async def submit_takedown_notice(
     if not payload.good_faith_confirmed or not payload.perjury_confirmed:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail={"error": {"code": "LEGAL_DECLARATIONS_REQUIRED", "message": "Good faith and perjury declarations must be accepted."}},
+            detail={
+                "error": {
+                    "code": "LEGAL_DECLARATIONS_REQUIRED",
+                    "message": "Good faith and perjury declarations must be accepted.",
+                }
+            },
         )
 
     ticket_num = f"DMCA-{datetime.now(UTC).strftime('%Y%m')}-{uuid.uuid4().hex[:6].upper()}"
@@ -135,11 +139,13 @@ async def submit_takedown_notice(
         signature=payload.signature,
         status="submitted",
         sla_deadline=now + timedelta(hours=48),  # 48-hour statutory SLA target
-        audit_trail=[{
-            "action": "notice_submitted",
-            "timestamp": now.isoformat(),
-            "claimant_email": payload.claimant_email,
-        }],
+        audit_trail=[
+            {
+                "action": "notice_submitted",
+                "timestamp": now.isoformat(),
+                "claimant_email": payload.claimant_email,
+            }
+        ],
         created_at=now,
         updated_at=now,
     )
@@ -152,11 +158,13 @@ async def submit_takedown_notice(
         if video:
             video.status = "flagged_dmca"
             takedown.status = "actioned_blocked"
-            takedown.audit_trail.append({
-                "action": "video_soft_blocked",
-                "video_id": str(matched_vid_id),
-                "timestamp": now.isoformat(),
-            })
+            takedown.audit_trail.append(
+                {
+                    "action": "video_soft_blocked",
+                    "video_id": str(matched_vid_id),
+                    "timestamp": now.isoformat(),
+                }
+            )
 
     db.add(takedown)
     await db.commit()
@@ -205,6 +213,7 @@ async def submit_counter_notice(
 # ---------------------------------------------------------------------------
 # Data Deletion & Privacy Rights (DPDP Act & GDPR Compliance)
 # ---------------------------------------------------------------------------
+
 
 @router.delete("/videos/{video_id}")
 async def delete_video_hard(
@@ -354,6 +363,7 @@ async def export_my_data(
 # ---------------------------------------------------------------------------
 # Support Desk
 # ---------------------------------------------------------------------------
+
 
 @router.post("/support/ticket")
 async def submit_support_ticket(

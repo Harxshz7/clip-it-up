@@ -11,7 +11,10 @@ from worker.transcription.segment_builder import build_segments_from_words
 
 MOCK_TRANSCRIPT_DIALOGUE = [
     ("SPEAKER_00", "Welcome back to the creator podcast today we are discussing short form video algorithms."),
-    ("SPEAKER_01", "Thanks for having me. The most important metric right now is 3-second hook retention and watch time percentage."),
+    (
+        "SPEAKER_01",
+        "Thanks for having me. The most important metric right now is 3-second hook retention and watch time percentage.",
+    ),
     ("SPEAKER_00", "Exactly. If viewers drop off before five seconds the distribution completely stops."),
     ("SPEAKER_01", "And dynamic word by word captions increase completion rates by over thirty percent."),
     ("SPEAKER_00", "That is why automated AI pipelines are changing how creators produce content daily."),

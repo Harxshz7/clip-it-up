@@ -1,4 +1,5 @@
 """API routes for Brand Kits and Brand Assets management."""
+
 import uuid
 from typing import Any
 
@@ -103,6 +104,7 @@ def to_kit_response(kit: BrandKit) -> BrandKitResponse:
 # Brand Kit Routes
 # ---------------------------------------------------------------------------
 
+
 @router.get("/brand-kits", response_model=list[BrandKitResponse])
 async def list_brand_kits(
     user: AuthenticatedUser = Depends(get_current_user),
@@ -113,7 +115,12 @@ async def list_brand_kits(
     if not features.get("brand_kit", False):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail={"error": {"code": "BRAND_KIT_NOT_IN_PLAN", "message": "Brand kits are not available on your plan. Upgrade to Creator or Pro to unlock custom branding."}},
+            detail={
+                "error": {
+                    "code": "BRAND_KIT_NOT_IN_PLAN",
+                    "message": "Brand kits are not available on your plan. Upgrade to Creator or Pro to unlock custom branding.",
+                }
+            },
         )
 
     stmt = (
@@ -142,7 +149,12 @@ async def create_brand_kit(
     if not features.get("brand_kit", False):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail={"error": {"code": "BRAND_KIT_NOT_IN_PLAN", "message": "Brand kits are not available on your plan. Upgrade to Creator or Pro to unlock custom branding."}},
+            detail={
+                "error": {
+                    "code": "BRAND_KIT_NOT_IN_PLAN",
+                    "message": "Brand kits are not available on your plan. Upgrade to Creator or Pro to unlock custom branding.",
+                }
+            },
         )
 
     max_kits = features.get("max_brand_kits", 1)
@@ -150,7 +162,12 @@ async def create_brand_kit(
     if current_count >= max_kits:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail={"error": {"code": "LIMIT_EXCEEDED", "message": f"Brand kit quota ({max_kits}) exceeded for your plan. Upgrade your plan to create more brand kits."}},
+            detail={
+                "error": {
+                    "code": "LIMIT_EXCEEDED",
+                    "message": f"Brand kit quota ({max_kits}) exceeded for your plan. Upgrade your plan to create more brand kits.",
+                }
+            },
         )
 
     # Validate asset ownership
@@ -164,13 +181,19 @@ async def create_brand_kit(
             if not asset:
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
-                    detail={"error": {"code": "NOT_FOUND", "message": f"Brand {kind_name} asset {asset_id} not found."}},
+                    detail={
+                        "error": {"code": "NOT_FOUND", "message": f"Brand {kind_name} asset {asset_id} not found."}
+                    },
                 )
 
     # If first kit or explicitly marked default, update default flags
     is_default = payload.is_default or (current_count == 0)
     if is_default:
-        existing_defaults = (await db.execute(select(BrandKit).where(BrandKit.user_id == user.id, BrandKit.is_default == True))).scalars().all()  # noqa: E712
+        existing_defaults = (
+            (await db.execute(select(BrandKit).where(BrandKit.user_id == user.id, BrandKit.is_default == True)))
+            .scalars()
+            .all()
+        )  # noqa: E712
         for d in existing_defaults:
             d.is_default = False
 
@@ -220,7 +243,9 @@ async def get_default_brand_kit(
     if not features.get("brand_kit", False):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail={"error": {"code": "BRAND_KIT_NOT_IN_PLAN", "message": "Brand kits are not available on your plan."}},
+            detail={
+                "error": {"code": "BRAND_KIT_NOT_IN_PLAN", "message": "Brand kits are not available on your plan."}
+            },
         )
 
     stmt = (
@@ -252,7 +277,9 @@ async def get_brand_kit(
     if not features.get("brand_kit", False):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail={"error": {"code": "BRAND_KIT_NOT_IN_PLAN", "message": "Brand kits are not available on your plan."}},
+            detail={
+                "error": {"code": "BRAND_KIT_NOT_IN_PLAN", "message": "Brand kits are not available on your plan."}
+            },
         )
 
     stmt = (
@@ -285,7 +312,9 @@ async def update_brand_kit(
     if not features.get("brand_kit", False):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail={"error": {"code": "BRAND_KIT_NOT_IN_PLAN", "message": "Brand kits are not available on your plan."}},
+            detail={
+                "error": {"code": "BRAND_KIT_NOT_IN_PLAN", "message": "Brand kits are not available on your plan."}
+            },
         )
 
     stmt = select(BrandKit).where(BrandKit.id == kit_id, BrandKit.user_id == user.id)
@@ -307,11 +336,17 @@ async def update_brand_kit(
             if not asset:
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
-                    detail={"error": {"code": "NOT_FOUND", "message": f"Brand {kind_name} asset {asset_id} not found."}},
+                    detail={
+                        "error": {"code": "NOT_FOUND", "message": f"Brand {kind_name} asset {asset_id} not found."}
+                    },
                 )
 
     if payload.is_default is True:
-        existing_defaults = (await db.execute(select(BrandKit).where(BrandKit.user_id == user.id, BrandKit.is_default == True))).scalars().all()  # noqa: E712
+        existing_defaults = (
+            (await db.execute(select(BrandKit).where(BrandKit.user_id == user.id, BrandKit.is_default == True)))
+            .scalars()
+            .all()
+        )  # noqa: E712
         for d in existing_defaults:
             d.is_default = False
         kit.is_default = True
@@ -372,7 +407,9 @@ async def set_default_brand_kit(
     if not features.get("brand_kit", False):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail={"error": {"code": "BRAND_KIT_NOT_IN_PLAN", "message": "Brand kits are not available on your plan."}},
+            detail={
+                "error": {"code": "BRAND_KIT_NOT_IN_PLAN", "message": "Brand kits are not available on your plan."}
+            },
         )
 
     stmt = select(BrandKit).where(BrandKit.id == kit_id, BrandKit.user_id == user.id)
@@ -386,7 +423,7 @@ async def set_default_brand_kit(
     # Clear other defaults
     all_kits = (await db.execute(select(BrandKit).where(BrandKit.user_id == user.id))).scalars().all()
     for k in all_kits:
-        k.is_default = (k.id == kit.id)
+        k.is_default = k.id == kit.id
 
     kit.updated_at = utc_now()
     await db.commit()
@@ -428,6 +465,7 @@ async def delete_brand_kit(
 # Brand Assets Routes
 # ---------------------------------------------------------------------------
 
+
 @router.get("/brand-assets", response_model=list[BrandAssetResponse])
 async def list_brand_assets(
     kind: str | None = Query(None, description="Optional filter by kind: logo | font | intro | outro"),
@@ -456,7 +494,12 @@ async def generate_brand_asset_upload_url(
     if not features.get("brand_kit", False):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail={"error": {"code": "BRAND_KIT_NOT_IN_PLAN", "message": "Brand assets require a plan with Brand Kit support."}},
+            detail={
+                "error": {
+                    "code": "BRAND_KIT_NOT_IN_PLAN",
+                    "message": "Brand assets require a plan with Brand Kit support.",
+                }
+            },
         )
 
     # Size check
@@ -464,7 +507,12 @@ async def generate_brand_asset_upload_url(
     if payload.size_bytes > max_mb * 1024 * 1024:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail={"error": {"code": "LIMIT_EXCEEDED", "message": f"Asset size exceeds maximum limit of {max_mb}MB for your plan."}},
+            detail={
+                "error": {
+                    "code": "LIMIT_EXCEEDED",
+                    "message": f"Asset size exceeds maximum limit of {max_mb}MB for your plan.",
+                }
+            },
         )
 
     # Intro/outro support check
@@ -473,7 +521,12 @@ async def generate_brand_asset_upload_url(
         if max_duration <= 0:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail={"error": {"code": "BRAND_KIT_NOT_IN_PLAN", "message": "Custom intro/outro videos are not included in your current plan."}},
+                detail={
+                    "error": {
+                        "code": "BRAND_KIT_NOT_IN_PLAN",
+                        "message": "Custom intro/outro videos are not included in your current plan.",
+                    }
+                },
             )
 
     asset_id = uuid.uuid4()
@@ -537,7 +590,12 @@ async def complete_brand_asset_upload(
     if asset.kind == "font" and not payload.license_acknowledged:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail={"error": {"code": "ASSET_INVALID", "message": "Commercial license rights must be acknowledged for font upload."}},
+            detail={
+                "error": {
+                    "code": "ASSET_INVALID",
+                    "message": "Commercial license rights must be acknowledged for font upload.",
+                }
+            },
         )
 
     meta = dict(asset.metadata_json or {})
@@ -548,6 +606,7 @@ async def complete_brand_asset_upload(
     # Trigger async Celery validation
     try:
         from worker.celery_app import celery_app
+
         celery_app.send_task("worker.tasks.brand.validate_brand_asset", args=[str(asset.id)])
     except Exception as e:
         logger.warning("Could not dispatch brand asset validation task", error=str(e))

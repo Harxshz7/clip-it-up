@@ -1,4 +1,5 @@
 """Face tracking engine with IoU + Centroid matching, velocity continuity, conservative merging, and trajectory statistics."""
+
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -17,6 +18,7 @@ class TrackedDetection:
 @dataclass
 class FaceTrackData:
     """Full trajectory and statistics for a tracked face across video duration."""
+
     track_id: int
     start_ms: int
     end_ms: int
@@ -178,7 +180,9 @@ class FaceTracker:
                 if tid not in assigned_tracks and c not in assigned_dets:
                     assigned_tracks.add(tid)
                     assigned_dets.add(c)
-                    self._active_tracks[tid].append(TrackedDetection(t_ms=t_ms, frame_idx=frame_idx, detection=detections[c]))
+                    self._active_tracks[tid].append(
+                        TrackedDetection(t_ms=t_ms, frame_idx=frame_idx, detection=detections[c])
+                    )
 
                 cost_matrix[r, :] = -1.0
                 cost_matrix[:, c] = -1.0
@@ -236,14 +240,16 @@ class FaceTracker:
             "mouth_mean": float(np.mean(mouths)) if mouths else 0.0,
         }
 
-        self._completed_tracks.append(FaceTrackData(
-            track_id=tid,
-            start_ms=start_ms,
-            end_ms=end_ms,
-            avg_conf=avg_conf,
-            detections=track_dets,
-            summary=summary,
-        ))
+        self._completed_tracks.append(
+            FaceTrackData(
+                track_id=tid,
+                start_ms=start_ms,
+                end_ms=end_ms,
+                avg_conf=avg_conf,
+                detections=track_dets,
+                summary=summary,
+            )
+        )
 
     def _merge_fragmented_tracks(self, tracks: list[FaceTrackData]) -> list[FaceTrackData]:
         """

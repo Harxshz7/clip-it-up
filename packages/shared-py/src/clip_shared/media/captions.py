@@ -1,4 +1,5 @@
 """Subtitle chunking, keyword emphasis detection, ASS generation, and preview parity."""
+
 import re
 from dataclasses import dataclass
 from typing import Any
@@ -9,6 +10,7 @@ from clip_shared.media.edl import EditDecisionList
 @dataclass
 class CaptionWord:
     """Word representation in subtitle stream."""
+
     text: str
     start_ms: int
     end_ms: int
@@ -24,6 +26,7 @@ class CaptionWord:
 @dataclass
 class CaptionLine:
     """A chunked display line of 1 or more words."""
+
     words: list[CaptionWord]
     start_ms: int
     end_ms: int
@@ -60,11 +63,43 @@ def detect_emphasis_words(
     scores: list[float] = [0.0] * n
 
     STRONG_WORDS = {
-        "never", "always", "must", "every", "huge", "massive", "insane", "secret",
-        "best", "worst", "stop", "danger", "free", "money", "million", "billion",
-        "kill", "win", "lose", "shocking", "truth", "magic", "hack", "mistake",
-        "power", "craziest", "genius", "impossible", "easy", "hard", "not", "no",
-        "first", "last", "ultimate", "future", "now",
+        "never",
+        "always",
+        "must",
+        "every",
+        "huge",
+        "massive",
+        "insane",
+        "secret",
+        "best",
+        "worst",
+        "stop",
+        "danger",
+        "free",
+        "money",
+        "million",
+        "billion",
+        "kill",
+        "win",
+        "lose",
+        "shocking",
+        "truth",
+        "magic",
+        "hack",
+        "mistake",
+        "power",
+        "craziest",
+        "genius",
+        "impossible",
+        "easy",
+        "hard",
+        "not",
+        "no",
+        "first",
+        "last",
+        "ultimate",
+        "future",
+        "now",
     }
 
     for i, w in enumerate(words):
@@ -122,7 +157,9 @@ def detect_emphasis_words(
 
     # If too few were selected, pick the highest duration content word
     if selected_count == 0 and n > 0:
-        longest_idx = max(range(n), key=lambda idx: int(words[idx].get("end_ms", 0)) - int(words[idx].get("start_ms", 0)))
+        longest_idx = max(
+            range(n), key=lambda idx: int(words[idx].get("end_ms", 0)) - int(words[idx].get("start_ms", 0))
+        )
         emphasis_flags[longest_idx] = True
 
     return emphasis_flags
@@ -153,14 +190,16 @@ def build_clip_captions_data(
         if end_ms <= clip_start_ms or start_ms >= clip_end_ms:
             continue
 
-        clip_words.append({
-            "text": text,
-            "start_ms": start_ms,
-            "end_ms": end_ms,
-            "speaker": w.get("speaker"),
-            "emphasis": bool(w.get("emphasis", False)),
-            "deleted": bool(w.get("deleted", False)),
-        })
+        clip_words.append(
+            {
+                "text": text,
+                "start_ms": start_ms,
+                "end_ms": end_ms,
+                "speaker": w.get("speaker"),
+                "emphasis": bool(w.get("emphasis", False)),
+                "deleted": bool(w.get("deleted", False)),
+            }
+        )
 
     # Auto-detect emphasis if not already present
     if clip_words and not any(w["emphasis"] for w in clip_words):
@@ -394,7 +433,8 @@ def generate_ass_subtitles(
             events.append(f"Dialogue: 0,{start_ass},{end_ass},Default,,0,0,0,,{text_event}")
 
     # Build full ASS file
-    header = f"""[Script Info]
+    header = (
+        f"""[Script Info]
 Title: {title}
 ScriptType: v4.00+
 PlayResX: {width}
@@ -408,7 +448,10 @@ Style: Default,{font_family},{font_size},{primary_color},&H000000FF,{outline_col
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
-""" + "\n".join(events) + "\n"
+"""
+        + "\n".join(events)
+        + "\n"
+    )
 
     return header
 

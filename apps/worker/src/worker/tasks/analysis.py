@@ -1,4 +1,5 @@
 """Celery tasks for video visual analysis and clip reframing."""
+
 import uuid
 from datetime import UTC, datetime
 

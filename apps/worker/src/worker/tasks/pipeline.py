@@ -11,6 +11,7 @@ import structlog
 from celery import shared_task
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 
+from clip_shared.billing.quota import QuotaService
 from clip_shared.config import get_settings
 from clip_shared.db.base import utc_now
 from clip_shared.db.models import (
@@ -24,7 +25,6 @@ from clip_shared.db.models import (
     Usage,
     Video,
 )
-from clip_shared.billing.quota import QuotaService
 from clip_shared.db.session import get_sync_db
 from clip_shared.media.audio_features import extract_audio_features
 from clip_shared.media.ffmpeg import (
@@ -414,7 +414,12 @@ def _execute_candidates_stage(
     transcript = db_session.query(Transcript).filter(Transcript.video_id == video.id).first()
     words_data = []
     if transcript:
-        words = db_session.query(TranscriptWord).filter(TranscriptWord.transcript_id == transcript.id).order_by(TranscriptWord.idx).all()
+        words = (
+            db_session.query(TranscriptWord)
+            .filter(TranscriptWord.transcript_id == transcript.id)
+            .order_by(TranscriptWord.idx)
+            .all()
+        )
         words_data = [{"start_ms": w.start_ms, "end_ms": w.end_ms, "word": w.word} for w in words]
 
     logger.info("extracting_audio_features", video_id=str(video.id))
@@ -431,19 +436,25 @@ def _execute_candidates_stage(
         logger.warning("failed_uploading_audio_features_npz", error=str(ex))
 
     # Persist AudioFeatures record
-    existing_feat = db_session.query(AudioFeatures).filter(AudioFeatures.video_id == video.id, AudioFeatures.version == "v1").first()
+    existing_feat = (
+        db_session.query(AudioFeatures)
+        .filter(AudioFeatures.video_id == video.id, AudioFeatures.version == "v1")
+        .first()
+    )
     if existing_feat:
         existing_feat.frames_key = features_s3_key
         existing_feat.summary = feat_result.summary
     else:
-        db_session.add(AudioFeatures(
-            id=uuid.uuid4(),
-            video_id=video.id,
-            version="v1",
-            frames_key=features_s3_key,
-            summary=feat_result.summary,
-            created_at=utc_now(),
-        ))
+        db_session.add(
+            AudioFeatures(
+                id=uuid.uuid4(),
+                video_id=video.id,
+                version="v1",
+                frames_key=features_s3_key,
+                summary=feat_result.summary,
+                created_at=utc_now(),
+            )
+        )
     db_session.flush()
     publish_progress_cb(60)
 
@@ -683,21 +694,25 @@ def run_stage(self, job_id_str: str, stage_name: str):
                 stage.meta = merged_meta
 
             # Upsert usage record idempotently
-            usage_stmt = pg_insert(Usage).values(
-                id=uuid.uuid4(),
-                user_id=job.user_id,
-                video_id=job.video_id,
-                job_id=job.id,
-                metric=metric_name,
-                quantity=metric_quantity,
-                cost_inr=stage_cost,
-                created_at=utc_now(),
-            ).on_conflict_do_update(
-                constraint="uq_usage_job_id_metric",
-                set_={
-                    "quantity": metric_quantity,
-                    "cost_inr": stage_cost,
-                },
+            usage_stmt = (
+                pg_insert(Usage)
+                .values(
+                    id=uuid.uuid4(),
+                    user_id=job.user_id,
+                    video_id=job.video_id,
+                    job_id=job.id,
+                    metric=metric_name,
+                    quantity=metric_quantity,
+                    cost_inr=stage_cost,
+                    created_at=utc_now(),
+                )
+                .on_conflict_do_update(
+                    constraint="uq_usage_job_id_metric",
+                    set_={
+                        "quantity": metric_quantity,
+                        "cost_inr": stage_cost,
+                    },
+                )
             )
             db.execute(usage_stmt)
             db.flush()

@@ -1,4 +1,5 @@
 """Pydantic schemas for Brand Kits and Brand Assets."""
+
 import uuid
 from datetime import datetime
 from typing import Any, Literal

@@ -1,4 +1,5 @@
 """API routes for caption styles, export presets, clip captions, cleanups, exports, and plans."""
+
 import json
 import uuid
 from datetime import UTC, datetime
@@ -10,6 +11,7 @@ from sqlalchemy import desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.dependencies import get_current_user
+from clip_shared.billing.quota import QuotaService
 from clip_shared.config import get_settings
 from clip_shared.db.models import (
     CaptionStyle,
@@ -27,7 +29,6 @@ from clip_shared.db.models import (
     UserPlan,
     Video,
 )
-from clip_shared.billing.quota import QuotaService
 from clip_shared.db.session import get_db
 from clip_shared.media.captions import build_clip_captions_data
 from clip_shared.media.cleanup import plan_clip_cleanup
@@ -60,6 +61,7 @@ settings = get_settings()
 # ---------------------------------------------------------------------------
 # 1. Caption Styles & Export Presets & Plans
 # ---------------------------------------------------------------------------
+
 
 @router.get("/caption-styles", response_model=list[CaptionStyleResponse])
 async def list_caption_styles(
@@ -147,9 +149,14 @@ async def get_my_plan(
 # 2. Clip Captions
 # ---------------------------------------------------------------------------
 
-async def _get_clip_and_verify_ownership(clip_id: uuid.UUID, user_id: uuid.UUID, db: AsyncSession) -> tuple[Clip, Video]:
+
+async def _get_clip_and_verify_ownership(
+    clip_id: uuid.UUID, user_id: uuid.UUID, db: AsyncSession
+) -> tuple[Clip, Video]:
     """Helper to verify clip and video ownership."""
-    stmt = select(Clip, Video).join(Video, Clip.video_id == Video.id).where(Clip.id == clip_id, Video.user_id == user_id)
+    stmt = (
+        select(Clip, Video).join(Video, Clip.video_id == Video.id).where(Clip.id == clip_id, Video.user_id == user_id)
+    )
     res = await db.execute(stmt)
     row = res.first()
     if not row:
@@ -188,21 +195,27 @@ async def get_clip_captions(
 
     raw_words = []
     if transcript:
-        w_stmt = select(TranscriptWord).where(
-            TranscriptWord.transcript_id == transcript.id,
-            TranscriptWord.end_ms >= clip.start_ms,
-            TranscriptWord.start_ms <= clip.end_ms,
-        ).order_by(TranscriptWord.idx)
+        w_stmt = (
+            select(TranscriptWord)
+            .where(
+                TranscriptWord.transcript_id == transcript.id,
+                TranscriptWord.end_ms >= clip.start_ms,
+                TranscriptWord.start_ms <= clip.end_ms,
+            )
+            .order_by(TranscriptWord.idx)
+        )
         w_res = await db.execute(w_stmt)
         for w in w_res.scalars().all():
-            raw_words.append({
-                "text": w.word,
-                "start_ms": w.start_ms,
-                "end_ms": w.end_ms,
-                "speaker": w.speaker,
-                "emphasis": False,
-                "deleted": False,
-            })
+            raw_words.append(
+                {
+                    "text": w.word,
+                    "start_ms": w.start_ms,
+                    "end_ms": w.end_ms,
+                    "speaker": w.speaker,
+                    "emphasis": False,
+                    "deleted": False,
+                }
+            )
 
     words_data = build_clip_captions_data(
         words=raw_words,
@@ -247,14 +260,24 @@ async def update_clip_captions(
         if "text" not in w or "start_ms" not in w or "end_ms" not in w:
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail={"error": {"code": "INVALID_CAPTION_WORD", "message": "Caption words must contain text, start_ms, and end_ms."}},
+                detail={
+                    "error": {
+                        "code": "INVALID_CAPTION_WORD",
+                        "message": "Caption words must contain text, start_ms, and end_ms.",
+                    }
+                },
             )
         start_ms = int(w["start_ms"])
         end_ms = int(w["end_ms"])
         if end_ms < start_ms:
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail={"error": {"code": "INVALID_WORD_TIMING", "message": f"Word end_ms ({end_ms}) cannot precede start_ms ({start_ms})."}},
+                detail={
+                    "error": {
+                        "code": "INVALID_WORD_TIMING",
+                        "message": f"Word end_ms ({end_ms}) cannot precede start_ms ({start_ms}).",
+                    }
+                },
             )
 
     stmt = select(ClipCaption).where(ClipCaption.clip_id == clip.id).order_by(desc(ClipCaption.created_at))
@@ -304,21 +327,27 @@ async def regenerate_clip_captions(
 
     raw_words = []
     if transcript:
-        w_stmt = select(TranscriptWord).where(
-            TranscriptWord.transcript_id == transcript.id,
-            TranscriptWord.end_ms >= clip.start_ms,
-            TranscriptWord.start_ms <= clip.end_ms,
-        ).order_by(TranscriptWord.idx)
+        w_stmt = (
+            select(TranscriptWord)
+            .where(
+                TranscriptWord.transcript_id == transcript.id,
+                TranscriptWord.end_ms >= clip.start_ms,
+                TranscriptWord.start_ms <= clip.end_ms,
+            )
+            .order_by(TranscriptWord.idx)
+        )
         w_res = await db.execute(w_stmt)
         for w in w_res.scalars().all():
-            raw_words.append({
-                "text": w.word,
-                "start_ms": w.start_ms,
-                "end_ms": w.end_ms,
-                "speaker": w.speaker,
-                "emphasis": False,
-                "deleted": False,
-            })
+            raw_words.append(
+                {
+                    "text": w.word,
+                    "start_ms": w.start_ms,
+                    "end_ms": w.end_ms,
+                    "speaker": w.speaker,
+                    "emphasis": False,
+                    "deleted": False,
+                }
+            )
 
     style_key = payload.style_key or "bold_pop"
     words_data = build_clip_captions_data(
@@ -358,6 +387,7 @@ async def regenerate_clip_captions(
 # ---------------------------------------------------------------------------
 # 3. Filler & Silence Cleanup
 # ---------------------------------------------------------------------------
+
 
 @router.get("/clips/{clip_id}/cleanup", response_model=ClipCleanupResponse)
 async def get_clip_cleanup(
@@ -415,7 +445,8 @@ async def update_clip_cleanup(
             id=uuid.uuid4(),
             clip_id=clip.id,
             version="v1",
-            options=payload.options or {
+            options=payload.options
+            or {
                 "remove_fillers": True,
                 "remove_silence": True,
                 "max_silence_ms": 700,
@@ -458,19 +489,25 @@ async def analyze_clip_cleanup(
 
     words_list = []
     if transcript:
-        w_stmt = select(TranscriptWord).where(
-            TranscriptWord.transcript_id == transcript.id,
-            TranscriptWord.end_ms >= clip.start_ms,
-            TranscriptWord.start_ms <= clip.end_ms,
-        ).order_by(TranscriptWord.idx)
+        w_stmt = (
+            select(TranscriptWord)
+            .where(
+                TranscriptWord.transcript_id == transcript.id,
+                TranscriptWord.end_ms >= clip.start_ms,
+                TranscriptWord.start_ms <= clip.end_ms,
+            )
+            .order_by(TranscriptWord.idx)
+        )
         w_res = await db.execute(w_stmt)
         for w in w_res.scalars().all():
-            words_list.append({
-                "text": w.word,
-                "start_ms": w.start_ms,
-                "end_ms": w.end_ms,
-                "speaker": w.speaker,
-            })
+            words_list.append(
+                {
+                    "text": w.word,
+                    "start_ms": w.start_ms,
+                    "end_ms": w.end_ms,
+                    "speaker": w.speaker,
+                }
+            )
 
     cleanup_res = plan_clip_cleanup(
         clip_start_ms=clip.start_ms,
@@ -500,6 +537,7 @@ async def analyze_clip_cleanup(
 # ---------------------------------------------------------------------------
 # 4. Exports
 # ---------------------------------------------------------------------------
+
 
 @router.post("/clips/{clip_id}/exports", response_model=list[ExportResponse])
 async def create_clip_export(
@@ -585,11 +623,15 @@ async def create_clip_export(
 
         # Idempotency check: if existing export matches and not force, return existing
         if not payload.force:
-            exist_stmt = select(Export).where(
-                Export.clip_id == clip.id,
-                Export.preset_key == p_key,
-                Export.status.in_(["queued", "rendering", "succeeded"]),
-            ).order_by(desc(Export.created_at))
+            exist_stmt = (
+                select(Export)
+                .where(
+                    Export.clip_id == clip.id,
+                    Export.preset_key == p_key,
+                    Export.status.in_(["queued", "rendering", "succeeded"]),
+                )
+                .order_by(desc(Export.created_at))
+            )
             exist_res = await db.execute(exist_stmt)
             existing = exist_res.scalar_one_or_none()
             if existing and existing.params_snapshot.get("hash") == params_hash:
@@ -612,6 +654,7 @@ async def create_clip_export(
 
         # Dispatch Celery render task
         from worker.tasks.render import render_export_task
+
         render_export_task.delay(str(export_id))
 
         created_exports.append(export_rec)
@@ -717,7 +760,12 @@ async def get_export_download_url(
     if export_rec.status != "succeeded" or not export_rec.storage_key:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail={"error": {"code": "EXPORT_NOT_READY", "message": f"Export status is '{export_rec.status}' and not ready for download."}},
+            detail={
+                "error": {
+                    "code": "EXPORT_NOT_READY",
+                    "message": f"Export status is '{export_rec.status}' and not ready for download.",
+                }
+            },
         )
 
     s3 = get_s3_client()
@@ -756,7 +804,9 @@ async def stream_export_events(
             "type": "export_state",
             "export_id": str(export_id),
             "status": export_rec.status,
-            "progress": 100.0 if export_rec.status == "succeeded" else (5.0 if export_rec.status == "rendering" else 0.0),
+            "progress": 100.0
+            if export_rec.status == "succeeded"
+            else (5.0 if export_rec.status == "rendering" else 0.0),
         }
         yield f"data: {json.dumps(initial_payload)}\n\n"
 

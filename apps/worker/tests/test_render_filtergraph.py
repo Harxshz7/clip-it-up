@@ -163,8 +163,26 @@ def test_build_render_filtergraph_with_phase7b_split_stack_layout():
         "layout": {
             "type": "split_stack",
             "regions": [
-                {"src_x": 0.1, "src_y": 0.2, "src_w": 0.3, "src_h": 0.4, "dst_x": 0.0, "dst_y": 0.0, "dst_w": 1.0, "dst_h": 0.5},
-                {"src_x": 0.6, "src_y": 0.2, "src_w": 0.3, "src_h": 0.4, "dst_x": 0.0, "dst_y": 0.5, "dst_w": 1.0, "dst_h": 0.5},
+                {
+                    "src_x": 0.1,
+                    "src_y": 0.2,
+                    "src_w": 0.3,
+                    "src_h": 0.4,
+                    "dst_x": 0.0,
+                    "dst_y": 0.0,
+                    "dst_w": 1.0,
+                    "dst_h": 0.5,
+                },
+                {
+                    "src_x": 0.6,
+                    "src_y": 0.2,
+                    "src_w": 0.3,
+                    "src_h": 0.4,
+                    "dst_x": 0.0,
+                    "dst_y": 0.5,
+                    "dst_w": 1.0,
+                    "dst_h": 0.5,
+                },
             ],
         },
     }
@@ -194,8 +212,27 @@ def test_build_render_filtergraph_with_phase7b_pip_layout():
         "layout": {
             "type": "pip",
             "regions": [
-                {"src_x": 0.0, "src_y": 0.0, "src_w": 1.0, "src_h": 1.0, "dst_x": 0.0, "dst_y": 0.21875, "dst_w": 1.0, "dst_h": 0.5625},
-                {"src_x": 0.8, "src_y": 0.1, "src_w": 0.15, "src_h": 0.15, "dst_x": 0.68, "dst_y": 0.12, "dst_w": 0.28, "dst_h": 0.16, "shape": "rounded_rect"},
+                {
+                    "src_x": 0.0,
+                    "src_y": 0.0,
+                    "src_w": 1.0,
+                    "src_h": 1.0,
+                    "dst_x": 0.0,
+                    "dst_y": 0.21875,
+                    "dst_w": 1.0,
+                    "dst_h": 0.5625,
+                },
+                {
+                    "src_x": 0.8,
+                    "src_y": 0.1,
+                    "src_w": 0.15,
+                    "src_h": 0.15,
+                    "dst_x": 0.68,
+                    "dst_y": 0.12,
+                    "dst_w": 0.28,
+                    "dst_h": 0.16,
+                    "shape": "rounded_rect",
+                },
             ],
         },
     }

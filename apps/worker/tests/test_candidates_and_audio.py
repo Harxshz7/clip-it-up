@@ -28,12 +28,16 @@ def test_score_window_start_and_end():
     assert "speaker_turn" in reasons
 
     # Strong claim hook
-    score2, reasons2 = score_window_start_heuristics("The truth is, nobody is going to hand you success.", is_speaker_turn=False)
+    score2, reasons2 = score_window_start_heuristics(
+        "The truth is, nobody is going to hand you success.", is_speaker_turn=False
+    )
     assert score2 >= 0.20
     assert "strong_claim" in reasons2
 
     # Conclusion & natural pause
-    score_end, reasons_end = score_window_end_heuristics("And that's why consistency beats talent every single time.", gap_after_ms=800)
+    score_end, reasons_end = score_window_end_heuristics(
+        "And that's why consistency beats talent every single time.", gap_after_ms=800
+    )
     assert score_end >= 0.35
     assert "conclusion_punchline" in reasons_end
     assert any("natural_pause" in r for r in reasons_end)
@@ -41,10 +45,34 @@ def test_score_window_start_and_end():
 
 def test_generate_candidate_windows():
     segments = [
-        {"idx": 0, "start_ms": 0, "end_ms": 5000, "speaker": "SPEAKER_00", "text": "What is the biggest myth in software engineering?"},
-        {"idx": 1, "start_ms": 5100, "end_ms": 12000, "speaker": "SPEAKER_00", "text": "People think you have to write thousands of lines of code every single day."},
-        {"idx": 2, "start_ms": 12200, "end_ms": 19000, "speaker": "SPEAKER_00", "text": "In reality, the best engineers spend most of their time deleting code."},
-        {"idx": 3, "start_ms": 19500, "end_ms": 25000, "speaker": "SPEAKER_00", "text": "And that's how you build scalable systems with zero technical debt."},
+        {
+            "idx": 0,
+            "start_ms": 0,
+            "end_ms": 5000,
+            "speaker": "SPEAKER_00",
+            "text": "What is the biggest myth in software engineering?",
+        },
+        {
+            "idx": 1,
+            "start_ms": 5100,
+            "end_ms": 12000,
+            "speaker": "SPEAKER_00",
+            "text": "People think you have to write thousands of lines of code every single day.",
+        },
+        {
+            "idx": 2,
+            "start_ms": 12200,
+            "end_ms": 19000,
+            "speaker": "SPEAKER_00",
+            "text": "In reality, the best engineers spend most of their time deleting code.",
+        },
+        {
+            "idx": 3,
+            "start_ms": 19500,
+            "end_ms": 25000,
+            "speaker": "SPEAKER_00",
+            "text": "And that's how you build scalable systems with zero technical debt.",
+        },
     ]
 
     windows = generate_candidate_windows(segments, min_length_s=10.0, max_length_s=30.0)
@@ -84,9 +112,15 @@ def test_candidate_filters_and_deduplication():
     assert is_excessive_silence(w, words_sparse, max_silence_ratio=0.30) is True
 
     # Clustering & deduplication
-    w_best = CandidateWindow(start_ms=0, end_ms=30000, start_segment_idx=0, end_segment_idx=2, text="best", heuristic_score=0.9)
-    w_overlap = CandidateWindow(start_ms=5000, end_ms=32000, start_segment_idx=1, end_segment_idx=2, text="overlap", heuristic_score=0.4)
-    w_other = CandidateWindow(start_ms=60000, end_ms=90000, start_segment_idx=4, end_segment_idx=6, text="other", heuristic_score=0.7)
+    w_best = CandidateWindow(
+        start_ms=0, end_ms=30000, start_segment_idx=0, end_segment_idx=2, text="best", heuristic_score=0.9
+    )
+    w_overlap = CandidateWindow(
+        start_ms=5000, end_ms=32000, start_segment_idx=1, end_segment_idx=2, text="overlap", heuristic_score=0.4
+    )
+    w_other = CandidateWindow(
+        start_ms=60000, end_ms=90000, start_segment_idx=4, end_segment_idx=6, text="other", heuristic_score=0.7
+    )
 
     deduped = cluster_and_deduplicate_candidates([w_overlap, w_best, w_other], iou_threshold=0.5)
     assert len(deduped) == 2
@@ -109,7 +143,9 @@ def test_audio_features_extraction(tmp_path):
     # Test extract_audio_features with mock/temp wav
     dummy_wav = str(tmp_path / "test_audio.wav")
     with open(dummy_wav, "wb") as f:
-        f.write(b"RIFF\x24\x00\x00\x00WAVEfmt \x10\x00\x00\x00\x01\x00\x01\x00\x80>\x00\x00\x00}\x00\x00\x02\x00\x10\x00data\x00\x00\x00\x00")
+        f.write(
+            b"RIFF\x24\x00\x00\x00WAVEfmt \x10\x00\x00\x00\x01\x00\x01\x00\x80>\x00\x00\x00}\x00\x00\x02\x00\x10\x00data\x00\x00\x00\x00"
+        )
 
     result = extract_audio_features(dummy_wav)
     assert result.duration_seconds > 0

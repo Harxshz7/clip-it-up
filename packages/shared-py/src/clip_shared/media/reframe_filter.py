@@ -1,4 +1,5 @@
 """Helper to generate crop and layout scaling filters for vertical reframing."""
+
 from typing import Any
 
 
@@ -53,7 +54,6 @@ def reframe_crop_to_filter(
         avg_y = int(sum(all_y) / len(all_y))
         return f"crop={crop_w_px}:{crop_h_px}:{avg_x}:{avg_y}"
 
-    x0_px = all_x[0]
     x_expr_parts = []
     for i in range(1, len(keyframes)):
         k_prev = keyframes[i - 1]
@@ -105,8 +105,10 @@ def compile_layout_reframe_filter(
 
         sub_w_px = min(src_w, max(120, int(src_w * 0.45)))
         sub_h_px = int(sub_w_px / 1.125)
-        if sub_w_px % 2 != 0: sub_w_px -= 1
-        if sub_h_px % 2 != 0: sub_h_px -= 1
+        if sub_w_px % 2 != 0:
+            sub_w_px -= 1
+        if sub_h_px % 2 != 0:
+            sub_h_px -= 1
 
         top_x = int(np_clip(t_cx * src_w - (sub_w_px / 2.0), 0, src_w - sub_w_px))
         top_y = int(np_clip(t_cy * src_h - (sub_h_px / 2.0), 0, src_h - sub_h_px))
@@ -125,15 +127,19 @@ def compile_layout_reframe_filter(
         bot_h = out_h - top_h
         c_w = min(src_w, int(src_w * 0.95))
         c_h = int(c_w * (top_h / float(out_w)))
-        if c_w % 2 != 0: c_w -= 1
-        if c_h % 2 != 0: c_h -= 1
+        if c_w % 2 != 0:
+            c_w -= 1
+        if c_h % 2 != 0:
+            c_h -= 1
         c_x = (src_w - c_w) // 2
         c_y = max(0, int(src_h * 0.05))
 
         spk_w = int(src_w * 0.40)
         spk_h = int(spk_w * (bot_h / float(out_w)))
-        if spk_w % 2 != 0: spk_w -= 1
-        if spk_h % 2 != 0: spk_h -= 1
+        if spk_w % 2 != 0:
+            spk_w -= 1
+        if spk_h % 2 != 0:
+            spk_h -= 1
         s_x = int(np_clip(0.5 * src_w - (spk_w / 2.0), 0, src_w - spk_w))
         s_y = int(np_clip(0.4 * src_h - (spk_h / 2.0), 0, src_h - spk_h))
 
@@ -147,12 +153,16 @@ def compile_layout_reframe_filter(
     if active_mode == "pip":
         pip_w = int(out_w * 0.28)
         pip_h = int(pip_w * 1.15)
-        if pip_w % 2 != 0: pip_w -= 1
-        if pip_h % 2 != 0: pip_h -= 1
+        if pip_w % 2 != 0:
+            pip_w -= 1
+        if pip_h % 2 != 0:
+            pip_h -= 1
         spk_w = int(src_w * 0.25)
         spk_h = int(src_h * 0.35)
-        if spk_w % 2 != 0: spk_w -= 1
-        if spk_h % 2 != 0: spk_h -= 1
+        if spk_w % 2 != 0:
+            spk_w -= 1
+        if spk_h % 2 != 0:
+            spk_h -= 1
         spk_x = int(np_clip(0.85 * src_w - (spk_w / 2.0), 0, src_w - spk_w))
         spk_y = int(np_clip(0.20 * src_h - (spk_h / 2.0), 0, src_h - spk_h))
 

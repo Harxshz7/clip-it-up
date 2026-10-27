@@ -1,4 +1,5 @@
 """Face mesh and lip landmark extraction for mouth openness and active speaker detection."""
+
 from dataclasses import dataclass
 
 import numpy as np
@@ -10,6 +11,7 @@ logger = structlog.get_logger()
 @dataclass
 class MouthFeatures:
     """Extracted lip and mouth kinematics for a face track."""
+
     openness: float  # Normalized vertical opening [0.0, 1.0]
     aspect_ratio: float  # Height to width ratio
     variance: float = 0.0  # Temporal variance (movement energy)
@@ -27,6 +29,7 @@ class MouthOpennessExtractor:
     def _init_mesh(self) -> None:
         try:
             import mediapipe as mp
+
             if hasattr(mp, "solutions") and hasattr(mp.solutions, "face_mesh"):
                 self._mesh = mp.solutions.face_mesh.FaceMesh(
                     max_num_faces=self.max_num_faces,
@@ -49,7 +52,7 @@ class MouthOpennessExtractor:
         if self._mesh is None:
             # Simple brightness/edge variance fallback on mouth region
             h, w = frame_crop.shape[:2]
-            mouth_region = frame_crop[int(h * 0.65):int(h * 0.95), int(w * 0.25):int(w * 0.75)]
+            mouth_region = frame_crop[int(h * 0.65) : int(h * 0.95), int(w * 0.25) : int(w * 0.75)]
             if mouth_region.size > 0:
                 std = float(np.std(mouth_region))
                 return min(1.0, std / 64.0)
@@ -57,6 +60,7 @@ class MouthOpennessExtractor:
 
         try:
             import cv2
+
             rgb = cv2.cvtColor(frame_crop, cv2.COLOR_BGR2RGB) if len(frame_crop.shape) == 3 else frame_crop
             results = self._mesh.process(rgb)
 

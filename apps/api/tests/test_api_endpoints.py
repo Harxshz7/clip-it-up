@@ -10,8 +10,7 @@ from clip_shared.db.models import Job, Video
 
 @pytest.mark.asyncio
 async def test_health_endpoint(client: AsyncClient):
-    with patch("api.routes.health.get_s3_client") as mock_s3, \
-         patch("redis.asyncio.from_url") as mock_redis:
+    with patch("api.routes.health.get_s3_client") as mock_s3, patch("redis.asyncio.from_url") as mock_redis:
         mock_redis_client = MagicMock()
         mock_redis_client.ping = MagicMock(return_value=asyncio_future(True))
         mock_redis_client.aclose = MagicMock(return_value=asyncio_future(None))

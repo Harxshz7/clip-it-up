@@ -27,12 +27,9 @@ async def get_job_snapshot_data(
     session: AsyncSession | None = None,
 ) -> dict | None:
     """Fetch complete job and stages data snapshot."""
+
     async def _fetch(s: AsyncSession):
-        stmt = (
-            select(Job)
-            .options(selectinload(Job.stages))
-            .where(Job.id == job_id, Job.user_id == user_id)
-        )
+        stmt = select(Job).options(selectinload(Job.stages)).where(Job.id == job_id, Job.user_id == user_id)
         result = await s.execute(stmt)
         job = result.scalar_one_or_none()
         if not job:
@@ -83,11 +80,7 @@ async def get_job(
     db: AsyncSession = Depends(get_db),
 ):
     """Get single job with stage execution details. Returns 404 if not found or unauthorized."""
-    stmt = (
-        select(Job)
-        .options(selectinload(Job.stages))
-        .where(Job.id == job_id, Job.user_id == user.id)
-    )
+    stmt = select(Job).options(selectinload(Job.stages)).where(Job.id == job_id, Job.user_id == user.id)
     result = await db.execute(stmt)
     job = result.scalar_one_or_none()
     if not job:
@@ -191,11 +184,7 @@ async def cancel_job(
     db: AsyncSession = Depends(get_db),
 ):
     """Cancel a running or queued job."""
-    stmt = (
-        select(Job)
-        .options(selectinload(Job.stages))
-        .where(Job.id == job_id, Job.user_id == user.id)
-    )
+    stmt = select(Job).options(selectinload(Job.stages)).where(Job.id == job_id, Job.user_id == user.id)
     result = await db.execute(stmt)
     job = result.scalar_one_or_none()
 

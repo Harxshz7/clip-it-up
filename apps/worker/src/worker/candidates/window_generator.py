@@ -6,6 +6,7 @@ from typing import Any
 @dataclass
 class CandidateWindow:
     """Represents a prospective clip moment window bounded by sentences."""
+
     start_ms: int
     end_ms: int
     start_segment_idx: int

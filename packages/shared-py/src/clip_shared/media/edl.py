@@ -4,6 +4,7 @@ Pure, deterministic module that maps source video time to rendered output timeli
 Handles arbitrary silence and filler cuts, maintains exact A/V alignment,
 and provides bidirectional time remapping for captions, crop keyframes, and audio.
 """
+
 from dataclasses import asdict, dataclass, field
 from typing import Any
 
@@ -11,6 +12,7 @@ from typing import Any
 @dataclass(frozen=True)
 class Removal:
     """A time interval cut out from the source video."""
+
     start_ms: int
     end_ms: int
     kind: str = "manual"  # filler | silence | manual
@@ -28,6 +30,7 @@ class Removal:
 @dataclass(frozen=True)
 class KeepSegment:
     """A contiguous segment preserved from the source video onto the output timeline."""
+
     src_start_ms: int
     src_end_ms: int
     out_start_ms: int
@@ -53,6 +56,7 @@ class EditDecisionList:
     Transforms (clip_range + removals) into a list of keep segments and
     provides deterministic bidirectional time mapping.
     """
+
     clip_start_ms: int
     clip_end_ms: int
     removals: list[Removal] = field(default_factory=list)

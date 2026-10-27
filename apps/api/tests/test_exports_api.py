@@ -132,7 +132,9 @@ async def test_clip_captions_and_cleanups_lifecycle(
     words = [
         TranscriptWord(id=uuid.uuid4(), transcript_id=transcript.id, idx=0, word="Hey", start_ms=1000, end_ms=1400),
         TranscriptWord(id=uuid.uuid4(), transcript_id=transcript.id, idx=1, word="um", start_ms=1500, end_ms=1800),
-        TranscriptWord(id=uuid.uuid4(), transcript_id=transcript.id, idx=2, word="everyone", start_ms=1900, end_ms=2500),
+        TranscriptWord(
+            id=uuid.uuid4(), transcript_id=transcript.id, idx=2, word="everyone", start_ms=1900, end_ms=2500
+        ),
         TranscriptWord(id=uuid.uuid4(), transcript_id=transcript.id, idx=3, word="welcome", start_ms=2600, end_ms=3000),
     ]
     for w in words:
@@ -194,7 +196,9 @@ async def test_clip_captions_and_cleanups_lifecycle(
     assert resp_regen.json()["style_key"] == "bold_pop"
 
     # 4. POST /clips/{id}/cleanup/analyze
-    resp_an = await client.post(f"/clips/{clip.id}/cleanup/analyze", json={"remove_fillers": True, "remove_silence": True})
+    resp_an = await client.post(
+        f"/clips/{clip.id}/cleanup/analyze", json={"remove_fillers": True, "remove_silence": True}
+    )
     assert resp_an.status_code == 200
     an_data = resp_an.json()
     assert an_data["original_duration_ms"] == 3000

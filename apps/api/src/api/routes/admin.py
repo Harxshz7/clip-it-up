@@ -10,12 +10,10 @@ from sqlalchemy import desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.dependencies import get_current_user
-from clip_shared.billing.invoicing import InvoiceService
-from clip_shared.config import get_settings, load_billing_config, load_plans_config
+from clip_shared.config import get_settings, load_plans_config
 from clip_shared.db.base import utc_now
 from clip_shared.db.models import (
     AnalyticsEvent,
-    Customer,
     DeadLetterJob,
     Export,
     InviteCode,
@@ -23,12 +21,10 @@ from clip_shared.db.models import (
     Job,
     JobStage,
     Payment,
-    Plan,
     Subscription,
     TakedownRequest,
     Usage,
     User,
-    UserPlan,
     Video,
 )
 from clip_shared.db.session import get_db
@@ -59,6 +55,7 @@ def verify_admin_access(
 # Schemas
 # ---------------------------------------------------------------------------
 
+
 class CreateInviteRequest(BaseModel):
     code: str
     max_uses: int = 10
@@ -76,6 +73,7 @@ class TrackEventRequest(BaseModel):
 # ---------------------------------------------------------------------------
 # Public / Client Telemetry Ingestion (with DNT & Consent support)
 # ---------------------------------------------------------------------------
+
 
 @router.post("/events")
 async def track_telemetry_event(
@@ -115,6 +113,7 @@ async def track_telemetry_event(
 # Admin Metric Dashboards
 # ---------------------------------------------------------------------------
 
+
 @router.get("/metrics/funnel")
 async def get_funnel_metrics(
     admin: AuthenticatedUser = Depends(verify_admin_access),
@@ -130,7 +129,9 @@ async def get_funnel_metrics(
     exporters_res = await db.execute(select(func.count(func.distinct(Export.user_id))))
     total_exporters = exporters_res.scalar() or 0
 
-    paid_res = await db.execute(select(func.count(func.distinct(Subscription.user_id))).where(Subscription.status == "active"))
+    paid_res = await db.execute(
+        select(func.count(func.distinct(Subscription.user_id))).where(Subscription.status == "active")
+    )
     total_paid = paid_res.scalar() or 0
 
     visit_proxy = max(total_signups * 4, 100)
@@ -139,9 +140,21 @@ async def get_funnel_metrics(
         "funnel": [
             {"step": "visit", "count": visit_proxy, "conversion_pct": 100.0},
             {"step": "signup", "count": total_signups, "conversion_pct": round((total_signups / visit_proxy) * 100, 1)},
-            {"step": "upload", "count": total_uploaders, "conversion_pct": round((total_uploaders / max(total_signups, 1)) * 100, 1)},
-            {"step": "export", "count": total_exporters, "conversion_pct": round((total_exporters / max(total_uploaders, 1)) * 100, 1)},
-            {"step": "paid", "count": total_paid, "conversion_pct": round((total_paid / max(total_exporters, 1)) * 100, 1)},
+            {
+                "step": "upload",
+                "count": total_uploaders,
+                "conversion_pct": round((total_uploaders / max(total_signups, 1)) * 100, 1),
+            },
+            {
+                "step": "export",
+                "count": total_exporters,
+                "conversion_pct": round((total_exporters / max(total_uploaders, 1)) * 100, 1),
+            },
+            {
+                "step": "paid",
+                "count": total_paid,
+                "conversion_pct": round((total_paid / max(total_exporters, 1)) * 100, 1),
+            },
         ]
     }
 
@@ -158,14 +171,20 @@ async def get_product_health_metrics(
     total_jobs_res = await db.execute(select(func.count(Job.id)).where(Job.created_at >= last_7d))
     total_jobs = total_jobs_res.scalar() or 0
 
-    success_jobs_res = await db.execute(select(func.count(Job.id)).where(Job.created_at >= last_7d, Job.status == "succeeded"))
+    success_jobs_res = await db.execute(
+        select(func.count(Job.id)).where(Job.created_at >= last_7d, Job.status == "succeeded")
+    )
     success_jobs = success_jobs_res.scalar() or 0
 
     dead_letter_res = await db.execute(select(func.count(DeadLetterJob.id)))
     dead_letters = dead_letter_res.scalar() or 0
 
     # Average stage durations
-    stages_stmt = select(JobStage.name, func.avg(JobStage.duration_ms)).where(JobStage.status == "succeeded").group_by(JobStage.name)
+    stages_stmt = (
+        select(JobStage.name, func.avg(JobStage.duration_ms))
+        .where(JobStage.status == "succeeded")
+        .group_by(JobStage.name)
+    )
     stages_res = await db.execute(stages_stmt)
     stage_durations = {row[0]: round(float(row[1] or 0), 1) for row in stages_res.all()}
 
@@ -188,7 +207,11 @@ async def get_money_metrics(
 ):
     """MRR, active subscriptions by plan, churn, refunds, revenue vs cost per user."""
     # Active subs by plan
-    sub_stmt = select(Subscription.plan_key, func.count(Subscription.id)).where(Subscription.status == "active").group_by(Subscription.plan_key)
+    sub_stmt = (
+        select(Subscription.plan_key, func.count(Subscription.id))
+        .where(Subscription.status == "active")
+        .group_by(Subscription.plan_key)
+    )
     sub_res = await db.execute(sub_stmt)
     subs_by_plan = {row[0]: int(row[1]) for row in sub_res.all()}
 
@@ -199,7 +222,9 @@ async def get_money_metrics(
         mrr_inr += price * count
 
     # Revenue
-    rev_res = await db.execute(select(func.coalesce(func.sum(Payment.amount), Decimal("0.00"))).where(Payment.status == "succeeded"))
+    rev_res = await db.execute(
+        select(func.coalesce(func.sum(Payment.amount), Decimal("0.00"))).where(Payment.status == "succeeded")
+    )
     total_rev = Decimal(str(rev_res.scalar() or "0.00"))
 
     # Processing costs from usage table
@@ -222,7 +247,9 @@ async def get_abuse_metrics(
     db: AsyncSession = Depends(get_db),
 ):
     """Abuse monitoring: users near caps, rate-limit hits, DMCA queue."""
-    takedown_res = await db.execute(select(func.count(TakedownRequest.id)).where(TakedownRequest.status.in_(["submitted", "under_review"])))
+    takedown_res = await db.execute(
+        select(func.count(TakedownRequest.id)).where(TakedownRequest.status.in_(["submitted", "under_review"]))
+    )
     dmca_pending = takedown_res.scalar() or 0
 
     flagged_videos_res = await db.execute(select(func.count(Video.id)).where(Video.status.like("%flagged%")))
@@ -241,6 +268,7 @@ async def get_abuse_metrics(
 # ---------------------------------------------------------------------------
 # Invite Codes Management
 # ---------------------------------------------------------------------------
+
 
 @router.get("/invites")
 async def list_invites(
@@ -295,6 +323,7 @@ async def revoke_invite(
 # Monthly Invoices Export for CA / Accountant
 # ---------------------------------------------------------------------------
 
+
 @router.get("/invoices/export")
 async def export_invoices_csv(
     month: str = Query(..., regex=r"^\d{4}-\d{2}$", description="Month in YYYY-MM format"),
@@ -308,26 +337,65 @@ async def export_invoices_csv(
     else:
         end_dt = start_dt.replace(month=start_dt.month + 1)
 
-    stmt = select(Invoice).where(Invoice.created_at >= start_dt, Invoice.created_at < end_dt).order_by(Invoice.seq_number.asc())
+    stmt = (
+        select(Invoice)
+        .where(Invoice.created_at >= start_dt, Invoice.created_at < end_dt)
+        .order_by(Invoice.seq_number.asc())
+    )
     res = await db.execute(stmt)
     invoices = res.scalars().all()
 
     import csv
+
     output = io.StringIO()
     writer = csv.writer(output)
-    writer.writerow([
-        "Invoice Number", "Date", "Financial Year", "Type", "Customer Name", "Customer Email",
-        "GSTIN", "Place of Supply", "Taxable Amount", "CGST Rate", "CGST Amount",
-        "SGST Rate", "SGST Amount", "IGST Rate", "IGST Amount", "Total Tax", "Total Amount", "Currency", "Status",
-    ])
+    writer.writerow(
+        [
+            "Invoice Number",
+            "Date",
+            "Financial Year",
+            "Type",
+            "Customer Name",
+            "Customer Email",
+            "GSTIN",
+            "Place of Supply",
+            "Taxable Amount",
+            "CGST Rate",
+            "CGST Amount",
+            "SGST Rate",
+            "SGST Amount",
+            "IGST Rate",
+            "IGST Amount",
+            "Total Tax",
+            "Total Amount",
+            "Currency",
+            "Status",
+        ]
+    )
     for inv in invoices:
-        writer.writerow([
-            inv.invoice_number, inv.created_at.strftime("%Y-%m-%d"), inv.financial_year, inv.type,
-            inv.customer_name, inv.customer_email, inv.customer_gstin or "", inv.place_of_supply,
-            f"{inv.taxable_amount:.2f}", f"{inv.cgst_rate:.4f}", f"{inv.cgst_amount:.2f}",
-            f"{inv.sgst_rate:.4f}", f"{inv.sgst_amount:.2f}", f"{inv.igst_rate:.4f}", f"{inv.igst_amount:.2f}",
-            f"{inv.total_tax:.2f}", f"{inv.total_amount:.2f}", inv.currency, inv.status,
-        ])
+        writer.writerow(
+            [
+                inv.invoice_number,
+                inv.created_at.strftime("%Y-%m-%d"),
+                inv.financial_year,
+                inv.type,
+                inv.customer_name,
+                inv.customer_email,
+                inv.customer_gstin or "",
+                inv.place_of_supply,
+                f"{inv.taxable_amount:.2f}",
+                f"{inv.cgst_rate:.4f}",
+                f"{inv.cgst_amount:.2f}",
+                f"{inv.sgst_rate:.4f}",
+                f"{inv.sgst_amount:.2f}",
+                f"{inv.igst_rate:.4f}",
+                f"{inv.igst_amount:.2f}",
+                f"{inv.total_tax:.2f}",
+                f"{inv.total_amount:.2f}",
+                inv.currency,
+                inv.status,
+            ]
+        )
 
     return Response(
         content=output.getvalue(),

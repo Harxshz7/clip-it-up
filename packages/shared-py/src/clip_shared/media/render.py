@@ -4,6 +4,7 @@ Combines EDL trimming, audio crossfade, vertical reframing, ASS subtitle burning
 EBU R128 loudness normalization, and server-enforced watermark overlay into a single
 efficient filtergraph.
 """
+
 import os
 import subprocess
 import time
@@ -24,6 +25,7 @@ logger = structlog.get_logger()
 @dataclass
 class RenderJobSnapshot:
     """Immutable snapshot of parameters driving the export."""
+
     clip_id: str
     user_id: str
     export_id: str
@@ -232,9 +234,7 @@ def build_render_filtergraph(
             for i in range(1, num_segs):
                 next_seg = f"[a_seg{i}]"
                 out_xf = f"[a_xf{i}]"
-                filter_parts.append(
-                    f"{a_cur}{next_seg}acrossfade=d={xfade_s:.3f}:c1=tri:c2=tri{out_xf};"
-                )
+                filter_parts.append(f"{a_cur}{next_seg}acrossfade=d={xfade_s:.3f}:c1=tri:c2=tri{out_xf};")
                 a_cur = out_xf
         else:
             a_cur = "[a_seg0]"
@@ -313,43 +313,64 @@ def build_render_ffmpeg_cmd(
     cmd = [
         "ffmpeg",
         "-y",
-        "-threads", str(threads),
-        "-filter_complex_threads", str(threads),
-        "-ss", f"{seek_s:.3f}",
-        "-i", input_video,
+        "-threads",
+        str(threads),
+        "-filter_complex_threads",
+        str(threads),
+        "-ss",
+        f"{seek_s:.3f}",
+        "-i",
+        input_video,
     ]
 
     if extra_inputs:
         for extra in extra_inputs:
             cmd.extend(["-i", extra])
 
-    cmd.extend([
-        "-filter_complex", filtergraph_str,
-        "-map", v_label,
-    ])
+    cmd.extend(
+        [
+            "-filter_complex",
+            filtergraph_str,
+            "-map",
+            v_label,
+        ]
+    )
 
     if has_audio and a_label != "[a_none]":
         cmd.extend(["-map", a_label])
 
-    cmd.extend([
-        "-c:v", "libx264",
-        "-preset", preset,
-        "-crf", str(crf),
-        "-maxrate", video_bitrate,
-        "-bufsize", bufsize,
-        "-pix_fmt", "yuv420p",
-        "-c:a", "aac",
-        "-b:a", audio_bitrate,
-        "-ar", "48000",
-        "-movflags", "+faststart",
-        "-avoid_negative_ts", "make_zero",
-        "-progress", "pipe:1",
-        "-nostats",
-        output_mp4,
-    ])
+    cmd.extend(
+        [
+            "-c:v",
+            "libx264",
+            "-preset",
+            preset,
+            "-crf",
+            str(crf),
+            "-maxrate",
+            video_bitrate,
+            "-bufsize",
+            bufsize,
+            "-pix_fmt",
+            "yuv420p",
+            "-c:a",
+            "aac",
+            "-b:a",
+            audio_bitrate,
+            "-ar",
+            "48000",
+            "-movflags",
+            "+faststart",
+            "-avoid_negative_ts",
+            "make_zero",
+            "-progress",
+            "pipe:1",
+            "-nostats",
+            output_mp4,
+        ]
+    )
 
     return cmd
-
 
 
 def validate_rendered_output(
@@ -454,7 +475,9 @@ def execute_export_render(
             outro_input_idx = 1 + len(extra_inputs)
             extra_inputs.append(snapshot.outro_path)
 
-        intro_offset_ms = snapshot.intro_duration_ms if (intro_input_idx is not None and snapshot.intro_duration_ms > 0) else 0
+        intro_offset_ms = (
+            snapshot.intro_duration_ms if (intro_input_idx is not None and snapshot.intro_duration_ms > 0) else 0
+        )
 
         # 2. Generate ASS subtitles (if captions provided)
         if snapshot.captions_words:

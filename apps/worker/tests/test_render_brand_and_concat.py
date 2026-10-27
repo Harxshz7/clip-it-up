@@ -1,4 +1,5 @@
 """Tests for Step 2 Render Integration: Brand logo overlay, intro/outro concat, custom fonts, and EDL offsets."""
+
 import shutil
 
 import pytest
@@ -96,13 +97,25 @@ def test_render_filtergraph_with_intro_and_outro_concat():
     )
 
     # Video prep & concat
-    assert "[2:v]scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1,setpts=PTS-STARTPTS[v_intro]" in filter_str
-    assert "[3:v]scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1,setpts=PTS-STARTPTS[v_outro]" in filter_str
+    assert (
+        "[2:v]scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1,setpts=PTS-STARTPTS[v_intro]"
+        in filter_str
+    )
+    assert (
+        "[3:v]scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1,setpts=PTS-STARTPTS[v_outro]"
+        in filter_str
+    )
     assert "[v_intro][v_logo_applied][v_outro]concat=n=3:v=1:a=0[v_out]" in filter_str
 
     # Audio prep & concat (intro audio + main audio + generated silence for outro)
-    assert "[2:a]asetpts=PTS-STARTPTS,aformat=sample_fmts=fltp:sample_rates=48000:channel_layouts=stereo[a_intro]" in filter_str
-    assert "aevalsrc=0:d=2.500:s=48000,aformat=sample_fmts=fltp:sample_rates=48000:channel_layouts=stereo[a_outro]" in filter_str
+    assert (
+        "[2:a]asetpts=PTS-STARTPTS,aformat=sample_fmts=fltp:sample_rates=48000:channel_layouts=stereo[a_intro]"
+        in filter_str
+    )
+    assert (
+        "aevalsrc=0:d=2.500:s=48000,aformat=sample_fmts=fltp:sample_rates=48000:channel_layouts=stereo[a_outro]"
+        in filter_str
+    )
     assert "[a_intro][a_main][a_outro]concat=n=3:v=0:a=1[a_combined]" in filter_str
     assert "[a_combined]loudnorm=I=-14.0" in filter_str
     assert v_out == "[v_out]"

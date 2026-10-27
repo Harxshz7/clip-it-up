@@ -7,16 +7,14 @@ from typing import Any
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from clip_shared.billing.exceptions import WebhookVerificationError
 from clip_shared.billing.factory import get_billing_provider
 from clip_shared.billing.invoicing import InvoiceService
 from clip_shared.billing.quota import QuotaService
-from clip_shared.config import load_billing_config, load_plans_config
+from clip_shared.config import load_plans_config
 from clip_shared.db.base import utc_now
 from clip_shared.db.models import (
     Customer,
     Payment,
-    Plan,
     Subscription,
     User,
     UserPlan,
@@ -102,7 +100,9 @@ class WebhookHandler:
 
         # Find or create user from customer or metadata
         user = None
-        user_id_str = event.payload.get("payload", {}).get("subscription", {}).get("entity", {}).get("notes", {}).get("user_id")
+        user_id_str = (
+            event.payload.get("payload", {}).get("subscription", {}).get("entity", {}).get("notes", {}).get("user_id")
+        )
         if not user_id_str:
             user_id_str = event.payload.get("data", {}).get("object", {}).get("metadata", {}).get("user_id")
 
@@ -160,7 +160,7 @@ class WebhookHandler:
             sub = Subscription(
                 id=uuid.uuid4(),
                 user_id=user.id,
-                customer_id=cust.id if 'cust' in locals() and cust else None,
+                customer_id=cust.id if "cust" in locals() and cust else None,
                 provider=event.provider,
                 provider_subscription_id=event.resource_id,
                 plan_key=plan_key,
@@ -228,11 +228,16 @@ class WebhookHandler:
                 user_plan.status = "active"
 
         # 5. Handle Payments, Invoices, and Credit Notes
-        if event.amount and event.amount > Decimal("0.00") and event.event_type in (
-            "subscription.charged",
-            "subscription.activated",
-            "invoice.paid",
-            "payment.captured",
+        if (
+            event.amount
+            and event.amount > Decimal("0.00")
+            and event.event_type
+            in (
+                "subscription.charged",
+                "subscription.activated",
+                "invoice.paid",
+                "payment.captured",
+            )
         ):
             # Record successful Payment
             pay_id = event.payment_id or f"pay_{uuid.uuid4().hex[:12]}"

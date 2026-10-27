@@ -1,4 +1,5 @@
 """Face detection interface with MediaPipe primary backend, YOLOv8 adapter, and Mock engine."""
+
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import Any
@@ -12,6 +13,7 @@ logger = structlog.get_logger()
 @dataclass
 class FaceDetection:
     """Normalized face bounding box and keypoints [0.0, 1.0]."""
+
     # xmin, ymin, width, height (all normalized 0.0 to 1.0)
     bbox: tuple[float, float, float, float]
     confidence: float
@@ -90,6 +92,7 @@ class MediaPipeFaceDetector(BaseFaceDetector):
     def _init_detector(self) -> None:
         try:
             import mediapipe as mp
+
             # Support both solutions.face_detection and new tasks API if present
             if hasattr(mp, "solutions") and hasattr(mp.solutions, "face_detection"):
                 self._detector = mp.solutions.face_detection.FaceDetection(
@@ -116,6 +119,7 @@ class MediaPipeFaceDetector(BaseFaceDetector):
 
         try:
             import cv2
+
             rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB) if len(frame.shape) == 3 and frame.shape[2] == 3 else frame
             results = self._detector.process(rgb)
 
@@ -145,11 +149,13 @@ class MediaPipeFaceDetector(BaseFaceDetector):
                     if i < len(kp_names):
                         keypoints[kp_names[i]] = (float(kp.x), float(kp.y))
 
-                detections.append(FaceDetection(
-                    bbox=(xmin, ymin, width, height),
-                    confidence=score,
-                    keypoints=keypoints,
-                ))
+                detections.append(
+                    FaceDetection(
+                        bbox=(xmin, ymin, width, height),
+                        confidence=score,
+                        keypoints=keypoints,
+                    )
+                )
 
             return detections
         except Exception as e:
@@ -160,6 +166,7 @@ class MediaPipeFaceDetector(BaseFaceDetector):
         """Simple OpenCV Haar cascade fallback if MediaPipe is unavailable or fails."""
         try:
             import cv2
+
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY) if len(frame.shape) == 3 else frame
             cascade_path = cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
             face_cascade = cv2.CascadeClassifier(cascade_path)
@@ -168,21 +175,23 @@ class MediaPipeFaceDetector(BaseFaceDetector):
             faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=4, minSize=min_size)
 
             detections: list[FaceDetection] = []
-            for (x, y, fw, fh) in faces:
+            for x, y, fw, fh in faces:
                 xmin = x / float(w)
                 ymin = y / float(h)
                 width = fw / float(w)
                 height = fh / float(h)
-                detections.append(FaceDetection(
-                    bbox=(xmin, ymin, width, height),
-                    confidence=0.85,
-                    keypoints={
-                        "right_eye": (xmin + (width * 0.3), ymin + (height * 0.35)),
-                        "left_eye": (xmin + (width * 0.7), ymin + (height * 0.35)),
-                        "nose": (xmin + (width * 0.5), ymin + (height * 0.55)),
-                        "mouth_center": (xmin + (width * 0.5), ymin + (height * 0.8)),
-                    }
-                ))
+                detections.append(
+                    FaceDetection(
+                        bbox=(xmin, ymin, width, height),
+                        confidence=0.85,
+                        keypoints={
+                            "right_eye": (xmin + (width * 0.3), ymin + (height * 0.35)),
+                            "left_eye": (xmin + (width * 0.7), ymin + (height * 0.35)),
+                            "nose": (xmin + (width * 0.5), ymin + (height * 0.55)),
+                            "mouth_center": (xmin + (width * 0.5), ymin + (height * 0.8)),
+                        },
+                    )
+                )
             return detections
         except Exception:
             return []
@@ -208,6 +217,7 @@ class YOLOv8FaceDetector(BaseFaceDetector):
     def _init_model(self) -> None:
         try:
             from ultralytics import YOLO
+
             self._model = YOLO(self.model_path)
         except Exception as e:
             logger.info("YOLOv8FaceDetector not initialized (ultralytics or weights missing)", error=str(e))
@@ -230,17 +240,23 @@ class YOLOv8FaceDetector(BaseFaceDetector):
                 ymin = float(xyxy[1] / h)
                 width = float((xyxy[2] - xyxy[0]) / w)
                 height = float((xyxy[3] - xyxy[1]) / h)
-                detections.append(FaceDetection(
-                    bbox=(xmin, ymin, width, height),
-                    confidence=conf,
-                ))
+                detections.append(
+                    FaceDetection(
+                        bbox=(xmin, ymin, width, height),
+                        confidence=conf,
+                    )
+                )
         return detections
 
 
 class MockFaceDetector(BaseFaceDetector):
     """Deterministic mock detector for tests and synthetic scenes."""
 
-    def __init__(self, detections_per_frame: list[list[FaceDetection]] | None = None, static_detections: list[FaceDetection] | None = None):
+    def __init__(
+        self,
+        detections_per_frame: list[list[FaceDetection]] | None = None,
+        static_detections: list[FaceDetection] | None = None,
+    ):
         self.detections_per_frame = detections_per_frame or []
         self.static_detections = static_detections or []
         self._call_count = 0

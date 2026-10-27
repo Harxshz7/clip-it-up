@@ -1,4 +1,5 @@
 """Analysis package for scene detection, face tracking, and active speaker association."""
+
 from worker.analysis.active_speaker import AudioVisualSpeakerAssociator, SpeakerTrackAssociation
 from worker.analysis.classifier import BaseSceneClassifier, RuleBasedSceneClassifier
 from worker.analysis.detector import (

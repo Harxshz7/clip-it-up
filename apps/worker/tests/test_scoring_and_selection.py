@@ -81,10 +81,22 @@ def test_signal_combiner():
 def test_moment_selection_and_diversity():
     moments = [
         {"moment_id": uuid.uuid4(), "start_ms": 10000, "end_ms": 40000, "final_score": 0.92, "title": "Clip 1"},
-        {"moment_id": uuid.uuid4(), "start_ms": 15000, "end_ms": 45000, "final_score": 0.88, "title": "Clip 2 Overlap"},  # IoU > 0.3 with Clip 1
+        {
+            "moment_id": uuid.uuid4(),
+            "start_ms": 15000,
+            "end_ms": 45000,
+            "final_score": 0.88,
+            "title": "Clip 2 Overlap",
+        },  # IoU > 0.3 with Clip 1
         {"moment_id": uuid.uuid4(), "start_ms": 70000, "end_ms": 100000, "final_score": 0.85, "title": "Clip 3"},
         {"moment_id": uuid.uuid4(), "start_ms": 120000, "end_ms": 150000, "final_score": 0.80, "title": "Clip 4"},
-        {"moment_id": uuid.uuid4(), "start_ms": 180000, "end_ms": 210000, "final_score": 0.75, "title": "Clip 5 (3rd in 5min bucket)"},
+        {
+            "moment_id": uuid.uuid4(),
+            "start_ms": 180000,
+            "end_ms": 210000,
+            "final_score": 0.75,
+            "title": "Clip 5 (3rd in 5min bucket)",
+        },
         {"moment_id": uuid.uuid4(), "start_ms": 600000, "end_ms": 630000, "final_score": 0.78, "title": "Clip 6"},
     ]
 

@@ -1,4 +1,5 @@
 """Comprehensive tests for face tracking, scene classification, speaker association, smoothing, and ffmpeg filter generation."""
+
 import numpy as np
 import pytest
 
@@ -221,14 +222,20 @@ def test_reframe_planner_fallback_chain():
 
 
 def test_enhanced_scene_classifier_classes_and_features():
-    from worker.analysis.classifier import EnhancedSceneClassifier, detect_text_regions_lite, is_corner_thumbnail_face
+    from worker.analysis.classifier import EnhancedSceneClassifier
 
     classifier = EnhancedSceneClassifier()
     scene = SceneCut(start_ms=0, end_ms=10000)
 
     # 1. 4-person panel -> group
     tracks_group = [
-        FaceTrackData(track_id=i, start_ms=0, end_ms=10000, avg_conf=0.9, summary={"mean_cx": 0.2 * (i + 1), "mean_cy": 0.4, "mean_w": 0.1, "mean_h": 0.15})
+        FaceTrackData(
+            track_id=i,
+            start_ms=0,
+            end_ms=10000,
+            avg_conf=0.9,
+            summary={"mean_cx": 0.2 * (i + 1), "mean_cy": 0.4, "mean_w": 0.1, "mean_h": 0.15},
+        )
         for i in range(4)
     ]
     res_group = classifier.classify(scene, tracks_group)
@@ -253,9 +260,9 @@ def test_enhanced_scene_classifier_classes_and_features():
 
 
 def test_ocr_lite_text_detection_and_thumbnail_detector():
-    from worker.analysis.classifier import detect_text_regions_lite, is_corner_thumbnail_face
-
     import cv2
+
+    from worker.analysis.classifier import detect_text_regions_lite, is_corner_thumbnail_face
 
     # Synthetic image with text lines
     canvas = np.zeros((360, 640, 3), dtype=np.uint8)
@@ -286,7 +293,13 @@ def test_classifier_hysteresis_prevents_flicker():
     scene2 = SceneCut(start_ms=5000, end_ms=10000)
 
     # Establish initial confident classification
-    t1 = FaceTrackData(track_id=0, start_ms=0, end_ms=5000, avg_conf=0.95, summary={"mean_cx": 0.5, "mean_cy": 0.4, "mean_w": 0.2, "mean_h": 0.25})
+    t1 = FaceTrackData(
+        track_id=0,
+        start_ms=0,
+        end_ms=5000,
+        avg_conf=0.95,
+        summary={"mean_cx": 0.5, "mean_cy": 0.4, "mean_w": 0.2, "mean_h": 0.25},
+    )
     res1 = classifier.classify(scene1, [t1])
     assert res1.type == "talking_head"
 
@@ -321,10 +334,18 @@ def test_n_speaker_hungarian_assignment():
 
     # 4 distinct face tracks with timing matching speech turns
     tracks = [
-        FaceTrackData(track_id=0, start_ms=5000, end_ms=10000, avg_conf=0.9, summary={"mean_cx": 0.2, "mouth_variance": 0.08}),
-        FaceTrackData(track_id=1, start_ms=0, end_ms=20000, avg_conf=0.9, summary={"mean_cx": 0.4, "mouth_variance": 0.01}),
-        FaceTrackData(track_id=2, start_ms=0, end_ms=5000, avg_conf=0.9, summary={"mean_cx": 0.6, "mouth_variance": 0.09}),
-        FaceTrackData(track_id=3, start_ms=10000, end_ms=15000, avg_conf=0.9, summary={"mean_cx": 0.8, "mouth_variance": 0.08}),
+        FaceTrackData(
+            track_id=0, start_ms=5000, end_ms=10000, avg_conf=0.9, summary={"mean_cx": 0.2, "mouth_variance": 0.08}
+        ),
+        FaceTrackData(
+            track_id=1, start_ms=0, end_ms=20000, avg_conf=0.9, summary={"mean_cx": 0.4, "mouth_variance": 0.01}
+        ),
+        FaceTrackData(
+            track_id=2, start_ms=0, end_ms=5000, avg_conf=0.9, summary={"mean_cx": 0.6, "mouth_variance": 0.09}
+        ),
+        FaceTrackData(
+            track_id=3, start_ms=10000, end_ms=15000, avg_conf=0.9, summary={"mean_cx": 0.8, "mouth_variance": 0.08}
+        ),
     ]
     # Diarization speaker turns corresponding to tracks
     turns = [
@@ -349,8 +370,22 @@ def test_anti_ping_pong_hold():
         SpeakerTurn(start_ms=800, end_ms=1400, speaker_label="SPEAKER_01"),
         SpeakerTurn(start_ms=1400, end_ms=2200, speaker_label="SPEAKER_00"),
     ]
-    t0 = FaceTrackData(track_id=0, start_ms=0, end_ms=5000, avg_conf=0.95, speaker_label="SPEAKER_00", summary={"mean_cx": 0.25, "mean_cy": 0.4, "mean_w": 0.15, "mean_h": 0.20})
-    t1 = FaceTrackData(track_id=1, start_ms=0, end_ms=5000, avg_conf=0.95, speaker_label="SPEAKER_01", summary={"mean_cx": 0.75, "mean_cy": 0.4, "mean_w": 0.15, "mean_h": 0.20})
+    t0 = FaceTrackData(
+        track_id=0,
+        start_ms=0,
+        end_ms=5000,
+        avg_conf=0.95,
+        speaker_label="SPEAKER_00",
+        summary={"mean_cx": 0.25, "mean_cy": 0.4, "mean_w": 0.15, "mean_h": 0.20},
+    )
+    t1 = FaceTrackData(
+        track_id=1,
+        start_ms=0,
+        end_ms=5000,
+        avg_conf=0.95,
+        speaker_label="SPEAKER_01",
+        summary={"mean_cx": 0.75, "mean_cy": 0.4, "mean_w": 0.15, "mean_h": 0.20},
+    )
 
     plan = plan_clip_reframe(
         clip_start_ms=0,
@@ -418,7 +453,17 @@ def test_layout_compiler_golden_strings():
         type="pip",
         regions=[
             LayoutRegion(src_x=0.0, src_y=0.0, src_w=1.0, src_h=1.0, dst_x=0.0, dst_y=0.21875, dst_w=1.0, dst_h=0.5625),
-            LayoutRegion(src_x=0.8, src_y=0.1, src_w=0.15, src_h=0.15, dst_x=0.68, dst_y=0.12, dst_w=0.28, dst_h=0.16, shape="rounded_rect"),
+            LayoutRegion(
+                src_x=0.8,
+                src_y=0.1,
+                src_w=0.15,
+                src_h=0.15,
+                dst_x=0.68,
+                dst_y=0.12,
+                dst_w=0.28,
+                dst_h=0.16,
+                shape="rounded_rect",
+            ),
         ],
     )
     path_pip = ReframeCropPath(
@@ -437,9 +482,7 @@ def test_v1_reframe_backward_compatibility():
             {"t_ms": 0, "cx": 0.50, "cy": 0.45, "w": 0.3164, "h": 1.0},
             {"t_ms": 2000, "cx": 0.52, "cy": 0.45, "w": 0.3164, "h": 1.0},
         ],
-        "segments": [
-            {"start_ms": 0, "end_ms": 2000, "mode": "speaker_track", "confidence": 0.95}
-        ],
+        "segments": [{"start_ms": 0, "end_ms": 2000, "mode": "speaker_track", "confidence": 0.95}],
     }
     filt = crop_path_to_ffmpeg_filter(v1_crop_doc, src_w=1280, src_h=720, out_w=1080, out_h=1920)
     assert "crop=" in filt
@@ -458,7 +501,15 @@ def test_normalized_coordinate_invariants_and_safe_zones():
             clip_start_ms=0,
             clip_end_ms=10000,
             scenes=[],
-            tracks=[FaceTrackData(track_id=0, start_ms=0, end_ms=10000, avg_conf=0.9, summary={"mean_cx": 0.4, "mean_cy": 0.4, "mean_w": 0.15, "mean_h": 0.2})],
+            tracks=[
+                FaceTrackData(
+                    track_id=0,
+                    start_ms=0,
+                    end_ms=10000,
+                    avg_conf=0.9,
+                    summary={"mean_cx": 0.4, "mean_cy": 0.4, "mean_w": 0.15, "mean_h": 0.2},
+                )
+            ],
             mode_override=mode,
         )
         layout = plan.crop_path.layout

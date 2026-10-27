@@ -1,4 +1,5 @@
 """Pydantic schemas for Auto-Variants generation, batch export, and metrics logging."""
+
 import uuid
 from datetime import datetime
 from typing import Any, Literal
@@ -8,9 +9,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 class VariantGenerateRequest(BaseModel):
     count: int = Field(default=4, ge=1, le=10)
-    dimensions: list[Literal["hook", "style", "cta"]] = Field(
-        default_factory=lambda: ["hook", "style", "cta"]
-    )
+    dimensions: list[Literal["hook", "style", "cta"]] = Field(default_factory=lambda: ["hook", "style", "cta"])
     cta_goal: str | None = Field(
         default="follow",
         description="follow | link_in_bio | subscribe | engagement | comment",

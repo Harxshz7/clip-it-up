@@ -1,9 +1,8 @@
 import uuid
-from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from typing import Any
 
-from fastapi import APIRouter, Depends, Header, HTTPException, Request, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from sqlalchemy import desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -14,7 +13,7 @@ from clip_shared.billing.quota import QuotaService
 from clip_shared.billing.webhook_handler import WebhookHandler
 from clip_shared.config import get_settings, load_plans_config
 from clip_shared.db.base import utc_now
-from clip_shared.db.models import Customer, Invoice, Plan, Subscription, TopUp, User, UserPlan
+from clip_shared.db.models import Customer, Invoice, Plan, Subscription, UserPlan
 from clip_shared.db.session import get_db
 from clip_shared.schemas.auth import AuthenticatedUser
 from clip_shared.schemas.billing import (
@@ -27,7 +26,6 @@ from clip_shared.schemas.billing import (
     TopUpPackDetail,
     TopUpRequest,
 )
-from clip_shared.storage.s3 import get_s3_client
 
 router = APIRouter(prefix="/billing", tags=["billing"])
 settings = get_settings()
@@ -72,10 +70,14 @@ async def get_my_billing_profile(
     ledger_bal = await QuotaService.get_ledger_balance(db, user.id)
 
     # Active subscription
-    sub_stmt = select(Subscription).where(
-        Subscription.user_id == user.id,
-        Subscription.status.in_(["active", "past_due", "canceled"]),
-    ).order_by(desc(Subscription.created_at))
+    sub_stmt = (
+        select(Subscription)
+        .where(
+            Subscription.user_id == user.id,
+            Subscription.status.in_(["active", "past_due", "canceled"]),
+        )
+        .order_by(desc(Subscription.created_at))
+    )
     sub_res = await db.execute(sub_stmt)
     sub = sub_res.scalars().first()
 
@@ -162,7 +164,11 @@ async def create_top_up_session(
         )
 
     provider = get_billing_provider(currency=payload.currency)
-    amount = Decimal(str(pack.get("price_inr", 399))) if payload.currency == "INR" else Decimal(str(pack.get("price_usd", 5)))
+    amount = (
+        Decimal(str(pack.get("price_inr", 399)))
+        if payload.currency == "INR"
+        else Decimal(str(pack.get("price_usd", 5)))
+    )
 
     # Fetch customer
     cust_stmt = select(Customer).where(Customer.user_id == user.id, Customer.provider == provider.name)
@@ -195,10 +201,14 @@ async def cancel_subscription(
     db: AsyncSession = Depends(get_db),
 ):
     """Cancel subscription at period end."""
-    sub_stmt = select(Subscription).where(
-        Subscription.user_id == user.id,
-        Subscription.status == "active",
-    ).order_by(desc(Subscription.created_at))
+    sub_stmt = (
+        select(Subscription)
+        .where(
+            Subscription.user_id == user.id,
+            Subscription.status == "active",
+        )
+        .order_by(desc(Subscription.created_at))
+    )
     sub_res = await db.execute(sub_stmt)
     sub = sub_res.scalars().first()
 
@@ -233,17 +243,26 @@ async def resume_subscription(
     db: AsyncSession = Depends(get_db),
 ):
     """Resume a canceled subscription before the period expires."""
-    sub_stmt = select(Subscription).where(
-        Subscription.user_id == user.id,
-        Subscription.status == "canceled",
-    ).order_by(desc(Subscription.created_at))
+    sub_stmt = (
+        select(Subscription)
+        .where(
+            Subscription.user_id == user.id,
+            Subscription.status == "canceled",
+        )
+        .order_by(desc(Subscription.created_at))
+    )
     sub_res = await db.execute(sub_stmt)
     sub = sub_res.scalars().first()
 
     if not sub:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail={"error": {"code": "NO_CANCELED_SUBSCRIPTION", "message": "No canceled subscription available to resume."}},
+            detail={
+                "error": {
+                    "code": "NO_CANCELED_SUBSCRIPTION",
+                    "message": "No canceled subscription available to resume.",
+                }
+            },
         )
 
     provider = get_billing_provider(sub.provider)
@@ -271,10 +290,14 @@ async def change_subscription_plan(
     db: AsyncSession = Depends(get_db),
 ):
     """Upgrade immediately (prorated) or change subscription tier."""
-    sub_stmt = select(Subscription).where(
-        Subscription.user_id == user.id,
-        Subscription.status.in_(["active", "canceled"]),
-    ).order_by(desc(Subscription.created_at))
+    sub_stmt = (
+        select(Subscription)
+        .where(
+            Subscription.user_id == user.id,
+            Subscription.status.in_(["active", "canceled"]),
+        )
+        .order_by(desc(Subscription.created_at))
+    )
     sub_res = await db.execute(sub_stmt)
     sub = sub_res.scalars().first()
 

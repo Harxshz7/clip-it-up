@@ -27,6 +27,7 @@ def _cleanup_gpu_memory():
     gc.collect()
     try:
         import torch
+
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
     except Exception:
@@ -38,6 +39,7 @@ def _get_device_and_compute_type() -> tuple[str, str]:
     settings = get_settings()
     try:
         import torch
+
         if torch.cuda.is_available():
             device = "cuda"
             compute_type = settings.WHISPER_COMPUTE_TYPE or "float16"
@@ -55,6 +57,7 @@ def get_cached_whisper_model():
     global _WHISPER_MODEL
     if _WHISPER_MODEL is None:
         import whisperx
+
         settings = get_settings()
         device, compute_type = _get_device_and_compute_type()
         logger.info(
@@ -77,6 +80,7 @@ def get_cached_align_model(language_code: str):
     global _ALIGN_MODELS
     if language_code not in _ALIGN_MODELS:
         import whisperx
+
         device, _ = _get_device_and_compute_type()
         logger.info("loading_alignment_model", language_code=language_code, device=device)
         model_a, metadata = whisperx.load_align_model(language_code=language_code, device=device)
@@ -93,6 +97,7 @@ def get_cached_diarization_pipeline():
 
     if _DIARIZATION_PIPELINE is None:
         import whisperx
+
         device, _ = _get_device_and_compute_type()
         logger.info("loading_diarization_pipeline", device=device)
         _DIARIZATION_PIPELINE = whisperx.DiarizationPipeline(

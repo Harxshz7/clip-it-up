@@ -1,4 +1,5 @@
 """Preview renderer generating quick low-res 360x640 vertical MP4 preview using FFmpeg."""
+
 import subprocess
 from typing import Any
 
@@ -40,16 +41,26 @@ def render_reframe_preview(
     cmd = [
         "ffmpeg",
         "-y",
-        "-ss", f"{start_s:.3f}",
-        "-t", f"{duration_s:.3f}",
-        "-i", video_path,
-        "-vf", filter_str,
-        "-c:v", "libx264",
-        "-preset", "ultrafast",
-        "-crf", "28",
-        "-c:a", "aac",
-        "-b:a", "64k",
-        "-movflags", "+faststart",
+        "-ss",
+        f"{start_s:.3f}",
+        "-t",
+        f"{duration_s:.3f}",
+        "-i",
+        video_path,
+        "-vf",
+        filter_str,
+        "-c:v",
+        "libx264",
+        "-preset",
+        "ultrafast",
+        "-crf",
+        "28",
+        "-c:a",
+        "aac",
+        "-b:a",
+        "64k",
+        "-movflags",
+        "+faststart",
         out_path,
     ]
 

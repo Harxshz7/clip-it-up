@@ -1,6 +1,6 @@
 """Audio-visual active speaker association using mouth variance, temporal diarization overlap, and Hungarian assignment."""
+
 from dataclasses import dataclass
-from typing import Any
 
 import numpy as np
 import scipy.optimize

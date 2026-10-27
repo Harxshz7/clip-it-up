@@ -1,4 +1,5 @@
 """Pydantic schemas and prompt templates for Auto-Variants generation."""
+
 from pydantic import BaseModel, Field
 
 

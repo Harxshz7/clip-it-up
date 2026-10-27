@@ -99,4 +99,3 @@ async def publish_event_async(channel: str, event_type: str, data: dict[str, Any
         await client.publish(channel, payload)
     except Exception:
         pass
-

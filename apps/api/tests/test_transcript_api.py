@@ -9,7 +9,9 @@ from clip_shared.db.models import Speaker, Transcript, TranscriptSegment, Transc
 
 
 @pytest.mark.asyncio
-async def test_transcript_api_complete_lifecycle(client: AsyncClient, sample_user, other_user, db_session: AsyncSession):
+async def test_transcript_api_complete_lifecycle(
+    client: AsyncClient, sample_user, other_user, db_session: AsyncSession
+):
     # 1. Setup video and transcript for sample_user
     video_id = uuid.uuid4()
     video = Video(
@@ -47,15 +49,51 @@ async def test_transcript_api_complete_lifecycle(client: AsyncClient, sample_use
     db_session.add_all([spk1, spk2])
 
     # Words
-    w1 = TranscriptWord(id=uuid.uuid4(), transcript_id=transcript_id, idx=0, word="Hello", start_ms=0, end_ms=400, speaker="SPEAKER_00")
-    w2 = TranscriptWord(id=uuid.uuid4(), transcript_id=transcript_id, idx=1, word="world.", start_ms=450, end_ms=800, speaker="SPEAKER_00")
-    w3 = TranscriptWord(id=uuid.uuid4(), transcript_id=transcript_id, idx=2, word="Hi", start_ms=1200, end_ms=1500, speaker="SPEAKER_01")
-    w4 = TranscriptWord(id=uuid.uuid4(), transcript_id=transcript_id, idx=3, word="there.", start_ms=1550, end_ms=1900, speaker="SPEAKER_01")
+    w1 = TranscriptWord(
+        id=uuid.uuid4(), transcript_id=transcript_id, idx=0, word="Hello", start_ms=0, end_ms=400, speaker="SPEAKER_00"
+    )
+    w2 = TranscriptWord(
+        id=uuid.uuid4(),
+        transcript_id=transcript_id,
+        idx=1,
+        word="world.",
+        start_ms=450,
+        end_ms=800,
+        speaker="SPEAKER_00",
+    )
+    w3 = TranscriptWord(
+        id=uuid.uuid4(), transcript_id=transcript_id, idx=2, word="Hi", start_ms=1200, end_ms=1500, speaker="SPEAKER_01"
+    )
+    w4 = TranscriptWord(
+        id=uuid.uuid4(),
+        transcript_id=transcript_id,
+        idx=3,
+        word="there.",
+        start_ms=1550,
+        end_ms=1900,
+        speaker="SPEAKER_01",
+    )
     db_session.add_all([w1, w2, w3, w4])
 
     # Segments
-    seg1 = TranscriptSegment(id=uuid.uuid4(), transcript_id=transcript_id, idx=0, start_ms=0, end_ms=800, speaker="SPEAKER_00", text="Hello world.")
-    seg2 = TranscriptSegment(id=uuid.uuid4(), transcript_id=transcript_id, idx=1, start_ms=1200, end_ms=1900, speaker="SPEAKER_01", text="Hi there.")
+    seg1 = TranscriptSegment(
+        id=uuid.uuid4(),
+        transcript_id=transcript_id,
+        idx=0,
+        start_ms=0,
+        end_ms=800,
+        speaker="SPEAKER_00",
+        text="Hello world.",
+    )
+    seg2 = TranscriptSegment(
+        id=uuid.uuid4(),
+        transcript_id=transcript_id,
+        idx=1,
+        start_ms=1200,
+        end_ms=1900,
+        speaker="SPEAKER_01",
+        text="Hi there.",
+    )
     db_session.add_all([seg1, seg2])
 
     await db_session.commit()

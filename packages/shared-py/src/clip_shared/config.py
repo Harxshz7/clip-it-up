@@ -188,6 +188,7 @@ def load_scoring_weights(custom_weights_path: str | None = None) -> dict:
 def load_plans_config(custom_path: str | None = None) -> dict:
     """Load plan definitions from YAML configuration file."""
     import os
+
     import yaml
 
     search_paths = [
@@ -259,6 +260,7 @@ def load_plans_config(custom_path: str | None = None) -> dict:
 def load_billing_config(custom_path: str | None = None) -> dict:
     """Load billing and GST config from YAML file."""
     import os
+
     import yaml
 
     search_paths = [
@@ -285,4 +287,3 @@ def load_billing_config(custom_path: str | None = None) -> dict:
         "billing_policy": {"overage_policy": "block", "grace_period_days": 3},
         "abuse_caps": {"max_free_signups_per_ip_per_day": 3, "disposable_email_domains": []},
     }
-

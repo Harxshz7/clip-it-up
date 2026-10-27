@@ -72,9 +72,9 @@ def test_detect_silence_shortening_not_deletion():
 def test_hook_protection_first_one_second():
     """Verify first 1.0s hook words are protected from filler/silence cut."""
     words = [
-        {"text": "um", "start_ms": 200, "end_ms": 500},        # Inside first 1s hook -> protected
+        {"text": "um", "start_ms": 200, "end_ms": 500},  # Inside first 1s hook -> protected
         {"text": "Start", "start_ms": 600, "end_ms": 900},
-        {"text": "um", "start_ms": 1500, "end_ms": 1800},      # After hook -> removed
+        {"text": "um", "start_ms": 1500, "end_ms": 1800},  # After hook -> removed
     ]
 
     fillers = detect_filler_removals(words, clip_start_ms=0)

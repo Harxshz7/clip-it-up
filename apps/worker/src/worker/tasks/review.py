@@ -48,22 +48,13 @@ def run_crude_exports_for_video(video_id: uuid.UUID, top_n: int = 8) -> list[dic
 
         if not moment_ids:
             # Fallback directly to clips ordered by score
-            c_stmt = (
-                select(Clip)
-                .where(Clip.video_id == video_id)
-                .order_by(desc(Clip.final_score))
-                .limit(top_n)
-            )
+            c_stmt = select(Clip).where(Clip.video_id == video_id).order_by(desc(Clip.final_score)).limit(top_n)
             clips = db.execute(c_stmt).scalars().all()
         else:
             # Fetch auto or longest variant per moment
             clips = []
             for m_id in moment_ids:
-                c_stmt = (
-                    select(Clip)
-                    .where(Clip.moment_id == m_id)
-                    .order_by(desc(Clip.final_score))
-                )
+                c_stmt = select(Clip).where(Clip.moment_id == m_id).order_by(desc(Clip.final_score))
                 m_clips = db.execute(c_stmt).scalars().all()
                 if m_clips:
                     # Prefer auto variant if present, otherwise top score
@@ -138,11 +129,13 @@ def run_crude_exports_for_video(video_id: uuid.UUID, top_n: int = 8) -> list[dic
                         db.commit()
 
                         completed_exports += 1
-                        results.append({
-                            "clip_id": str(clip.id),
-                            "kind": kind,
-                            "storage_key": storage_key,
-                        })
+                        results.append(
+                            {
+                                "clip_id": str(clip.id),
+                                "kind": kind,
+                                "storage_key": storage_key,
+                            }
+                        )
 
                     except Exception as clip_err:
                         logger.error(

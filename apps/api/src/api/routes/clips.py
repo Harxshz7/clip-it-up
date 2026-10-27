@@ -36,9 +36,13 @@ settings = get_settings()
 @router.get("/videos/{video_id}/clips", response_model=VideoClipsResponse)
 async def get_video_clips(
     video_id: uuid.UUID,
-    status_filter: str | None = Query(None, alias="status", description="Filter by moment status (selected | scored | candidate | rejected)"),
+    status_filter: str | None = Query(
+        None, alias="status", description="Filter by moment status (selected | scored | candidate | rejected)"
+    ),
     min_score: float | None = Query(None, ge=0.0, le=1.0, description="Minimum clip score"),
-    sort: str | None = Query("score", pattern="^(score|time|rank)$", description="Sort moments by score, time, or rank"),
+    sort: str | None = Query(
+        "score", pattern="^(score|time|rank)$", description="Sort moments by score, time, or rank"
+    ),
     user: AuthenticatedUser = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
@@ -78,11 +82,7 @@ async def get_video_clips(
     clips_by_moment: dict[uuid.UUID, list[ClipResponse]] = {m.id: [] for m in moments}
 
     if moment_ids:
-        c_stmt = (
-            select(Clip)
-            .where(Clip.moment_id.in_(moment_ids))
-            .order_by(Clip.variant_length_s)
-        )
+        c_stmt = select(Clip).where(Clip.moment_id.in_(moment_ids)).order_by(Clip.variant_length_s)
         c_res = await db.execute(c_stmt)
         clips = c_res.scalars().all()
 
@@ -158,11 +158,7 @@ async def get_single_clip(
     db: AsyncSession = Depends(get_db),
 ):
     """Get single clip details with breakdown and user feedback."""
-    stmt = (
-        select(Clip)
-        .join(Video, Video.id == Clip.video_id)
-        .where(Clip.id == clip_id, Video.user_id == user.id)
-    )
+    stmt = select(Clip).join(Video, Video.id == Clip.video_id).where(Clip.id == clip_id, Video.user_id == user.id)
     res = await db.execute(stmt)
     clip = res.scalar_one_or_none()
     if not clip:
@@ -207,11 +203,7 @@ async def submit_clip_feedback(
 ):
     """Submit thumbs up/down and optional reason tag on a clip (upsert)."""
     # Verify clip ownership
-    stmt = (
-        select(Clip)
-        .join(Video, Video.id == Clip.video_id)
-        .where(Clip.id == clip_id, Video.user_id == user.id)
-    )
+    stmt = select(Clip).join(Video, Video.id == Clip.video_id).where(Clip.id == clip_id, Video.user_id == user.id)
     res = await db.execute(stmt)
     clip = res.scalar_one_or_none()
     if not clip:
@@ -292,7 +284,9 @@ async def rescore_video(
     if not transcript or transcript.status != "ready":
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail={"error": {"code": "TRANSCRIPT_NOT_READY", "message": "Cannot rescore: transcript is not ready yet."}},
+            detail={
+                "error": {"code": "TRANSCRIPT_NOT_READY", "message": "Cannot rescore: transcript is not ready yet."}
+            },
         )
 
     # 2. Create Job for scoring rerun
@@ -320,6 +314,7 @@ async def rescore_video(
     # 3. Trigger worker candidates stage directly
     try:
         from worker.celery_app import celery_app
+
         celery_app.send_task("worker.tasks.pipeline.run_stage", args=[str(job.id), "candidates"], queue="cpu")
     except Exception:
         pass

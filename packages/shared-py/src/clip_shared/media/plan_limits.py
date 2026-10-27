@@ -1,4 +1,5 @@
 """Server-side subscription plan limits and usage validation."""
+
 import hashlib
 import json
 import uuid
@@ -61,19 +62,27 @@ def get_user_plan_and_usage(user_id: uuid.UUID, db: Session) -> dict[str, Any]:
         )
 
     # 1. Calculate monthly source minutes processed
-    source_min_query = db.query(func.coalesce(func.sum(Usage.quantity), 0)).filter(
-        Usage.user_id == user_id,
-        Usage.metric == "source_minutes",
-        Usage.created_at >= period_start,
-    ).scalar()
+    source_min_query = (
+        db.query(func.coalesce(func.sum(Usage.quantity), 0))
+        .filter(
+            Usage.user_id == user_id,
+            Usage.metric == "source_minutes",
+            Usage.created_at >= period_start,
+        )
+        .scalar()
+    )
     source_min_used = float(source_min_query or 0.0)
 
     # 2. Calculate monthly exports completed / in progress
-    exports_count_query = db.query(func.count(Export.id)).filter(
-        Export.user_id == user_id,
-        Export.status.in_(["queued", "rendering", "succeeded"]),
-        Export.created_at >= period_start,
-    ).scalar()
+    exports_count_query = (
+        db.query(func.count(Export.id))
+        .filter(
+            Export.user_id == user_id,
+            Export.status.in_(["queued", "rendering", "succeeded"]),
+            Export.created_at >= period_start,
+        )
+        .scalar()
+    )
     exports_used = int(exports_count_query or 0)
 
     return {

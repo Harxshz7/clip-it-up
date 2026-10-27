@@ -1,4 +1,5 @@
 """End-to-end video analysis service orchestrating sampling, scene detection, tracking, and S3/DB persistence."""
+
 import io
 import os
 import tempfile
@@ -137,7 +138,10 @@ def run_video_analysis(
                         ymin_px = int(det.ymin * target_h)
                         w_px = int(det.width * target_w)
                         h_px = int(det.height * target_h)
-                        crop = small_frame[max(0, ymin_px):min(target_h, ymin_px + h_px), max(0, xmin_px):min(target_w, xmin_px + w_px)]
+                        crop = small_frame[
+                            max(0, ymin_px) : min(target_h, ymin_px + h_px),
+                            max(0, xmin_px) : min(target_w, xmin_px + w_px),
+                        ]
                         if crop.size > 0:
                             det.mouth_openness = mesh_extractor.compute_mouth_openness(crop)
 
@@ -145,12 +149,14 @@ def run_video_analysis(
                 sampled_count += 1
 
                 for d in detections:
-                    raw_detections_log.append({
-                        "t_ms": t_ms,
-                        "bbox": list(d.bbox),
-                        "conf": d.confidence,
-                        "mouth": d.mouth_openness,
-                    })
+                    raw_detections_log.append(
+                        {
+                            "t_ms": t_ms,
+                            "bbox": list(d.bbox),
+                            "conf": d.confidence,
+                            "mouth": d.mouth_openness,
+                        }
+                    )
 
                 if on_progress and total_frames > 0 and (sampled_count % 30 == 0):
                     pct = int(25 + (frame_idx / float(total_frames)) * 50)
@@ -169,19 +175,24 @@ def run_video_analysis(
         face_tracks_data = tracker.finalize()
 
         # 7. Active speaker association with transcript
-        seg_stmt = select(TranscriptSegment).join(TranscriptSegment.transcript).where(
-            TranscriptSegment.transcript.has(video_id=video_id)
-        ).order_by(TranscriptSegment.idx)
+        seg_stmt = (
+            select(TranscriptSegment)
+            .join(TranscriptSegment.transcript)
+            .where(TranscriptSegment.transcript.has(video_id=video_id))
+            .order_by(TranscriptSegment.idx)
+        )
         segments = db_session.execute(seg_stmt).scalars().all()
 
         speaker_turns: list[SpeakerTurn] = []
         for s in segments:
             if s.speaker:
-                speaker_turns.append(SpeakerTurn(
-                    start_ms=s.start_ms,
-                    end_ms=s.end_ms,
-                    speaker_label=s.speaker,
-                ))
+                speaker_turns.append(
+                    SpeakerTurn(
+                        start_ms=s.start_ms,
+                        end_ms=s.end_ms,
+                        speaker_label=s.speaker,
+                    )
+                )
 
         associator = AudioVisualSpeakerAssociator()
         speaker_map = associator.associate_speakers_with_tracks(face_tracks_data, speaker_turns)
@@ -203,8 +214,12 @@ def run_video_analysis(
         npz_buffer = io.BytesIO()
         np.savez_compressed(
             npz_buffer,
-            detections=np.array([d["bbox"] for d in raw_detections_log], dtype=np.float32) if raw_detections_log else np.empty((0, 4)),
-            timestamps=np.array([d["t_ms"] for d in raw_detections_log], dtype=np.int64) if raw_detections_log else np.empty((0,)),
+            detections=np.array([d["bbox"] for d in raw_detections_log], dtype=np.float32)
+            if raw_detections_log
+            else np.empty((0, 4)),
+            timestamps=np.array([d["t_ms"] for d in raw_detections_log], dtype=np.int64)
+            if raw_detections_log
+            else np.empty((0,)),
         )
         npz_buffer.seek(0)
         frames_key = f"users/{video.user_id}/videos/{video_id}/analysis/{version}.npz"
@@ -249,15 +264,19 @@ def run_video_analysis(
         video_duration_s = video.duration_seconds or (frame_idx / src_fps)
         cost_inr = StageRateConfig.calculate_stage_cost("analysis", video_duration_s)
 
-        usage_stmt = pg_insert(Usage).values(
-            id=uuid.uuid4(),
-            user_id=video.user_id,
-            video_id=video.id,
-            metric="cpu_seconds",
-            quantity=Decimal(str(round(elapsed_seconds, 2))),
-            cost_inr=cost_inr,
-            created_at=utc_now(),
-        ).on_conflict_do_nothing()
+        usage_stmt = (
+            pg_insert(Usage)
+            .values(
+                id=uuid.uuid4(),
+                user_id=video.user_id,
+                video_id=video.id,
+                metric="cpu_seconds",
+                quantity=Decimal(str(round(elapsed_seconds, 2))),
+                cost_inr=cost_inr,
+                created_at=utc_now(),
+            )
+            .on_conflict_do_nothing()
+        )
         db_session.execute(usage_stmt)
 
         db_session.commit()

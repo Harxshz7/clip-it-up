@@ -112,9 +112,7 @@ def run_candidate_generation(
 
     # 5. Idempotent Database Persistence (replace existing candidate moments if re-run)
     existing_moments = (
-        db.query(ClipMoment)
-        .filter(ClipMoment.video_id == video_id, ClipMoment.status == "candidate")
-        .all()
+        db.query(ClipMoment).filter(ClipMoment.video_id == video_id, ClipMoment.status == "candidate").all()
     )
     for m in existing_moments:
         db.delete(m)
