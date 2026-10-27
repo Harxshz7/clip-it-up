@@ -42,10 +42,32 @@ Rather than executing multiple encode/decode passes or storing intermediate disk
 ### Video Pipeline Stages
 1. **Accurate Input Seeking**: `-ss {clip_start_ms/1000}` before `-i` avoids decoding unnecessary video prefixes.
 2. **Segment Trimming**: `[0:v]trim=start=...:end=...,setpts=PTS-STARTPTS` extracts each kept segment with millisecond accuracy.
-3. **Concat & Reframe**: `concat=n=K:v=1:a=0` joins video cuts; reframing applies dynamic piecewise linear cropping or `fit_blur` mode (`split=2`, `boxblur=20:2`, centered foreground).
+3. **Concat & Reframe**: `concat=n=K:v=1:a=0` joins video cuts; reframing applies dynamic piecewise linear cropping or Phase 7b multi-region layouts via the Layout Compiler (`compile_layout_reframe_filter`).
 4. **Target Scaling**: Scaled to 1080x1920 with high-quality `flags=lanczos,setsar=1`.
 5. **Subtitle Burning (`libass`)**: Burned using `ass='subtitles.ass':fontsdir='fonts/'` ensuring perfect font rendering and HarfBuzz Indic script shaping.
 6. **Watermark Overlay**: Server-side enforced watermark overlay applied in the top-right corner on free tier exports (cannot be cropped).
+
+### Phase 7b Layout Compiler Subgraphs
+When a clip has structured multi-region framing, the single filtergraph builder delegates the `crop/reframe` stage to `compile_layout_reframe_filter`:
+- **`split_stack`**: Splits stream into top and bottom halves; crops each active speaker to $1.125$ aspect ratio, scales each to $1080 \times 960$, and concatenates with `vstack=inputs=2`:
+  ```text
+  [v_cat]split=2[t_in][b_in];
+  [t_in]crop=w0:h0:x0:y0,scale=1080:960[top];
+  [b_in]crop=w1:h1:x1:y1,scale=1080:960[bot];
+  [top][bot]vstack=inputs=2[v_reframe]
+  ```
+- **`stack`**: Content on top (60%, $1080 \times 1152$), speaker cutout below (40%, $1080 \times 768$).
+- **`pip`**: Full presentation with blurred background, overlaying the speaker thumbnail in a safe corner with padding away from caption zones and platform UI:
+  ```text
+  [v_cat]split=2[main_src][pip_src];
+  [main_src]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,boxblur=20:2[bg_blur];
+  [v_cat]scale=1080:-2[fg_scaled];
+  [bg_blur][fg_scaled]overlay=(W-w)/2:(H-h)/2[base];
+  [pip_src]crop=sw:sh:sx:sy,scale=302:347[pip];
+  [base][pip]overlay=W-w-50:140[v_reframe]
+  ```
+- **`content_fit`**: Preserves full presentation content uncropped on an aesthetically blurred or brand-colored background.
+- **`content_zoom`**: Snaps to code editor/active window ROI, preserving text line integrity.
 
 ### Audio Pipeline Stages
 1. **Trimming & Crossfading**: Segment joins are smoothed with 40ms equal-power crossfades (`acrossfade=d=0.040:c1=tri:c2=tri`) to eliminate audio pops.

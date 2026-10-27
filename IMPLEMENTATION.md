@@ -28,10 +28,24 @@
 | **5. Editor & Grid**| W15–16 | Single source-of-truth edit doc, 9:16 canvas preview, transcript trim/edit, inspector tabs, autosave/409, streaming grid | **Complete** | `<DEV_A>` / `<DEV_B>` |
 | **6. Billing & Quotas**| W17–18 | Razorpay & Stripe dual gateways, dynamic quotas from `config/plans.yaml`, meter ledger, GST invoices | **Complete** | `<DEV_A>` / `<DEV_B>` |
 | **7a. Brand Kit & Auto-Variants**| W19–20 | Custom logos/fonts/bumpers, single-pass render concat, 9:16 safe-zones, combinatoric A/B auto-variants, ZIP download | **Complete** | `<DEV_A>` / `<DEV_B>` |
+| **7b. Enhanced Reframe**| W21–22 | Multi-person panel tracking, Hungarian N-speaker diarization, screen/code content zoom, PIP/split-stack layouts, quality gates | **Complete** | `<DEV_A>` / `<DEV_B>` |
 
 ---
 
 ## 4. Phase Task Checklist
+
+### Phase 7b: Enhanced Reframe & Content-Aware Framing (Weeks 21–22) — COMPLETE
+- [x] `[db]` Alembic migration `0010_phase7b_layouts` adding `clip_reframes.layout` JSONB column.
+- [x] `[shared]` Schemas: `LayoutRegion`, `ReframeLayout` (`content_fit`, `content_zoom`, `split_stack`, `stack`, `pip`, `crop`), flags (`unreadable_text`, `multi_speaker_conflict`, `low_roi_confidence`, `ping_pong_prevented`), and TypeScript types in `@clip-it-up/shared`.
+- [x] `[analysis]` Upgraded `EnhancedSceneClassifier` covering 7 target classes (`talking_head`, `two_shot`, `group`, `screen_content`, `whiteboard`, `hybrid_pip`, `b_roll_other`), OCR-lite text-region detector (<5ms), corner thumbnail face detector, sub-shot segmentation, and hysteresis.
+- [x] `[analysis]` Multi-person tracking: velocity-damped prediction, gap bridging, conservative track merging ($\le 1500\text{ms}$).
+- [x] `[analysis]` AudioVisual active speaker association generalized to $N$ diarization speakers and $M$ face tracks with square-padded Hungarian algorithm and mouth variance correlation.
+- [x] `[reframe]` Planner upgrades in `plan_clip_reframe`: look-room, anti-ping-pong minimum hold ($1500\text{ms}$), text block bounding snapping (`snap_roi_to_text_bounds`), and mobile readability guard ($< 14\text{px}$ effective font height triggers `unreadable_text` and safe fallback to `content_fit`).
+- [x] `[media]` Layout compiler in `clip_shared.media.reframe_filter` compiling `split_stack` (dual $1080 \times 960$ vstack), `stack` (60/40), `pip` (overlay + blurred background), `content_fit`, and `content_zoom` directly into the single EDL filtergraph in `render.py`.
+- [x] `[api]` Reframe API endpoints in `apps/api/src/api/routes/reframe.py`: layout validation, persistence, and preservation of manual edits.
+- [x] `[web]` Editor Framing tab `FramingTab.tsx`: 9 mode selection chips, speaker focus selector, ROI boundary sliders, safe-zone overlays, and one-click warning fix chips.
+- [x] `[web]` Real-time canvas/CSS proxy preview in `EditorPreview.tsx` with layout rendering parity for `split_stack`, `stack`, `pip`, and `content_fit`.
+- [x] `[eval]` Extended eval suite in `scripts/reframe_eval.py` evaluating 11 benchmark scenarios, generating visual contact sheets, confusion matrix, diff against v1 baseline, and quality gate enforcement.
 
 ### Phase 7a: Brand Kit & Auto-Variants (Weeks 19–20) — COMPLETE
 - [x] `[db]` Alembic migration `0009_phase7a_brand_and_variants` (`brand_kits`, `brand_assets`, `variant_sets`, `clip_variants`, `exports.variant_id` with bidirectional relation fix and circular cascade protection).

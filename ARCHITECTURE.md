@@ -127,5 +127,24 @@ The Celery worker executes 6 sequential stages. Re-running any stage is strictly
    - Deduplication and plan limits (Creator: 4, Pro: 8) enforced before generation.
    - Deterministic SHA256 prompt hashing guarantees cached reruns cost ₹0.00.
 
+---
+
+## 8. Phase 7b Enhanced Reframe & Content-Aware Framing Architecture
+
+1. **Multi-Person Panel & Group Framing**:
+   - **Velocity-Damped Face Tracking**: Predicts `(vx, vy)` to maintain ID stability across temporary occlusions and motion pans; merges fragmented tracks separated by $\le 1500\text{ms}$.
+   - **Generalized Hungarian Diarization Assignment**: Solves square-padded linear sum assignment matching arbitrary $N$ diarization speakers to $M$ face tracks using speech-turn overlap and mouth motion variance correlation.
+   - **Anti-Ping-Pong Model**: Enforces $1500\text{ms}$ minimum speaker hold and distance-based cut vs pan threshold ($0.35$ normalized units). Merges rapid speaker alternations into `split_stack` or `balanced` framing.
+
+2. **Screen-Content & Document Framing**:
+   - **OCR-Lite Line Clustering**: Morphological horizontal line detector identifying code editors, slide headers, and window boundaries in $< 5\text{ms}$ on proxy frames.
+   - **ROI Boundary Snapping**: Snaps region of interest to text block clusters with $4\%$ safety padding so text lines are never cut through.
+   - **Mobile Text Readability Guard**: Automatically evaluates effective rendered font height ($< 14\text{px}$ triggers fallback to `content_fit` and sets `unreadable_text: true`).
+   - **Corner Thumbnail PIP**: Detects presenter video in quadrants and routes to composite `pip` layout.
+
+3. **Unified Single-Pass Filtergraph Layout Compiler**:
+   - Compiles `split_stack` (dual $1080 \times 960$ vstack), `stack` (60/40), `pip` (overlay with blurred background), `content_fit`, and `content_zoom` into FFmpeg subgraphs integrated directly into the EDL render pipeline. No secondary render path.
+   - Lazy migration maintains full backward compatibility for Phase 3 v1 reframes.
+
 
 
